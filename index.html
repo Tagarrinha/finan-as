@@ -1,13 +1,42 @@
 <!doctype html>
-<html lang="en">
+<html lang="pt">
   <head>
     <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Vite + React + TS</title>
+
+    <!-- PWA -->
+    <link rel="manifest" href="/manifest.json" />
+    <meta name="theme-color" content="#f97316" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="apple-mobile-web-app-title" content="Fintrack" />
+
+    <!-- Icons (Apple) -->
+    <link rel="apple-touch-icon" href="/icon-192.png" />
+
+    <!-- SEO / Social -->
+    <meta name="description" content="O teu gestor de finanças pessoais — despesas, poupanças, objetivos e muito mais." />
+    <meta property="og:title" content="My Own Fintrack" />
+    <meta property="og:description" content="Controla as tuas finanças em qualquer dispositivo." />
+    <meta property="og:type" content="website" />
+
+    <title>My Own Fintrack</title>
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>💰</text></svg>" />
   </head>
   <body>
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
+
+    <!-- Register Service Worker -->
+    <script>
+      if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+          navigator.serviceWorker.register('/sw.js')
+            .then(reg => console.log('SW registered:', reg.scope))
+            .catch(err => console.log('SW error:', err));
+        });
+      }
+    </script>
   </body>
 </html>
