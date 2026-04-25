@@ -1,6 +1,7 @@
 import { useState, useMemo, useEffect, ReactNode, CSSProperties } from "react";
 import { createClient, User as SBUser } from "@supabase/supabase-js";
 import RecurringExpenses, { RecurringExpense } from "./RecurringExpenses";
+import SavingsGoals, { SavingsGoal } from "./SavingsGoals";
 
 const SUPA_URL = "https://aiifzqmwnnfnrwmacyxq.supabase.co";
 const SUPA_KEY = "sb_publishable_GaZqBKcZGXJagV9mLnM1Zw_3Dq3wm6g";
@@ -318,6 +319,7 @@ function MainApp({user,userName,onLogout}:{user:SBUser;userName:string;onLogout:
   const [accounts,setAccounts]=useState<BankAccount[]>([]);
   const [transfers,setTransfers]=useState<Transfer[]>([]);
   const [recurring,setRecurring]=useState<RecurringExpense[]>([]);
+  const [goals,setGoals]=useState<SavingsGoal[]>([]);
   const [monthlyRev,setMonthlyRev]=useState<Record<string,Record<string,number[]>>>({});
   const [budgetTargets,setBudgetTargets]=useState<BudgetTargets>(DEFAULT_BUDGET);
   const [enabledPExp,setEnabledPExp]=useState<string[]>(BASE_PERSONAL_EXP.map(c=>c.id));
@@ -355,12 +357,13 @@ function MainApp({user,userName,onLogout}:{user:SBUser;userName:string;onLogout:
   async function loadAll(){
     setDataLoading(true);
     const uid=user.id;
-    const [expR,incR,accR,trR,recR,mrR,setR]=await Promise.all([
+    const [expR,incR,accR,trR,recR,goalsR,mrR,setR]=await Promise.all([
       supabase.from("expenses").select("*").eq("user_id",uid).order("data",{ascending:false}),
       supabase.from("incomes").select("*").eq("user_id",uid).order("data",{ascending:false}),
       supabase.from("accounts").select("*").eq("user_id",uid).order("created_at"),
       supabase.from("transfers").select("*").eq("user_id",uid).order("data",{ascending:false}),
       supabase.from("recurring_expenses").select("*").eq("user_id",uid).order("proxima_data"),
+      supabase.from("savings_goals").select("*").eq("user_id",uid).order("prazo"),
       supabase.from("monthly_revenue").select("*").eq("user_id",uid),
       supabase.from("user_settings").select("*").eq("user_id",uid).single(),
     ]);
@@ -369,6 +372,7 @@ function MainApp({user,userName,onLogout}:{user:SBUser;userName:string;onLogout:
     if(accR.data)setAccounts(accR.data as BankAccount[]);
     if(trR.data)setTransfers(trR.data as Transfer[]);
     if(recR.data)setRecurring(recR.data as RecurringExpense[]);
+    if(goalsR.data)setGoals(goalsR.data as SavingsGoal[]);
     if(mrR.data){const rev:Record<string,Record<string,number[]>>={};(mrR.data as any[]).forEach(r=>{if(!rev[r.world])rev[r.world]={};if(!rev[r.world][r.year])rev[r.world][r.year]=new Array(12).fill(0);rev[r.world][r.year][r.month]=Number(r.valor);});setMonthlyRev(rev);}
     if(setR.data){const s=setR.data as any;setBudgetTargets({necessidade:s.budget_necessidade,desejo:s.budget_desejo,investimento:s.budget_investimento});if(s.enabled_p_exp)setEnabledPExp(s.enabled_p_exp);if(s.enabled_p_inc)setEnabledPInc(s.enabled_p_inc);if(s.enabled_c_exp)setEnabledCExp(s.enabled_c_exp);if(s.enabled_c_inc)setEnabledCInc(s.enabled_c_inc);if(s.custom_exp_cats)setCustomExpCats(s.custom_exp_cats);if(s.custom_inc_cats)setCustomIncCats(s.custom_inc_cats);if(s.theme)setThemeKey(s.theme as ThemeKey);if(s.world1_name)setWorld1Name(s.world1_name);if(s.world1_icon)setWorld1Icon(s.world1_icon);if(s.world2_name)setWorld2Name(s.world2_name);if(s.world2_icon)setWorld2Icon(s.world2_icon);if(!s.tour_done)setShowTour(true);}
     setDataLoading(false);
@@ -588,7 +592,7 @@ function MainApp({user,userName,onLogout}:{user:SBUser;userName:string;onLogout:
           <button style={wBtn(world==="clinica")} onClick={()=>{setWorld("clinica");setTab("resumo");}}>{world2Icon} {world2Name}</button>
         </div>
         <div style={{display:"flex",gap:1,overflowX:"auto"}}>
-          {[["resumo","📊"],["despesas","📥"],["recorrentes","🔄"],["rendimentos","📈"],["progressao","📉"]].map(([id,icon])=>(
+          {[["resumo","📊"],["despesas","📥"],["recorrentes","🔄"],["objetivos","🎯"],["rendimentos","📈"],["progressao","📉"]].map(([id,icon])=>(
             <button key={id} style={tBtn(tab===id)} onClick={()=>setTab(id)}>
               {icon} {id.charAt(0).toUpperCase()+id.slice(1)}
               {id==="recorrentes"&&dueRecurring>0&&<span style={{position:"absolute",top:4,right:4,width:8,height:8,borderRadius:"50%",background:"#f59e0b"}}/>}
@@ -686,6 +690,16 @@ function MainApp({user,userName,onLogout}:{user:SBUser;userName:string;onLogout:
             accent={T.accent} accentDark={T.accentDark} cardBg={T.cardBg}
             cardBorder={T.cardBorder} subtext={T.subtext} positive={T.positive} negative={T.negative}
             recurring={recurring} setRecurring={setRecurring} onApplyDue={applyRecurring}
+          />
+        )}
+
+        {/* OBJETIVOS */}
+        {tab==="objetivos"&&(
+          <SavingsGoals
+            userId={user.id} accent={T.accent} accentDark={T.accentDark}
+            cardBg={T.cardBg} cardBorder={T.cardBorder} subtext={T.subtext}
+            positive={T.positive} negative={T.negative}
+            goals={goals} setGoals={setGoals}
           />
         )}
 
