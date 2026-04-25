@@ -15,7 +15,7 @@ interface ExpCat    { id:string; label:string; icon:string; type:TypeKey; sub?:s
 interface IncCat    { id:string; label:string; icon:string; custom?:boolean; }
 interface Expense   { id:number; descricao:string; valor:number; cat:string; subcat:string; data:string; tipo:TypeKey; world:string; }
 interface Income    { id:number; descricao:string; valor:number; cat:string; data:string; world:string; }
-interface BankAccount { id:number; nome:string; tipo:"corrente"|"poupanca"|"outro"; saldo:number; icon:string; cor:string; }
+interface BankAccount { id:number; nome:string; tipo:"corrente"|"poupanca"|"investimento"|"outro"; saldo:number; icon:string; cor:string; }
 interface Transfer  { id:number; from_account_id:number; to_account_id:number; valor:number; descricao:string; data:string; }
 interface BudgetTargets { necessidade:number; desejo:number; investimento:number; }
 interface AppTheme  { name:string; emoji:string; root:string; header:string; accent:string; accentDark:string; accent2:string; positive:string; negative:string; subtext:string; worldBtn:string; cardBg:string; cardBorder:string; glow1:string; glow2:string; }
@@ -75,9 +75,10 @@ const TYPE_META: Record<TypeKey,{label:string;color:string;bg:string;icon:string
   investimento:{label:"Investimento",color:"#10b981",bg:"#064e3b33",icon:"📈"},
 };
 const TIPO_ACC: Record<BankAccount["tipo"],{label:string;icon:string;cor:string}> = {
-  corrente:{label:"Conta Corrente",icon:"💳",cor:"#3b82f6"},
-  poupanca:{label:"Conta Poupança",icon:"🏦",cor:"#10b981"},
-  outro:   {label:"Outra Conta",   icon:"📂",cor:"#f59e0b"},
+  corrente:    {label:"Conta Corrente",    icon:"💳",cor:"#3b82f6"},
+  poupanca:    {label:"Conta Poupança",    icon:"🏦",cor:"#10b981"},
+  investimento:{label:"Conta Investimento",icon:"📈",cor:"#a78bfa"},
+  outro:       {label:"Outra Conta",       icon:"📂",cor:"#f59e0b"},
 };
 const TOUR_STEPS = [
   { title:"Olá! 👋",                    desc:"Bem-vindo! Faz este tour rápido para perceberes como tudo funciona.", anchor:"middle" },
@@ -521,7 +522,7 @@ function MainApp({user,userName,onLogout}:{user:SBUser;userName:string;onLogout:
             <div style={{background:T.cardBg,border:`1px dashed ${T.cardBorder}`,borderRadius:12,padding:"14px",marginTop:8}}>
               <div style={{fontSize:11,fontWeight:700,color:T.subtext,textTransform:"uppercase" as const,marginBottom:10}}>+ Nova conta</div>
               <input style={{...sInp,marginBottom:8}} placeholder="Nome da conta" value={newAccName} onChange={e=>setNewAccName(e.target.value)}/>
-              <select style={{...sSel,marginBottom:8}} value={newAccTipo} onChange={e=>setNewAccTipo(e.target.value as BankAccount["tipo"])}><option value="corrente">💳 Conta Corrente</option><option value="poupanca">🏦 Conta Poupança</option><option value="outro">📂 Outra</option></select>
+              <select style={{...sSel,marginBottom:8}} value={newAccTipo} onChange={e=>setNewAccTipo(e.target.value as BankAccount["tipo"])}><option value="corrente">💳 Conta Corrente</option><option value="poupanca">🏦 Conta Poupança</option><option value="investimento">📈 Conta Investimento</option><option value="outro">📂 Outra</option></select>
               <input style={{...sInp,marginBottom:10}} type="number" placeholder="Saldo inicial (€)" value={newAccSaldo} onChange={e=>setNewAccSaldo(e.target.value)} onKeyDown={e=>e.key==="Enter"&&addAccount()}/>
               <button onClick={addAccount} style={{width:"100%",padding:"9px 0",background:`linear-gradient(135deg,${T.accent},${T.accentDark})`,border:"none",borderRadius:8,color:"#fff",fontWeight:700,fontSize:13,cursor:"pointer",fontFamily:"'Sora',sans-serif"}}>+ Adicionar conta</button>
             </div>
@@ -629,6 +630,44 @@ function MainApp({user,userName,onLogout}:{user:SBUser;userName:string;onLogout:
             </div>
           )}
           {accounts.length>0&&(<div style={{display:"flex",gap:8,overflowX:"auto",marginBottom:14,paddingBottom:4}}>{accounts.map(a=>(<div key={a.id} style={{background:T.cardBg,border:`1px solid ${T.accent}25`,borderRadius:12,padding:"10px 14px",flexShrink:0,minWidth:130}}><div style={{fontSize:12,fontWeight:600,color:T.subtext,marginBottom:2}}>{a.icon} {a.nome}</div><div style={{fontSize:16,fontWeight:800,color:Number(a.saldo)>=0?T.positive:T.negative}}>{fmt(Number(a.saldo))}</div></div>))}</div>)}
+
+          {/* NET WORTH */}
+          {accounts.length>0&&(()=>{
+            const totalCorrente   = accounts.filter(a=>a.tipo==="corrente").reduce((s,a)=>s+Number(a.saldo),0);
+            const totalPoupanca   = accounts.filter(a=>a.tipo==="poupanca").reduce((s,a)=>s+Number(a.saldo),0);
+            const totalInvest     = accounts.filter(a=>a.tipo==="investimento").reduce((s,a)=>s+Number(a.saldo),0);
+            const totalOutro      = accounts.filter(a=>a.tipo==="outro").reduce((s,a)=>s+Number(a.saldo),0);
+            const netWorth        = totalSaldo;
+            const rows = [
+              {label:"Conta Corrente",    icon:"💳", val:totalCorrente,  color:"#3b82f6", show:totalCorrente!==0},
+              {label:"Conta Poupança",    icon:"🏦", val:totalPoupanca,  color:"#10b981", show:totalPoupanca!==0},
+              {label:"Investimentos",     icon:"📈", val:totalInvest,    color:"#a78bfa", show:totalInvest!==0},
+              {label:"Outros",            icon:"📂", val:totalOutro,     color:"#f59e0b", show:totalOutro!==0},
+            ].filter(r=>r.show);
+            return(
+              <div style={{...S.card,marginBottom:14}}>
+                <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:14}}>
+                  <SectionTitle>💎 Net Worth</SectionTitle>
+                  <span style={{fontSize:18,fontWeight:800,color:netWorth>=0?T.positive:T.negative,letterSpacing:"-0.5px"}}>{fmt(netWorth)}</span>
+                </div>
+                {rows.map(r=>(
+                  <div key={r.label} style={{marginBottom:10}}>
+                    <div style={{display:"flex",justifyContent:"space-between",marginBottom:4}}>
+                      <span style={{fontSize:13}}>{r.icon} {r.label}</span>
+                      <span style={{fontSize:13,fontWeight:700,color:r.color}}>{fmt(r.val)}</span>
+                    </div>
+                    <div style={{height:5,borderRadius:99,background:"rgba(255,255,255,0.07)",overflow:"hidden"}}>
+                      <div style={{width:`${Math.min(100,Math.abs(r.val)/Math.max(Math.abs(netWorth),1)*100)}%`,height:"100%",background:r.color,borderRadius:99,transition:"width .5s"}}/>
+                    </div>
+                  </div>
+                ))}
+                <div style={{marginTop:10,paddingTop:10,borderTop:`1px solid ${T.cardBorder}`,display:"flex",justifyContent:"space-between",alignItems:"center"}}>
+                  <span style={{fontSize:12,color:T.subtext,fontWeight:600}}>Total</span>
+                  <span style={{fontSize:16,fontWeight:800,color:netWorth>=0?T.positive:T.negative}}>{fmt(netWorth)}</span>
+                </div>
+              </div>
+            );
+          })()}
           <div style={S.card}>
             <SectionTitle>Distribuição por tipo — metas</SectionTitle>
             {(Object.entries(TYPE_META) as [TypeKey,typeof TYPE_META[TypeKey]][]).map(([type,meta])=>{
