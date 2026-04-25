@@ -3,6 +3,7 @@ import { createClient, User as SBUser } from "@supabase/supabase-js";
 import RecurringExpenses, { RecurringExpense } from "./RecurringExpenses";
 import SavingsGoals, { SavingsGoal } from "./SavingsGoals";
 import MonthComparison from "./MonthComparison";
+import CoupleMode from "./CoupleMode";
 
 const SUPA_URL = "https://aiifzqmwnnfnrwmacyxq.supabase.co";
 const SUPA_KEY = "sb_publishable_GaZqBKcZGXJagV9mLnM1Zw_3Dq3wm6g";
@@ -593,7 +594,7 @@ function MainApp({user,userName,onLogout}:{user:SBUser;userName:string;onLogout:
           <button style={wBtn(world==="clinica")} onClick={()=>{setWorld("clinica");setTab("resumo");}}>{world2Icon} {world2Name}</button>
         </div>
         <div style={{display:"flex",gap:1,overflowX:"auto"}}>
-          {[["resumo","📊"],["despesas","📥"],["recorrentes","🔄"],["objetivos","🎯"],["comparacao","📈"],["rendimentos","💶"],["progressao","📉"]].map(([id,icon])=>(
+          {[["resumo","📊"],["despesas","📥"],["recorrentes","🔄"],["objetivos","🎯"],["comparacao","📈"],["casal","👫"],["rendimentos","💶"],["progressao","📉"]].map(([id,icon])=>(
             <button key={id} style={tBtn(tab===id)} onClick={()=>setTab(id)}>
               {icon} {id.charAt(0).toUpperCase()+id.slice(1)}
               {id==="recorrentes"&&dueRecurring>0&&<span style={{position:"absolute",top:4,right:4,width:8,height:8,borderRadius:"50%",background:"#f59e0b"}}/>}
@@ -701,6 +702,16 @@ function MainApp({user,userName,onLogout}:{user:SBUser;userName:string;onLogout:
             cardBg={T.cardBg} cardBorder={T.cardBorder} subtext={T.subtext}
             positive={T.positive} negative={T.negative}
             goals={goals} setGoals={setGoals}
+          />
+        )}
+
+        {/* MODO CASAL */}
+        {tab==="casal"&&(
+          <CoupleMode
+            userId={user.id} userEmail={user.email||""} userName={userName}
+            expCats={expCats} accent={T.accent} accentDark={T.accentDark}
+            cardBg={T.cardBg} cardBorder={T.cardBorder} subtext={T.subtext}
+            positive={T.positive} negative={T.negative}
           />
         )}
 
