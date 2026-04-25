@@ -81,13 +81,14 @@ const TIPO_ACC: Record<BankAccount["tipo"],{label:string;icon:string;cor:string}
   outro:       {label:"Outra Conta",       icon:"📂",cor:"#f59e0b"},
 };
 const TOUR_STEPS = [
-  { title:"Olá! 👋",                    desc:"Bem-vindo! Faz este tour rápido para perceberes como tudo funciona.", anchor:"middle" },
-  { title:"Os teus mundos 🌍",           desc:"Alterna entre finanças pessoais e negócio. Cada um tem dados completamente separados.", anchor:"top" },
-  { title:"Resumo 📊",                   desc:"Vês o teu balanço em tempo real — rendimento, despesas, resultado e contas bancárias.", anchor:"middle" },
-  { title:"Metas orçamentais 🎯",         desc:"Controla se estás dentro dos limites: 75% necessidades, 10% desejos, 15% investimentos.", anchor:"middle" },
-  { title:"Despesas recorrentes 🔄",      desc:"Regista despesas fixas como renda ou ginásio uma vez — a app avisa quando é altura de as registar.", anchor:"middle" },
-  { title:"Menu ⚙️",                     desc:"Personaliza contas bancárias, categorias, tema e nome dos mundos.", anchor:"top" },
-  { title:"Tudo pronto! 🎉",             desc:"Os dados ficam na cloud — acedes de qualquer dispositivo. Vai ao ⚙️ para personalizar tudo.", anchor:"middle" },
+  { title:"Olá! 👋",                    desc:"Bem-vindo! Faz este tour rápido para perceberes como tudo funciona.", anchor:"middle", pwa:false },
+  { title:"Os teus mundos 🌍",           desc:"Alterna entre finanças pessoais e negócio. Cada um tem dados completamente separados.", anchor:"top", pwa:false },
+  { title:"Resumo 📊",                   desc:"Vês o teu balanço em tempo real — rendimento, despesas, resultado e contas bancárias.", anchor:"middle", pwa:false },
+  { title:"Metas orçamentais 🎯",         desc:"Controla se estás dentro dos limites: 75% necessidades, 10% desejos, 15% investimentos.", anchor:"middle", pwa:false },
+  { title:"Despesas recorrentes 🔄",      desc:"Regista despesas fixas como renda ou ginásio uma vez — a app avisa quando é altura de as registar.", anchor:"middle", pwa:false },
+  { title:"Menu ⚙️",                     desc:"Personaliza contas bancárias, categorias, tema e nome dos mundos.", anchor:"top", pwa:false },
+  { title:"Instala a app 📱",            desc:"", anchor:"middle", pwa:true },
+  { title:"Tudo pronto! 🎉",             desc:"Os dados ficam na cloud — acedes de qualquer dispositivo. Vai ao ⚙️ para personalizar tudo.", anchor:"middle", pwa:false },
 ];
 
 const fmt = (n:number) => new Intl.NumberFormat("pt-PT",{style:"currency",currency:"EUR"}).format(n||0);
@@ -97,6 +98,7 @@ function Tour({userName,accent,onFinish}:{userName:string;accent:string;onFinish
   const [step,setStep]=useState(0);
   const cur=TOUR_STEPS[step];
   const isLast=step===TOUR_STEPS.length-1;
+  const isIOS = /iphone|ipad|ipod/i.test(navigator.userAgent);
   return (
     <>
       <div style={{position:"fixed",inset:0,background:"rgba(0,0,0,0.75)",zIndex:100,pointerEvents:"none"}}/>
@@ -109,6 +111,39 @@ function Tour({userName,accent,onFinish}:{userName:string;accent:string;onFinish
             <div style={{fontSize:36,marginBottom:10}}>👋</div>
             <div style={{fontSize:18,fontWeight:800,color:"#f1f5f9",marginBottom:6}}>Olá, {userName}!</div>
             <div style={{fontSize:13,color:"#64748b",lineHeight:1.6}}>Bem-vindo à tua app de finanças pessoais. Faz este tour para perceber como tudo funciona.</div>
+          </div>
+        ):cur.pwa?(
+          <div style={{marginBottom:16}}>
+            <div style={{fontSize:15,fontWeight:800,color:"#f1f5f9",marginBottom:8}}>Instala a app no telemóvel 📱</div>
+            <div style={{fontSize:13,color:"#94a3b8",marginBottom:14,lineHeight:1.6}}>Adiciona o FinTrack ao ecrã inicial — funciona como uma app nativa, sem precisar de app store!</div>
+            {/* iOS */}
+            <div style={{background:"rgba(255,255,255,0.05)",border:"1px solid rgba(255,255,255,0.08)",borderRadius:12,padding:"12px 14px",marginBottom:8}}>
+              <div style={{fontSize:11,fontWeight:700,color:"#94a3b8",textTransform:"uppercase" as const,letterSpacing:"0.08em",marginBottom:8}}>🍎 iPhone / iPad (Safari)</div>
+              {[
+                {icon:"📤", text:"Toca no ícone de partilha em baixo"},
+                {icon:"➕", text:"\"Adicionar ao ecrã de início\""},
+                {icon:"✅", text:"Toca em \"Adicionar\" — pronto!"},
+              ].map((s,i)=>(
+                <div key={i} style={{display:"flex",alignItems:"center",gap:10,marginBottom:6}}>
+                  <div style={{width:28,height:28,borderRadius:8,background:`${accent}20`,display:"flex",alignItems:"center",justifyContent:"center",fontSize:14,flexShrink:0}}>{s.icon}</div>
+                  <span style={{fontSize:12,color:"#cbd5e1"}}>{s.text}</span>
+                </div>
+              ))}
+            </div>
+            {/* Android */}
+            <div style={{background:"rgba(255,255,255,0.05)",border:"1px solid rgba(255,255,255,0.08)",borderRadius:12,padding:"12px 14px"}}>
+              <div style={{fontSize:11,fontWeight:700,color:"#94a3b8",textTransform:"uppercase" as const,letterSpacing:"0.08em",marginBottom:8}}>🤖 Android (Chrome)</div>
+              {[
+                {icon:"⋮", text:"Toca nos 3 pontos no canto superior"},
+                {icon:"➕", text:"\"Adicionar ao ecrã principal\""},
+                {icon:"✅", text:"Confirma — o ícone aparece!"},
+              ].map((s,i)=>(
+                <div key={i} style={{display:"flex",alignItems:"center",gap:10,marginBottom:6}}>
+                  <div style={{width:28,height:28,borderRadius:8,background:`${accent}20`,display:"flex",alignItems:"center",justifyContent:"center",fontSize:14,flexShrink:0}}>{s.icon}</div>
+                  <span style={{fontSize:12,color:"#cbd5e1"}}>{s.text}</span>
+                </div>
+              ))}
+            </div>
           </div>
         ):(
           <>
