@@ -1,4 +1,5 @@
 import { useState, useEffect, CSSProperties } from "react";
+import CoupleRecurring, { CoupleRecurringExpense } from "./CoupleRecurring";
 import { createClient } from "@supabase/supabase-js";
 
 const SUPA_URL = "https://aiifzqmwnnfnrwmacyxq.supabase.co";
@@ -33,7 +34,8 @@ export default function CoupleMode({ userId, userEmail, userName, expCats, accen
   const [expenses,    setExpenses]    = useState<CoupleExpense[]>([]);
   const [settlements, setSettlements] = useState<Settlement[]>([]);
   const [loading,     setLoading]     = useState(true);
-  const [tab,         setTab]         = useState<"conta"|"despesas"|"acerto">("conta");
+  const [tab,         setTab]         = useState<"conta"|"despesas"|"recorrentes"|"acerto">("conta");
+  const [coupleRecurring,setCoupleRecurring]=useState<CoupleRecurringExpense[]>([]);
   const [inviteEmail, setInviteEmail] = useState("");
   const [inviting,    setInviting]    = useState(false);
   const [inviteErr,   setInviteErr]   = useState("");

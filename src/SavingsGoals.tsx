@@ -6,43 +6,29 @@ const SUPA_KEY = "sb_publishable_GaZqBKcZGXJagV9mLnM1Zw_3Dq3wm6g";
 const supabase = createClient(SUPA_URL, SUPA_KEY);
 
 export interface SavingsGoal {
-  id: number;
-  descricao: string;
-  emoji: string;
-  meta: number;
-  atual: number;
-  prazo: string;
-  cor: string;
-  ativa: boolean;
+  id: number; descricao: string; emoji: string; meta: number;
+  atual: number; prazo: string; cor: string; ativa: boolean;
 }
 
 interface Props {
-  userId: string;
-  accent: string;
-  accentDark: string;
-  cardBg: string;
-  cardBorder: string;
-  subtext: string;
-  positive: string;
-  negative: string;
-  goals: SavingsGoal[];
-  setGoals: (v: SavingsGoal[]) => void;
+  userId: string; accent: string; accentDark: string;
+  cardBg: string; cardBorder: string; subtext: string;
+  positive: string; negative: string;
+  goals: SavingsGoal[]; setGoals: (v: SavingsGoal[]) => void;
 }
 
 const fmt = (n: number) => new Intl.NumberFormat("pt-PT", { style: "currency", currency: "EUR" }).format(n || 0);
 const CORES = ["#f97316","#3b82f6","#8b5cf6","#10b981","#f59e0b","#ec4899","#06b6d4","#ef4444"];
+const EMPTY_FORM = { descricao:"", emoji:"🎯", meta:"", prazo:"", cor:"#f97316" };
 
-export default function SavingsGoals({
-  userId, accent, accentDark, cardBg, cardBorder, subtext, positive, negative, goals, setGoals,
-}: Props) {
+export default function SavingsGoals({ userId, accent, accentDark, cardBg, cardBorder, subtext, positive, negative, goals, setGoals }: Props) {
   const today = new Date().toISOString().slice(0,10);
-  const [showForm,    setShowForm]    = useState(false);
-  const [showDeposit, setShowDeposit] = useState<number|null>(null);
-  const [depositVal,  setDepositVal]  = useState("");
-  const [saving,      setSaving]      = useState(false);
-  const [form, setForm] = useState({
-    descricao:"", emoji:"🎯", meta:"", prazo:"", cor:"#f97316",
-  });
+  const [showForm,     setShowForm]     = useState(false);
+  const [editingId,    setEditingId]    = useState<number|null>(null);
+  const [showDeposit,  setShowDeposit]  = useState<number|null>(null);
+  const [depositVal,   setDepositVal]   = useState("");
+  const [saving,       setSaving]       = useState(false);
+  const [form, setForm] = useState(EMPTY_FORM);
 
   const totalMeta  = goals.filter(g=>g.ativa).reduce((s,g)=>s+g.meta,0);
   const totalAtual = goals.filter(g=>g.ativa).reduce((s,g)=>s+g.atual,0);
@@ -50,12 +36,36 @@ export default function SavingsGoals({
 
   const inp: CSSProperties = { width:"100%", background:"rgba(255,255,255,0.06)", border:"1px solid rgba(255,255,255,0.1)", borderRadius:8, padding:"10px 12px", color:"#e2e8f0", fontSize:13, boxSizing:"border-box", outline:"none", fontFamily:"'Sora',sans-serif" };
 
-  async function addGoal() {
+  function openEdit(g: SavingsGoal) {
+    setEditingId(g.id);
+    setForm({ descricao:g.descricao, emoji:g.emoji, meta:String(g.meta), prazo:g.prazo, cor:g.cor });
+    setShowForm(true);
+    window.scrollTo({ top:0, behavior:"smooth" });
+  }
+
+  function resetForm() {
+    setForm(EMPTY_FORM);
+    setEditingId(null);
+    setShowForm(false);
+  }
+
+  async function saveGoal() {
     if(!form.descricao.trim()||!form.meta||!form.prazo) return;
     setSaving(true);
-    const row = { user_id:userId, descricao:form.descricao.trim(), emoji:form.emoji, meta:Number(form.meta), atual:0, prazo:form.prazo, cor:form.cor, ativa:true };
-    const {data,error} = await supabase.from("savings_goals").insert(row).select().single();
-    if(!error&&data) { setGoals([...goals, data as SavingsGoal]); setForm({descricao:"",emoji:"🎯",meta:"",prazo:"",cor:"#f97316"}); setShowForm(false); }
+    if(editingId) {
+      // UPDATE
+      await supabase.from("savings_goals").update({
+        descricao:form.descricao.trim(), emoji:form.emoji,
+        meta:Number(form.meta), prazo:form.prazo, cor:form.cor,
+      }).eq("id",editingId);
+      setGoals(goals.map(g=>g.id===editingId?{...g,descricao:form.descricao.trim(),emoji:form.emoji,meta:Number(form.meta),prazo:form.prazo,cor:form.cor}:g));
+    } else {
+      // INSERT
+      const row = { user_id:userId, descricao:form.descricao.trim(), emoji:form.emoji, meta:Number(form.meta), atual:0, prazo:form.prazo, cor:form.cor, ativa:true };
+      const {data,error} = await supabase.from("savings_goals").insert(row).select().single();
+      if(!error&&data) setGoals([...goals, data as SavingsGoal]);
+    }
+    resetForm();
     setSaving(false);
   }
 
@@ -101,15 +111,17 @@ export default function SavingsGoals({
         </div>
       )}
 
-      {/* Add button */}
-      <button onClick={()=>setShowForm(!showForm)} style={{width:"100%",marginBottom:14,padding:"11px 0",background:showForm?`${accent}18`:`linear-gradient(135deg,${accent},${accentDark})`,border:showForm?`1px solid ${accent}40`:"none",borderRadius:10,color:showForm?accent:"#fff",fontWeight:700,fontSize:13,cursor:"pointer",fontFamily:"'Sora',sans-serif",transition:"all .2s"}}>
-        {showForm?"✕ Cancelar":"+ Novo objetivo de poupança"}
+      {/* Add/Edit button */}
+      <button onClick={()=>{if(showForm&&!editingId){resetForm();}else{setEditingId(null);setForm(EMPTY_FORM);setShowForm(true);}}} style={{width:"100%",marginBottom:14,padding:"11px 0",background:showForm?`${accent}18`:`linear-gradient(135deg,${accent},${accentDark})`,border:showForm?`1px solid ${accent}40`:"none",borderRadius:10,color:showForm?accent:"#fff",fontWeight:700,fontSize:13,cursor:"pointer",fontFamily:"'Sora',sans-serif",transition:"all .2s"}}>
+        {showForm?(editingId?"✕ Cancelar edição":"✕ Cancelar"):"+ Novo objetivo de poupança"}
       </button>
 
       {/* Form */}
       {showForm&&(
-        <div style={{background:cardBg,border:`1px solid ${accent}30`,borderRadius:14,padding:"16px 18px",marginBottom:14}}>
-          <div style={{fontSize:11,fontWeight:700,color:accent,textTransform:"uppercase" as const,letterSpacing:"0.08em",marginBottom:14}}>Novo objetivo</div>
+        <div style={{background:cardBg,border:`1px solid ${editingId?"#f59e0b":accent}40`,borderRadius:14,padding:"16px 18px",marginBottom:14}}>
+          <div style={{fontSize:11,fontWeight:700,color:editingId?"#f59e0b":accent,textTransform:"uppercase" as const,letterSpacing:"0.08em",marginBottom:14}}>
+            {editingId?"✏️ Editar objetivo":"Novo objetivo"}
+          </div>
           <div style={{display:"flex",gap:8,marginBottom:10}}>
             <input style={{...inp,flex:"0 0 56px",textAlign:"center",fontSize:22}} placeholder="🎯" value={form.emoji} onChange={e=>setForm(f=>({...f,emoji:e.target.value}))} maxLength={2}/>
             <input style={{...inp,flex:1}} placeholder="Nome do objetivo (ex: Férias, Carro...)" value={form.descricao} onChange={e=>setForm(f=>({...f,descricao:e.target.value}))}/>
@@ -124,16 +136,16 @@ export default function SavingsGoals({
               <input style={inp} type="date" value={form.prazo} onChange={e=>setForm(f=>({...f,prazo:e.target.value}))}/>
             </div>
           </div>
-          {/* Color picker */}
           <div style={{marginBottom:14}}>
             <div style={{fontSize:10,fontWeight:700,color:subtext,textTransform:"uppercase" as const,letterSpacing:"0.07em",marginBottom:8}}>Cor</div>
             <div style={{display:"flex",gap:8,flexWrap:"wrap" as const}}>
               {CORES.map(c=><div key={c} onClick={()=>setForm(f=>({...f,cor:c}))} style={{width:28,height:28,borderRadius:"50%",background:c,cursor:"pointer",border:form.cor===c?"3px solid #fff":"3px solid transparent",boxShadow:form.cor===c?`0 0 0 2px ${c}`:"none",transition:"all .15s"}}/>)}
             </div>
           </div>
-          <button onClick={addGoal} disabled={saving} style={{width:"100%",padding:"11px 0",background:`linear-gradient(135deg,${accent},${accentDark})`,border:"none",borderRadius:9,color:"#fff",fontWeight:700,fontSize:13,cursor:saving?"not-allowed":"pointer",fontFamily:"'Sora',sans-serif",opacity:saving?0.7:1}}>
-            {saving?"A guardar...":"Criar objetivo →"}
+          <button onClick={saveGoal} disabled={saving} style={{width:"100%",padding:"11px 0",background:`linear-gradient(135deg,${editingId?"#f59e0b":accent},${editingId?"#d97706":accentDark})`,border:"none",borderRadius:9,color:"#fff",fontWeight:700,fontSize:13,cursor:saving?"not-allowed":"pointer",fontFamily:"'Sora',sans-serif",opacity:saving?0.7:1}}>
+            {saving?"A guardar...":(editingId?"✓ Guardar alterações":"Criar objetivo →")}
           </button>
+          {editingId&&<button onClick={resetForm} style={{width:"100%",marginTop:8,padding:"9px 0",background:"rgba(255,255,255,0.04)",border:`1px solid ${cardBorder}`,borderRadius:9,color:subtext,fontSize:13,fontWeight:600,cursor:"pointer",fontFamily:"'Sora',sans-serif"}}>✕ Cancelar</button>}
         </div>
       )}
 
@@ -149,14 +161,14 @@ export default function SavingsGoals({
       {/* Goals list */}
       {goals.map(g=>{
         const pct    = Math.min(100,Math.round((g.atual/g.meta)*100));
-        const done   = pct >= 100;
+        const isDone = pct >= 100;
         const falta  = Math.max(0, g.meta - g.atual);
         const prazo  = new Date(g.prazo+"T12:00:00");
         const meses  = Math.max(0, Math.round((prazo.getTime()-Date.now())/(1000*60*60*24*30)));
         const porMes = meses>0 ? falta/meses : 0;
 
         return(
-          <div key={g.id} style={{background:done?`${g.cor}0d`:cardBg,border:`1px solid ${done?g.cor:g.ativa?cardBorder:"rgba(255,255,255,0.03)"}`,borderRadius:16,padding:"16px 18px",marginBottom:12,opacity:g.ativa?1:0.5,transition:"all .2s"}}>
+          <div key={g.id} style={{background:isDone?`${g.cor}0d`:cardBg,border:`1px solid ${isDone?g.cor:g.ativa?cardBorder:"rgba(255,255,255,0.03)"}`,borderRadius:16,padding:"16px 18px",marginBottom:12,opacity:g.ativa?1:0.5,transition:"all .2s"}}>
             {/* Header */}
             <div style={{display:"flex",justifyContent:"space-between",alignItems:"flex-start",marginBottom:12}}>
               <div style={{display:"flex",alignItems:"center",gap:10}}>
@@ -166,7 +178,7 @@ export default function SavingsGoals({
                   <div style={{fontSize:11,color:subtext,marginTop:2}}>Prazo: {prazo.toLocaleDateString("pt-PT",{month:"long",year:"numeric"})}</div>
                 </div>
               </div>
-              {done&&<div style={{background:`${g.cor}20`,border:`1px solid ${g.cor}50`,borderRadius:99,padding:"3px 10px",fontSize:11,fontWeight:700,color:g.cor,flexShrink:0}}>✓ Atingido!</div>}
+              {isDone&&<div style={{background:`${g.cor}20`,border:`1px solid ${g.cor}50`,borderRadius:99,padding:"3px 10px",fontSize:11,fontWeight:700,color:g.cor,flexShrink:0}}>✓ Atingido!</div>}
             </div>
 
             {/* Progress */}
@@ -175,17 +187,17 @@ export default function SavingsGoals({
                 <span style={{fontSize:14,fontWeight:800,color:g.cor}}>{fmt(g.atual)}</span>
                 <span style={{fontSize:13,color:subtext}}>{fmt(g.meta)}</span>
               </div>
-              <div style={{height:10,borderRadius:99,background:"rgba(255,255,255,0.07)",overflow:"hidden",position:"relative"}}>
-                <div style={{width:`${pct}%`,height:"100%",background:done?`linear-gradient(90deg,${g.cor},${g.cor}bb)`:g.cor,borderRadius:99,transition:"width .6s ease"}}/>
+              <div style={{height:10,borderRadius:99,background:"rgba(255,255,255,0.07)",overflow:"hidden"}}>
+                <div style={{width:`${pct}%`,height:"100%",background:isDone?`linear-gradient(90deg,${g.cor},${g.cor}bb)`:g.cor,borderRadius:99,transition:"width .6s ease"}}/>
               </div>
               <div style={{display:"flex",justifyContent:"space-between",marginTop:4}}>
                 <span style={{fontSize:11,color:subtext}}>{pct}% concluído</span>
-                {!done&&meses>0&&<span style={{fontSize:11,color:subtext}}>{meses} {meses===1?"mês":"meses"} restantes</span>}
+                {!isDone&&meses>0&&<span style={{fontSize:11,color:subtext}}>{meses} {meses===1?"mês":"meses"} restantes</span>}
               </div>
             </div>
 
-            {/* Stats row */}
-            {!done&&g.ativa&&(
+            {/* Stats */}
+            {!isDone&&g.ativa&&(
               <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:8,marginBottom:10}}>
                 <div style={{background:"rgba(255,255,255,0.04)",borderRadius:10,padding:"8px 12px"}}>
                   <div style={{fontSize:10,color:subtext,marginBottom:2}}>Falta</div>
@@ -209,13 +221,14 @@ export default function SavingsGoals({
 
             {/* Actions */}
             <div style={{display:"flex",gap:6}}>
-              {!done&&g.ativa&&(
+              {!isDone&&g.ativa&&(
                 <button onClick={()=>setShowDeposit(showDeposit===g.id?null:g.id)} style={{flex:2,padding:"7px 0",background:`${g.cor}22`,border:`1px solid ${g.cor}40`,borderRadius:8,color:g.cor,fontSize:12,fontWeight:700,cursor:"pointer",fontFamily:"'Sora',sans-serif"}}>
                   {showDeposit===g.id?"✕ Cancelar":"💰 Adicionar poupança"}
                 </button>
               )}
+              <button onClick={()=>openEdit(g)} style={{flex:1,padding:"7px 0",background:"rgba(255,255,255,0.05)",border:"1px solid rgba(255,255,255,0.09)",borderRadius:8,color:"#f59e0b",fontSize:11,fontWeight:600,cursor:"pointer",fontFamily:"'Sora',sans-serif"}}>✏️ Editar</button>
               <button onClick={()=>toggleGoal(g.id)} style={{flex:1,padding:"7px 0",background:"rgba(255,255,255,0.05)",border:"1px solid rgba(255,255,255,0.09)",borderRadius:8,color:g.ativa?"#f59e0b":subtext,fontSize:11,fontWeight:600,cursor:"pointer",fontFamily:"'Sora',sans-serif"}}>
-                {g.ativa?"⏸ Pausar":"▶ Ativar"}
+                {g.ativa?"⏸":"▶"}
               </button>
               <button onClick={()=>deleteGoal(g.id)} style={{padding:"7px 10px",background:"rgba(239,68,68,0.08)",border:"1px solid rgba(239,68,68,0.2)",borderRadius:8,color:"#f87171",fontSize:11,cursor:"pointer"}}>🗑️</button>
             </div>

@@ -27,6 +27,7 @@ const TYPE_META: Record<TypeKey,{label:string;color:string;bg:string}> = {
   investimento:{label:"Investimento",color:"#10b981",bg:"#064e3b33"},
 };
 const fmt = (n:number) => new Intl.NumberFormat("pt-PT",{style:"currency",currency:"EUR"}).format(n||0);
+const EMPTY_FORM = { descricao:"", valor:"", cat:"", subcat:"", tipo:"necessidade" as TypeKey, frequencia:"mensal" as FreqKey, dia_do_mes:"1", proxima_data:new Date().toISOString().slice(0,10) };
 
 function nextDate(freq:FreqKey, from:string):string {
   const d = new Date(from+"T12:00:00");
@@ -37,32 +38,19 @@ function nextDate(freq:FreqKey, from:string):string {
 }
 
 interface Props {
-  userId: string;
-  world: string;
-  expCats: ExpCat[];
-  accent: string;
-  accentDark: string;
-  cardBg: string;
-  cardBorder: string;
-  subtext: string;
-  positive: string;
-  negative: string;
-  recurring: RecurringExpense[];
-  setRecurring: (v: RecurringExpense[]) => void;
+  userId: string; world: string; expCats: ExpCat[];
+  accent: string; accentDark: string; cardBg: string;
+  cardBorder: string; subtext: string; positive: string; negative: string;
+  recurring: RecurringExpense[]; setRecurring: (v: RecurringExpense[]) => void;
   onApplyDue: (r: RecurringExpense) => void;
 }
 
-export default function RecurringExpenses({
-  userId, world, expCats, accent, accentDark, cardBg, cardBorder,
-  subtext, positive, negative, recurring, setRecurring, onApplyDue,
-}: Props) {
+export default function RecurringExpenses({ userId, world, expCats, accent, accentDark, cardBg, cardBorder, subtext, positive, negative, recurring, setRecurring, onApplyDue }: Props) {
   const today = new Date().toISOString().slice(0,10);
-  const [showForm, setShowForm] = useState(false);
-  const [form, setForm] = useState({
-    descricao:"", valor:"", cat:"", subcat:"", tipo:"necessidade" as TypeKey,
-    frequencia:"mensal" as FreqKey, dia_do_mes:"1", proxima_data:today,
-  });
-  const [saving, setSaving] = useState(false);
+  const [showForm,  setShowForm]  = useState(false);
+  const [editingId, setEditingId] = useState<number|null>(null);
+  const [saving,    setSaving]    = useState(false);
+  const [form, setForm] = useState(EMPTY_FORM);
 
   const myRecurring = recurring.filter(r=>r.world===world);
   const dueNow = myRecurring.filter(r=>r.ativa && r.proxima_data<=today);
@@ -71,21 +59,31 @@ export default function RecurringExpenses({
   const sel:CSSProperties={width:"100%",background:"#111827",border:"1px solid rgba(255,255,255,0.1)",borderRadius:8,padding:"10px 12px",color:"#e2e8f0",fontSize:13,boxSizing:"border-box",outline:"none"};
   const lbl:CSSProperties={fontSize:10,fontWeight:700,color:"#64748b",textTransform:"uppercase",letterSpacing:"0.08em",display:"block",marginBottom:5};
 
-  async function addRecurring() {
+  function openEdit(r: RecurringExpense) {
+    setEditingId(r.id);
+    setForm({ descricao:r.descricao, valor:String(r.valor), cat:r.cat, subcat:r.subcat, tipo:r.tipo, frequencia:r.frequencia, dia_do_mes:String(r.dia_do_mes||1), proxima_data:r.proxima_data });
+    setShowForm(true);
+    window.scrollTo({ top:0, behavior:"smooth" });
+  }
+
+  function resetForm() {
+    setForm(EMPTY_FORM);
+    setEditingId(null);
+    setShowForm(false);
+  }
+
+  async function saveRecurring() {
     if(!form.descricao.trim()||!form.valor||!form.cat) return;
     setSaving(true);
-    const row = {
-      user_id:userId, descricao:form.descricao.trim(), valor:Number(form.valor),
-      cat:form.cat, subcat:form.subcat, tipo:form.tipo, world,
-      frequencia:form.frequencia, dia_do_mes:Number(form.dia_do_mes)||null,
-      proxima_data:form.proxima_data, ativa:true,
-    };
-    const {data,error} = await supabase.from("recurring_expenses").insert(row).select().single();
-    if(!error&&data){
-      setRecurring([...recurring, data as RecurringExpense]);
-      setForm({descricao:"",valor:"",cat:"",subcat:"",tipo:"necessidade",frequencia:"mensal",dia_do_mes:"1",proxima_data:today});
-      setShowForm(false);
+    const payload = { descricao:form.descricao.trim(), valor:Number(form.valor), cat:form.cat, subcat:form.subcat, tipo:form.tipo, frequencia:form.frequencia, dia_do_mes:Number(form.dia_do_mes)||null, proxima_data:form.proxima_data };
+    if(editingId) {
+      await supabase.from("recurring_expenses").update(payload).eq("id",editingId);
+      setRecurring(recurring.map(r=>r.id===editingId?{...r,...payload}:r));
+    } else {
+      const {data,error} = await supabase.from("recurring_expenses").insert({user_id:userId,...payload,world,ativa:true}).select().single();
+      if(!error&&data) setRecurring([...recurring, data as RecurringExpense]);
     }
+    resetForm();
     setSaving(false);
   }
 
@@ -101,9 +99,7 @@ export default function RecurringExpenses({
   }
 
   async function applyAndAdvance(r:RecurringExpense) {
-    // Add as regular expense
     onApplyDue(r);
-    // Advance next date
     const next = nextDate(r.frequencia, r.proxima_data);
     await supabase.from("recurring_expenses").update({proxima_data:next}).eq("id",r.id);
     setRecurring(recurring.map(x=>x.id===r.id?{...x,proxima_data:next}:x));
@@ -116,7 +112,7 @@ export default function RecurringExpenses({
       {/* Due now banner */}
       {dueNow.length>0&&(
         <div style={{background:"rgba(245,158,11,0.08)",border:"1px solid rgba(245,158,11,0.3)",borderRadius:12,padding:"12px 14px",marginBottom:14}}>
-          <div style={{fontSize:12,fontWeight:700,color:"#f59e0b",marginBottom:8}}>🔔 {dueNow.length} despesa{dueNow.length>1?"s":""} recorrente{dueNow.length>1?"s":""} a vencer!</div>
+          <div style={{fontSize:12,fontWeight:700,color:"#f59e0b",marginBottom:8}}>🔔 {dueNow.length} despesa{dueNow.length>1?"s":""} a vencer!</div>
           {dueNow.map(r=>{
             const cat=expCats.find(c=>c.id===r.cat);
             return(
@@ -134,15 +130,17 @@ export default function RecurringExpenses({
         </div>
       )}
 
-      {/* Add button */}
-      <button onClick={()=>setShowForm(!showForm)} style={{width:"100%",marginBottom:14,padding:"11px 0",background:showForm?`${accent}18`:`linear-gradient(135deg,${accent},${accentDark})`,border:showForm?`1px solid ${accent}40`:"none",borderRadius:10,color:showForm?accent:"#fff",fontWeight:700,fontSize:13,cursor:"pointer",fontFamily:"'Sora',sans-serif",transition:"all .2s"}}>
-        {showForm?"✕ Cancelar":"+ Adicionar despesa recorrente"}
+      {/* Add/Edit button */}
+      <button onClick={()=>{if(showForm&&!editingId){resetForm();}else{setEditingId(null);setForm(EMPTY_FORM);setShowForm(true);}}} style={{width:"100%",marginBottom:14,padding:"11px 0",background:showForm?`${accent}18`:`linear-gradient(135deg,${accent},${accentDark})`,border:showForm?`1px solid ${accent}40`:"none",borderRadius:10,color:showForm?accent:"#fff",fontWeight:700,fontSize:13,cursor:"pointer",fontFamily:"'Sora',sans-serif",transition:"all .2s"}}>
+        {showForm?(editingId?"✕ Cancelar edição":"✕ Cancelar"):"+ Adicionar despesa recorrente"}
       </button>
 
       {/* Form */}
       {showForm&&(
-        <div style={{background:cardBg,border:`1px solid ${accent}30`,borderRadius:14,padding:"16px 18px",marginBottom:14}}>
-          <div style={{fontSize:11,fontWeight:700,color:accent,textTransform:"uppercase" as const,letterSpacing:"0.08em",marginBottom:14}}>Nova despesa recorrente</div>
+        <div style={{background:cardBg,border:`1px solid ${editingId?"#f59e0b":accent}40`,borderRadius:14,padding:"16px 18px",marginBottom:14}}>
+          <div style={{fontSize:11,fontWeight:700,color:editingId?"#f59e0b":accent,textTransform:"uppercase" as const,letterSpacing:"0.08em",marginBottom:14}}>
+            {editingId?"✏️ Editar despesa recorrente":"Nova despesa recorrente"}
+          </div>
           <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:10,marginBottom:10}}>
             <div><label style={lbl}>Descrição</label><input style={inp} placeholder="Ex: Ginásio" value={form.descricao} onChange={e=>setForm(f=>({...f,descricao:e.target.value}))}/></div>
             <div><label style={lbl}>Valor (€)</label><input style={inp} type="number" placeholder="0,00" value={form.valor} onChange={e=>setForm(f=>({...f,valor:e.target.value}))}/></div>
@@ -168,7 +166,7 @@ export default function RecurringExpenses({
             <div style={{marginBottom:10}}>
               <label style={lbl}>Sub-categoria</label>
               <div style={{display:"flex",flexWrap:"wrap" as const,gap:6}}>
-                {selCat.sub.map(s=>{const a=form.subcat===s;return<button key={s} onClick={()=>setForm(f=>({...f,subcat:a?"":s}))} style={{padding:"6px 12px",border:`1.5px solid ${a?accent:"rgba(255,255,255,0.13)"}`,borderRadius:99,background:a?`${accent}22`:"rgba(255,255,255,0.04)",color:a?accent:"#94a3b8",fontSize:12,fontWeight:a?700:500,cursor:"pointer",fontFamily:"'Sora',sans-serif"}}>{s}</button>;})}
+                {selCat.sub.map((s:string)=>{const a=form.subcat===s;return<button key={s} onClick={()=>setForm(f=>({...f,subcat:a?"":s}))} style={{padding:"6px 12px",border:`1.5px solid ${a?accent:"rgba(255,255,255,0.13)"}`,borderRadius:99,background:a?`${accent}22`:"rgba(255,255,255,0.04)",color:a?accent:"#94a3b8",fontSize:12,fontWeight:a?700:500,cursor:"pointer",fontFamily:"'Sora',sans-serif"}}>{s}</button>;})}
               </div>
             </div>
           )}
@@ -182,17 +180,18 @@ export default function RecurringExpenses({
               </select>
             </div>
             <div>
-              <label style={lbl}>Primeira data</label>
+              <label style={lbl}>{editingId?"Próxima data":"Primeira data"}</label>
               <input style={inp} type="date" value={form.proxima_data} onChange={e=>setForm(f=>({...f,proxima_data:e.target.value}))}/>
             </div>
           </div>
-          <button onClick={addRecurring} disabled={saving} style={{width:"100%",padding:"11px 0",background:`linear-gradient(135deg,${accent},${accentDark})`,border:"none",borderRadius:9,color:"#fff",fontWeight:700,fontSize:13,cursor:saving?"not-allowed":"pointer",fontFamily:"'Sora',sans-serif",opacity:saving?0.7:1}}>
-            {saving?"A guardar...":"+ Criar despesa recorrente"}
+          <button onClick={saveRecurring} disabled={saving} style={{width:"100%",padding:"11px 0",background:`linear-gradient(135deg,${editingId?"#f59e0b":accent},${editingId?"#d97706":accentDark})`,border:"none",borderRadius:9,color:"#fff",fontWeight:700,fontSize:13,cursor:saving?"not-allowed":"pointer",fontFamily:"'Sora',sans-serif",opacity:saving?0.7:1}}>
+            {saving?"A guardar...":(editingId?"✓ Guardar alterações":"+ Criar despesa recorrente")}
           </button>
+          {editingId&&<button onClick={resetForm} style={{width:"100%",marginTop:8,padding:"9px 0",background:"rgba(255,255,255,0.04)",border:`1px solid ${cardBorder}`,borderRadius:9,color:subtext,fontSize:13,fontWeight:600,cursor:"pointer",fontFamily:"'Sora',sans-serif"}}>✕ Cancelar</button>}
         </div>
       )}
 
-      {/* List */}
+      {/* Empty */}
       {myRecurring.length===0&&!showForm&&(
         <div style={{textAlign:"center" as const,color:subtext,fontSize:13,padding:"32px 0"}}>
           <div style={{fontSize:32,marginBottom:10}}>🔄</div>
@@ -201,6 +200,7 @@ export default function RecurringExpenses({
         </div>
       )}
 
+      {/* List */}
       {myRecurring.map(r=>{
         const cat=expCats.find(c=>c.id===r.cat);
         const freq=FREQ_META[r.frequencia];
@@ -224,7 +224,8 @@ export default function RecurringExpenses({
             </div>
             <div style={{display:"flex",gap:6}}>
               {isDue&&<button onClick={()=>applyAndAdvance(r)} style={{flex:2,padding:"7px 0",background:`${accent}22`,border:`1px solid ${accent}40`,borderRadius:8,color:accent,fontSize:12,fontWeight:700,cursor:"pointer",fontFamily:"'Sora',sans-serif"}}>✓ Registar agora</button>}
-              <button onClick={()=>toggleActive(r)} style={{flex:1,padding:"7px 0",background:"rgba(255,255,255,0.05)",border:"1px solid rgba(255,255,255,0.09)",borderRadius:8,color:r.ativa?"#f59e0b":"#94a3b8",fontSize:11,fontWeight:600,cursor:"pointer",fontFamily:"'Sora',sans-serif"}}>{r.ativa?"⏸ Pausar":"▶ Ativar"}</button>
+              <button onClick={()=>openEdit(r)} style={{flex:1,padding:"7px 0",background:"rgba(245,158,11,0.08)",border:"1px solid rgba(245,158,11,0.2)",borderRadius:8,color:"#f59e0b",fontSize:11,fontWeight:600,cursor:"pointer",fontFamily:"'Sora',sans-serif"}}>✏️ Editar</button>
+              <button onClick={()=>toggleActive(r)} style={{flex:1,padding:"7px 0",background:"rgba(255,255,255,0.05)",border:"1px solid rgba(255,255,255,0.09)",borderRadius:8,color:r.ativa?"#f59e0b":"#94a3b8",fontSize:11,fontWeight:600,cursor:"pointer",fontFamily:"'Sora',sans-serif"}}>{r.ativa?"⏸":"▶"}</button>
               <button onClick={()=>deleteRecurring(r.id)} style={{padding:"7px 10px",background:"rgba(239,68,68,0.08)",border:"1px solid rgba(239,68,68,0.2)",borderRadius:8,color:"#f87171",fontSize:11,cursor:"pointer"}}>🗑️</button>
             </div>
           </div>
