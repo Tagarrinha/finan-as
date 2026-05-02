@@ -1,4 +1,4 @@
-const CACHE_NAME = "fintrack-v1";
+const CACHE_NAME = "fintrack-v2";
 const STATIC_ASSETS = [
   "/",
   "/index.html",
