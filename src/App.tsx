@@ -5,6 +5,7 @@ import SavingsGoals, { SavingsGoal } from "./SavingsGoals";
 import MonthComparison from "./MonthComparison";
 import WorldEditor from "./WorldEditor";
 import CoupleMode from "./CoupleMode";
+import PremiumDashboard from "./PremiumDashboard";
 
 const SUPA_URL = "https://aiifzqmwnnfnrwmacyxq.supabase.co";
 const SUPA_KEY = "sb_publishable_GaZqBKcZGXJagV9mLnM1Zw_3Dq3wm6g";
@@ -22,7 +23,7 @@ interface BudgetTargets { necessidade:number; desejo:number; investimento:number
 interface AppTheme  { name:string; emoji:string; root:string; header:string; accent:string; accentDark:string; accent2:string; positive:string; negative:string; subtext:string; worldBtn:string; cardBg:string; cardBorder:string; glow1:string; glow2:string; }
 
 const THEMES: Record<ThemeKey,AppTheme> = {
-  original: { name:"Original",emoji:"🟠", root:"#080810", header:"linear-gradient(135deg,#1a0c08,#2d150a)", accent:"#f97316", accentDark:"#c2410c", accent2:"#ef4444", positive:"#34d399", negative:"#fb7185", subtext:"#475569", worldBtn:"linear-gradient(135deg,#f97316,#ef4444)", cardBg:"rgba(255,255,255,0.04)", cardBorder:"rgba(255,255,255,0.07)", glow1:"rgba(249,115,22,0.12)", glow2:"rgba(52,211,153,0.08)" },
+  original: { name:"Original",emoji:"🟢", root:"#0a0f14", header:"linear-gradient(145deg,#0d1117,#161b22)", accent:"#10b981", accentDark:"#059669", accent2:"#06b6d4", positive:"#10b981", negative:"#f87171", subtext:"#6b7280", worldBtn:"linear-gradient(135deg,#10b981,#059669)", cardBg:"rgba(255,255,255,0.02)", cardBorder:"rgba(255,255,255,0.06)", glow1:"rgba(16,185,129,0.08)", glow2:"rgba(6,182,212,0.05)" },
   aurora:   { name:"Aurora",  emoji:"🟢", root:"#050d12", header:"linear-gradient(135deg,#0a1f1a,#0f2d1f)", accent:"#00d4aa", accentDark:"#00a884", accent2:"#7c3aed", positive:"#00d4aa", negative:"#ff6b9d", subtext:"#4a7a6d", worldBtn:"linear-gradient(135deg,#00d4aa,#7c3aed)", cardBg:"rgba(0,212,170,0.04)", cardBorder:"rgba(0,212,170,0.1)", glow1:"rgba(0,212,170,0.12)", glow2:"rgba(124,58,237,0.08)" },
   ocean:    { name:"Ocean",   emoji:"🔵", root:"#030d14", header:"linear-gradient(135deg,#061828,#091f30)", accent:"#00c8ff", accentDark:"#0066ff", accent2:"#0066ff", positive:"#00e5b3", negative:"#ff4f7b", subtext:"#2a6080", worldBtn:"linear-gradient(135deg,#00c8ff,#0066ff)", cardBg:"rgba(0,200,255,0.04)", cardBorder:"rgba(0,200,255,0.1)", glow1:"rgba(0,200,255,0.13)", glow2:"rgba(0,102,255,0.08)" },
   nebula:   { name:"Nebula",  emoji:"🟣", root:"#07050f", header:"linear-gradient(135deg,#110a22,#160d2e)", accent:"#b06eff", accentDark:"#7c3aed", accent2:"#4fc3f7", positive:"#64ffda", negative:"#ff5c8d", subtext:"#5a4080", worldBtn:"linear-gradient(135deg,#b06eff,#4fc3f7)", cardBg:"rgba(176,110,255,0.04)", cardBorder:"rgba(176,110,255,0.1)", glow1:"rgba(176,110,255,0.13)", glow2:"rgba(79,195,247,0.08)" },
@@ -165,9 +166,9 @@ function Tour({userName,accent,onFinish}:{userName:string;accent:string;onFinish
   );
 }
 
-function ProgressBar({value,max,color,height=6}:{value:number;max:number;color:string;height?:number}) {
+function ProgressBar({value,max,color,height=4}:{value:number;max:number;color:string;height?:number}) {
   const p=max>0?Math.min(100,Math.round(value/max*100)):0;
-  return <div style={{height,borderRadius:99,background:"rgba(255,255,255,0.07)",overflow:"hidden"}}><div style={{width:`${p}%`,height:"100%",background:color,borderRadius:99,transition:"width .5s ease"}}/></div>;
+  return <div style={{height,borderRadius:99,background:"rgba(255,255,255,0.08)",overflow:"hidden"}}><div style={{width:`${p}%`,height:"100%",background:color,borderRadius:99,transition:"width .5s ease"}}/></div>;
 }
 function Tag({type}:{type:string}) {
   const m=TYPE_META[type as TypeKey];
@@ -176,11 +177,11 @@ function Tag({type}:{type:string}) {
 }
 function TypeSelector({value,onChange}:{value:TypeKey;onChange:(v:TypeKey)=>void}) {
   return (
-    <div style={{display:"grid",gridTemplateColumns:"1fr 1fr 1fr",gap:7}}>
+    <div style={{display:"grid",gridTemplateColumns:"1fr 1fr 1fr",gap:10}}>
       {(Object.entries(TYPE_META) as [TypeKey,typeof TYPE_META[TypeKey]][]).map(([type,meta])=>{
         const active=value===type;
-        return <button key={type} onClick={()=>onChange(type)} style={{padding:"10px 6px",border:`1.5px solid ${active?meta.color:"rgba(255,255,255,0.09)"}`,borderRadius:10,background:active?meta.bg:"rgba(255,255,255,0.03)",color:active?meta.color:"#4b5563",fontWeight:700,fontSize:11,cursor:"pointer",textAlign:"center" as const,fontFamily:"'Sora',sans-serif",lineHeight:1.4}}>
-          <div style={{fontSize:17,marginBottom:3}}>{meta.icon}</div>{meta.label}
+        return <button key={type} onClick={()=>onChange(type)} style={{padding:"12px 8px",border:`1.5px solid ${active?meta.color:"rgba(255,255,255,0.08)"}`,borderRadius:12,background:active?`${meta.color}15`:"rgba(255,255,255,0.03)",color:active?meta.color:"#6b7280",fontWeight:700,fontSize:11,cursor:"pointer",textAlign:"center" as const,fontFamily:"'Sora',sans-serif",lineHeight:1.4,transition:"all 0.2s"}}>
+          <div style={{fontSize:18,marginBottom:4}}>{meta.icon}</div>{meta.label}
         </button>;
       })}
     </div>
@@ -188,10 +189,10 @@ function TypeSelector({value,onChange}:{value:TypeKey;onChange:(v:TypeKey)=>void
 }
 function StatCard({label,value,color,sub}:{label:string;value:number;color:string;sub?:string}) {
   return (
-    <div style={{background:"rgba(255,255,255,0.04)",border:`1px solid ${color}30`,borderRadius:14,padding:"15px 16px"}}>
-      <div style={{fontSize:10,color:"#64748b",textTransform:"uppercase" as const,letterSpacing:"0.07em",marginBottom:5}}>{label}</div>
-      <div style={{fontSize:19,fontWeight:800,color,letterSpacing:"-0.5px"}}>{fmt(value)}</div>
-      {sub&&<div style={{fontSize:11,color:"#475569",marginTop:3}}>{sub}</div>}
+    <div style={{background:"rgba(255,255,255,0.03)",border:"1px solid rgba(255,255,255,0.08)",borderRadius:14,padding:"16px 18px"}}>
+      <div style={{fontSize:10,color:"#6b7280",textTransform:"uppercase" as const,letterSpacing:"0.1em",marginBottom:6}}>{label}</div>
+      <div style={{fontSize:20,fontWeight:800,color,letterSpacing:"-0.5px"}}>{fmt(value)}</div>
+      {sub&&<div style={{fontSize:11,color:"#6b7280",marginTop:4}}>{sub}</div>}
     </div>
   );
 }
@@ -473,19 +474,19 @@ function MainApp({user,userName,onLogout}:{user:SBUser;userName:string;onLogout:
   }
 
   const S:Record<string,CSSProperties>={
-    root:{minHeight:"100vh",background:T.root,color:"#e2e8f0",fontFamily:"'Sora',sans-serif",paddingBottom:64},
+    root:{minHeight:"100vh",background:T.root,color:"#e2e8f0",fontFamily:"'Sora',sans-serif",paddingBottom:100},
     header:{background:T.header,padding:"20px 20px 0",borderBottom:`1px solid ${T.cardBorder}`},
-    body:{padding:"16px 20px"},
-    card:{background:T.cardBg,border:`1px solid ${T.cardBorder}`,borderRadius:14,padding:"16px 18px",marginBottom:14},
-    inp:{width:"100%",background:"rgba(255,255,255,0.06)",border:"1px solid rgba(255,255,255,0.1)",borderRadius:8,padding:"10px 12px",color:"#e2e8f0",fontSize:13,boxSizing:"border-box",outline:"none",fontFamily:"'Sora',sans-serif"},
-    sel:{width:"100%",background:"#111827",border:"1px solid rgba(255,255,255,0.1)",borderRadius:8,padding:"10px 12px",color:"#e2e8f0",fontSize:13,boxSizing:"border-box",outline:"none"},
-    lbl:{fontSize:10,fontWeight:700,color:"#64748b",textTransform:"uppercase",letterSpacing:"0.08em",display:"block",marginBottom:5},
-    row2:{display:"grid",gridTemplateColumns:"1fr 1fr",gap:10,marginBottom:10},
-    sg:{display:"grid",gridTemplateColumns:"1fr 1fr",gap:10,marginBottom:14},
+    body:{padding:"0"},
+    card:{background:"rgba(255,255,255,0.03)",border:"1px solid rgba(255,255,255,0.08)",borderRadius:16,padding:"18px 20px",marginBottom:16},
+    inp:{width:"100%",background:"rgba(255,255,255,0.06)",border:"1px solid rgba(255,255,255,0.1)",borderRadius:12,padding:"12px 14px",color:"#e2e8f0",fontSize:13,boxSizing:"border-box",outline:"none",fontFamily:"'Sora',sans-serif"},
+    sel:{width:"100%",background:"#0d1117",border:"1px solid rgba(255,255,255,0.1)",borderRadius:12,padding:"12px 14px",color:"#e2e8f0",fontSize:13,boxSizing:"border-box",outline:"none"},
+    lbl:{fontSize:10,fontWeight:700,color:"#6b7280",textTransform:"uppercase",letterSpacing:"0.08em",display:"block",marginBottom:6},
+    row2:{display:"grid",gridTemplateColumns:"1fr 1fr",gap:12,marginBottom:12},
+    sg:{display:"grid",gridTemplateColumns:"1fr 1fr",gap:12,marginBottom:16},
   };
-  const wBtn=(a:boolean):CSSProperties=>({flex:1,padding:"10px 0",border:"none",borderRadius:10,cursor:"pointer",fontWeight:700,fontSize:13,fontFamily:"'Sora',sans-serif",background:a?T.worldBtn:"rgba(255,255,255,0.05)",color:a?"#fff":T.subtext});
-  const tBtn=(a:boolean):CSSProperties=>({padding:"9px 10px",border:"none",borderRadius:"8px 8px 0 0",cursor:"pointer",fontSize:11,fontWeight:700,whiteSpace:"nowrap",fontFamily:"'Sora',sans-serif",background:a?"rgba(255,255,255,0.07)":"transparent",color:a?T.accent:T.subtext,borderBottom:a?`2px solid ${T.accent}`:"2px solid transparent",position:"relative"});
-  const btnAdd:CSSProperties={background:`linear-gradient(135deg,${T.accent},${T.accentDark})`,color:"#fff",border:"none",borderRadius:9,padding:"12px 0",fontWeight:700,fontSize:13,cursor:"pointer",width:"100%",fontFamily:"'Sora',sans-serif",marginTop:6};
+  const wBtn=(a:boolean):CSSProperties=>({flex:1,padding:"11px 0",border:a?"none":"1px solid rgba(255,255,255,0.08)",borderRadius:12,cursor:"pointer",fontWeight:700,fontSize:13,fontFamily:"'Sora',sans-serif",background:a?T.worldBtn:"rgba(255,255,255,0.03)",color:a?"#fff":"#6b7280"});
+  const tBtn=(a:boolean):CSSProperties=>({padding:"10px 14px",border:"none",borderRadius:10,cursor:"pointer",fontSize:11,fontWeight:700,whiteSpace:"nowrap",fontFamily:"'Sora',sans-serif",background:a?"rgba(255,255,255,0.08)":"transparent",color:a?"#e5e7eb":"#6b7280",position:"relative"});
+  const btnAdd:CSSProperties={background:"linear-gradient(135deg,#10b981,#059669)",color:"#fff",border:"none",borderRadius:14,padding:"14px 0",fontWeight:700,fontSize:14,cursor:"pointer",width:"100%",fontFamily:"'Sora',sans-serif",marginTop:8,boxShadow:"0 4px 20px rgba(16,185,129,0.25)"};
   const sInp:CSSProperties={width:"100%",background:"rgba(255,255,255,0.06)",border:"1px solid rgba(255,255,255,0.1)",borderRadius:8,padding:"9px 11px",color:"#e2e8f0",fontSize:13,boxSizing:"border-box",outline:"none",fontFamily:"'Sora',sans-serif"};
   const sSel:CSSProperties={width:"100%",background:"#111827",border:"1px solid rgba(255,255,255,0.1)",borderRadius:8,padding:"9px 11px",color:"#e2e8f0",fontSize:13,boxSizing:"border-box",outline:"none"};
   const selCat=expCats.find(c=>c.id===expForm.cat);
@@ -495,14 +496,15 @@ function MainApp({user,userName,onLogout}:{user:SBUser;userName:string;onLogout:
   return(
     <div style={S.root}>
       <link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700;800&display=swap" rel="stylesheet"/>
-      <div style={{position:"fixed",top:-80,right:-80,width:300,height:300,borderRadius:"50%",background:`radial-gradient(circle,${T.glow1} 0%,transparent 70%)`,pointerEvents:"none",zIndex:0}}/>
-      <div style={{position:"fixed",bottom:-60,left:-60,width:250,height:250,borderRadius:"50%",background:`radial-gradient(circle,${T.glow2} 0%,transparent 70%)`,pointerEvents:"none",zIndex:0}}/>
+      {/* Subtle ambient glow for premium feel */}
+      <div style={{position:"fixed",top:-120,right:-120,width:400,height:400,borderRadius:"50%",background:"radial-gradient(circle,rgba(16,185,129,0.06) 0%,transparent 70%)",pointerEvents:"none",zIndex:0}}/>
+      <div style={{position:"fixed",bottom:-100,left:-100,width:350,height:350,borderRadius:"50%",background:"radial-gradient(circle,rgba(6,182,212,0.04) 0%,transparent 70%)",pointerEvents:"none",zIndex:0}}/>
 
       {showTour&&<Tour userName={userName} accent={T.accent} onFinish={finishTour}/>}
 
-      {/* SIDEBAR */}
-      {sidebarOpen&&<div onClick={()=>setSidebarOpen(false)} style={{position:"fixed",inset:0,background:"rgba(0,0,0,0.6)",zIndex:40}}/>}
-      <div style={{position:"fixed",top:0,right:0,bottom:0,width:300,background:"#0f1117",borderLeft:`1px solid ${T.cardBorder}`,zIndex:50,transform:sidebarOpen?"translateX(0)":"translateX(100%)",transition:"transform .3s ease",display:"flex",flexDirection:"column" as const,fontFamily:"'Sora',sans-serif"}}>
+      {/* SIDEBAR - Premium Style */}
+      {sidebarOpen&&<div onClick={()=>setSidebarOpen(false)} style={{position:"fixed",inset:0,background:"rgba(0,0,0,0.7)",backdropFilter:"blur(4px)",zIndex:40}}/>}
+      <div style={{position:"fixed",top:0,right:0,bottom:0,width:300,background:"#0a0f14",borderLeft:"1px solid rgba(255,255,255,0.08)",zIndex:50,transform:sidebarOpen?"translateX(0)":"translateX(100%)",transition:"transform .3s ease",display:"flex",flexDirection:"column" as const,fontFamily:"'Sora',sans-serif"}}>
         <div style={{padding:"18px 20px 0",borderBottom:`1px solid ${T.cardBorder}`,flexShrink:0}}>
           <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:14}}>
             <div style={{fontSize:15,fontWeight:800,color:"#f1f5f9"}}>Menu</div>
@@ -621,121 +623,63 @@ function MainApp({user,userName,onLogout}:{user:SBUser;userName:string;onLogout:
         </div>
       </div>
 
-      {/* HEADER */}
-      <div style={{...S.header,position:"relative",zIndex:1}}>
-        <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:14}}>
-          <div>
-            <div style={{fontSize:16,fontWeight:800,color:"#f1f5f9",letterSpacing:"-0.3px"}}>💰 As Minhas Finanças</div>
-            <div style={{fontSize:11,color:T.subtext,marginTop:1}}>Olá, <span style={{color:T.accent,fontWeight:700}}>{userName}</span> · <span style={{color:T.positive}}>sincronizado ✓</span></div>
+      {/* HEADER - Premium FinTech Style */}
+      <div style={{background:"transparent",padding:"16px 20px 0",position:"relative",zIndex:1}}>
+        <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:16}}>
+          <button onClick={()=>setSidebarOpen(true)} style={{background:"transparent",border:"none",color:"#e5e7eb",fontSize:20,cursor:"pointer",padding:4}}>☰</button>
+          <div style={{fontSize:15,fontWeight:700,color:"#f1f5f9",letterSpacing:"-0.2px"}}>Dashboard</div>
+          <div style={{position:"relative"}}>
+            <button style={{background:"transparent",border:"none",color:"#e5e7eb",fontSize:18,cursor:"pointer",padding:4}}>🔔</button>
+            {dueRecurring>0&&<span style={{position:"absolute",top:2,right:2,width:8,height:8,borderRadius:"50%",background:"#ef4444"}}/>}
           </div>
-          <button onClick={()=>setSidebarOpen(true)} style={{background:`${T.accent}15`,border:`1px solid ${T.accent}30`,borderRadius:9,padding:"7px 11px",color:T.accent,fontSize:16,cursor:"pointer"}}>⚙️</button>
         </div>
-        <div style={{display:"flex",gap:4,marginBottom:14}}>
+        <div style={{display:"flex",gap:6,marginBottom:12}}>
           <button style={wBtn(world==="pessoal")} onClick={()=>{setWorld("pessoal");setTab("resumo");}}>{world1Icon} {world1Name}</button>
           <button style={wBtn(world==="clinica")} onClick={()=>{setWorld("clinica");setTab("resumo");}}>{world2Icon} {world2Name}</button>
         </div>
-        <div style={{display:"flex",gap:1,overflowX:"auto"}}>
+        <div style={{display:"flex",gap:2,overflowX:"auto",paddingBottom:8}}>
           {[["resumo","📊"],["despesas","📥"],["recorrentes","🔄"],["objetivos","🎯"],["comparacao","📈"],["casal","👫"],["rendimentos","💶"],["progressao","📉"]].map(([id,icon])=>(
             <button key={id} style={tBtn(tab===id)} onClick={()=>setTab(id)}>
               {icon} {id.charAt(0).toUpperCase()+id.slice(1)}
-              {id==="recorrentes"&&dueRecurring>0&&<span style={{position:"absolute",top:4,right:4,width:8,height:8,borderRadius:"50%",background:"#f59e0b"}}/>}
             </button>
           ))}
         </div>
       </div>
 
-      {/* FILTERS */}
-      <div style={{padding:"12px 20px 0",display:"flex",gap:8,position:"relative",zIndex:1}}>
-        <select style={{...S.sel,flex:1}} value={fYear} onChange={e=>setFYear(e.target.value)}><option value="todos">Todos os anos</option>{["2024","2025","2026"].map(y=><option key={y} value={y}>{y}</option>)}</select>
-        <select style={{...S.sel,flex:1}} value={fMonth} onChange={e=>setFMonth(e.target.value)}><option value="todos">Todos os meses</option>{MONTHS.map((m,i)=><option key={i} value={String(i)}>{m}</option>)}</select>
+      {/* FILTERS - Clean minimal style */}
+      <div style={{padding:"8px 20px 16px",display:"flex",gap:10,position:"relative",zIndex:1}}>
+        <select style={{...S.sel,flex:1,background:"rgba(255,255,255,0.03)",border:"1px solid rgba(255,255,255,0.08)"}} value={fYear} onChange={e=>setFYear(e.target.value)}><option value="todos">Todos os anos</option>{["2024","2025","2026"].map(y=><option key={y} value={y}>{y}</option>)}</select>
+        <select style={{...S.sel,flex:1,background:"rgba(255,255,255,0.03)",border:"1px solid rgba(255,255,255,0.08)"}} value={fMonth} onChange={e=>setFMonth(e.target.value)}><option value="todos">Todos os meses</option>{MONTHS.map((m,i)=><option key={i} value={String(i)}>{m}</option>)}</select>
       </div>
 
       <div style={{...S.body,position:"relative",zIndex:1}}>
 
-        {/* RESUMO */}
-        {tab==="resumo"&&<>
-          <div style={S.sg}>
-            <StatCard label="Rendimento" value={totalInc} color={T.positive} sub={`${myIncomes.length} entradas`}/>
-            <StatCard label="Despesas"   value={totalExp} color={T.negative} sub={`${myExpenses.length} items`}/>
-          </div>
-          <div style={{...S.card,display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:14}}>
-            <span style={{fontSize:13,color:T.subtext,fontWeight:600}}>Resultado</span>
-            <span style={{fontSize:22,fontWeight:800,color:balance>=0?T.positive:T.negative,letterSpacing:"-0.5px"}}>{fmt(balance)}</span>
-          </div>
-          {dueRecurring>0&&(
-            <div onClick={()=>setTab("recorrentes")} style={{background:"rgba(245,158,11,0.08)",border:"1px solid rgba(245,158,11,0.3)",borderRadius:12,padding:"10px 14px",marginBottom:14,cursor:"pointer",display:"flex",alignItems:"center",gap:10}}>
-              <span style={{fontSize:20}}>🔔</span>
-              <div style={{flex:1}}><div style={{fontSize:13,fontWeight:700,color:"#f59e0b"}}>{dueRecurring} despesa{dueRecurring>1?"s":""} recorrente{dueRecurring>1?"s":""} a vencer</div><div style={{fontSize:11,color:"#78350f"}}>Toca para ver e registar</div></div>
-              <span style={{color:"#f59e0b"}}>→</span>
+        {/* RESUMO - Premium Dashboard */}
+        {tab==="resumo"&&(
+          <PremiumDashboard
+            myExpenses={myExpenses}
+            myIncomes={myIncomes}
+            totalExp={totalExp}
+            totalInc={totalInc}
+            balance={balance}
+            byType={byType}
+            byCat={byCat}
+            budgetTargets={budgetTargets}
+            onAddExpense={()=>setTab("despesas")}
+            onOpenSidebar={()=>setSidebarOpen(true)}
+            T={T}
+          />
+        )}
+
+        {/* DESPESAS - Premium Style */}
+        {tab==="despesas"&&<div style={{padding:"0 20px 100px"}}>
+          {overBudget.length>0&&(<div style={{background:"linear-gradient(145deg, rgba(245, 158, 11, 0.12) 0%, rgba(245, 158, 11, 0.04) 100%)",border:"1px solid rgba(245, 158, 11, 0.25)",borderRadius:16,padding:"14px 16px",marginBottom:16,display:"flex",alignItems:"center",gap:14}}>
+            <div style={{width:40,height:40,borderRadius:12,background:"rgba(245, 158, 11, 0.2)",display:"flex",alignItems:"center",justifyContent:"center",fontSize:18,flexShrink:0}}>⚠️</div>
+            <div>
+              <div style={{fontSize:13,fontWeight:700,color:"#fbbf24",marginBottom:3}}>Orçamento excedido</div>
+              {overBudget.slice(0,1).map(([type])=>{const actual=byType[type]||0,target=budgetTargets[type],targetAmt=totalExp*(target/100),meta=TYPE_META[type];return<div key={type} style={{fontSize:11,color:"#a16207"}}>{meta.icon} {meta.label}: excesso de {fmt(actual-targetAmt)}</div>;})}
             </div>
-          )}
-          {accounts.length>0&&(<div style={{display:"flex",gap:8,overflowX:"auto",marginBottom:14,paddingBottom:4}}>{accounts.map(a=>(<div key={a.id} style={{background:T.cardBg,border:`1px solid ${T.accent}25`,borderRadius:12,padding:"10px 14px",flexShrink:0,minWidth:130}}><div style={{fontSize:12,fontWeight:600,color:T.subtext,marginBottom:2}}>{a.icon} {a.nome}</div><div style={{fontSize:16,fontWeight:800,color:Number(a.saldo)>=0?T.positive:T.negative}}>{fmt(Number(a.saldo))}</div></div>))}</div>)}
-
-          {/* NET WORTH */}
-          {accounts.length>0&&(()=>{
-            const totalCorrente   = accounts.filter(a=>a.tipo==="corrente").reduce((s,a)=>s+Number(a.saldo),0);
-            const totalPoupanca   = accounts.filter(a=>a.tipo==="poupanca").reduce((s,a)=>s+Number(a.saldo),0);
-            const totalInvest     = accounts.filter(a=>a.tipo==="investimento").reduce((s,a)=>s+Number(a.saldo),0);
-            const totalOutro      = accounts.filter(a=>a.tipo==="outro").reduce((s,a)=>s+Number(a.saldo),0);
-            const netWorth        = totalSaldo;
-            const rows = [
-              {label:"Conta Corrente",    icon:"💳", val:totalCorrente,  color:"#3b82f6", show:totalCorrente!==0},
-              {label:"Conta Poupança",    icon:"🏦", val:totalPoupanca,  color:"#10b981", show:totalPoupanca!==0},
-              {label:"Investimentos",     icon:"📈", val:totalInvest,    color:"#a78bfa", show:totalInvest!==0},
-              {label:"Outros",            icon:"📂", val:totalOutro,     color:"#f59e0b", show:totalOutro!==0},
-            ].filter(r=>r.show);
-            return(
-              <div style={{...S.card,marginBottom:14}}>
-                <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:14}}>
-                  <SectionTitle>💎 Net Worth</SectionTitle>
-                  <span style={{fontSize:18,fontWeight:800,color:netWorth>=0?T.positive:T.negative,letterSpacing:"-0.5px"}}>{fmt(netWorth)}</span>
-                </div>
-                {rows.map(r=>(
-                  <div key={r.label} style={{marginBottom:10}}>
-                    <div style={{display:"flex",justifyContent:"space-between",marginBottom:4}}>
-                      <span style={{fontSize:13}}>{r.icon} {r.label}</span>
-                      <span style={{fontSize:13,fontWeight:700,color:r.color}}>{fmt(r.val)}</span>
-                    </div>
-                    <div style={{height:5,borderRadius:99,background:"rgba(255,255,255,0.07)",overflow:"hidden"}}>
-                      <div style={{width:`${Math.min(100,Math.abs(r.val)/Math.max(Math.abs(netWorth),1)*100)}%`,height:"100%",background:r.color,borderRadius:99,transition:"width .5s"}}/>
-                    </div>
-                  </div>
-                ))}
-                <div style={{marginTop:10,paddingTop:10,borderTop:`1px solid ${T.cardBorder}`,display:"flex",justifyContent:"space-between",alignItems:"center"}}>
-                  <span style={{fontSize:12,color:T.subtext,fontWeight:600}}>Total</span>
-                  <span style={{fontSize:16,fontWeight:800,color:netWorth>=0?T.positive:T.negative}}>{fmt(netWorth)}</span>
-                </div>
-              </div>
-            );
-          })()}
-          <div style={S.card}>
-            <SectionTitle>Distribuição por tipo — metas</SectionTitle>
-            {(Object.entries(TYPE_META) as [TypeKey,typeof TYPE_META[TypeKey]][]).map(([type,meta])=>{
-              const actual=byType[type]||0,target=budgetTargets[type],targetAmt=totalExp*(target/100),actualPct=pct(actual,totalExp),over=actual>targetAmt&&totalExp>0;
-              return(<div key={type} style={{marginBottom:14}}>
-                <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:5}}>
-                  <div style={{display:"flex",alignItems:"center",gap:7}}><span style={{fontSize:15}}>{meta.icon}</span><span style={{fontSize:13,fontWeight:600,color:over?"#ef4444":meta.color}}>{meta.label}</span><span style={{fontSize:10,color:T.subtext,background:"rgba(255,255,255,0.05)",padding:"2px 7px",borderRadius:99}}>meta {target}%</span></div>
-                  <div><span style={{fontSize:14,fontWeight:800,color:over?"#ef4444":meta.color}}>{fmt(actual)}</span><span style={{fontSize:11,color:over?"#ef4444":T.subtext,marginLeft:4}}>({actualPct}%)</span></div>
-                </div>
-                <div style={{position:"relative",height:8,borderRadius:99,background:"rgba(255,255,255,0.07)",overflow:"visible"}}>
-                  <div style={{position:"absolute",left:0,top:0,bottom:0,width:`${Math.min(100,actualPct)}%`,background:over?"#ef4444":meta.color,borderRadius:99,transition:"width .5s ease"}}/>
-                  <div style={{position:"absolute",top:-3,bottom:-3,left:`${target}%`,width:2,background:"rgba(255,255,255,0.3)",borderRadius:1,zIndex:2}}/>
-                </div>
-                {over&&<div style={{display:"flex",alignItems:"center",gap:7,background:"#450a0a",border:"1px solid #ef444460",borderRadius:8,padding:"7px 10px",marginTop:7}}><span>⚠️</span><span style={{fontSize:11,color:"#f87171"}}>+{fmt(actual-targetAmt)} acima do limite</span></div>}
-              </div>);
-            })}
-            {totalExp===0&&<div style={{color:T.subtext,fontSize:12,textAlign:"center",padding:"8px 0"}}>Regista despesas para ver a distribuição.</div>}
-          </div>
-          <div style={S.card}>
-            <SectionTitle>Top categorias</SectionTitle>
-            {byCat.filter(c=>c.total>0).slice(0,6).map(c=>(<div key={c.id} style={{marginBottom:10}}><div style={{display:"flex",justifyContent:"space-between",marginBottom:4}}><span style={{fontSize:13}}>{c.icon} {c.label}</span><span style={{fontSize:13,fontWeight:700}}>{fmt(c.total)}</span></div><ProgressBar value={c.total} max={maxCat} color={TYPE_META[c.type]?.color||"#6b7280"} height={4}/></div>))}
-            {byCat.filter(c=>c.total>0).length===0&&<div style={{color:T.subtext,fontSize:13,textAlign:"center",padding:"16px 0"}}>Sem despesas.</div>}
-          </div>
-        </>}
-
-        {/* DESPESAS */}
-        {tab==="despesas"&&<>
-          {overBudget.length>0&&(<div style={{background:"#450a0a",border:"1px solid #ef4444",borderRadius:12,padding:"12px 14px",marginBottom:14}}><div style={{fontSize:12,fontWeight:700,color:"#fca5a5",marginBottom:5}}>⚠️ Orçamento excedido</div>{overBudget.map(([type])=>{const actual=byType[type]||0,target=budgetTargets[type],targetAmt=totalExp*(target/100),meta=TYPE_META[type];return<div key={type} style={{fontSize:11,color:"#f87171",marginBottom:2}}>{meta.icon} {meta.label}: {pct(actual,totalExp)}% (meta {target}%) · excesso {fmt(actual-targetAmt)}</div>;})}</div>)}
+          </div>)}
           <div style={S.card}>
             <SectionTitle>Adicionar Despesa</SectionTitle>
             <div style={S.row2}>
@@ -748,65 +692,73 @@ function MainApp({user,userName,onLogout}:{user:SBUser;userName:string;onLogout:
               </select></div>
               <div><label style={S.lbl}>Data</label><input style={S.inp} type="date" value={expForm.data} onChange={e=>setExpForm(f=>({...f,data:e.target.value}))}/></div>
             </div>
-            {selCat?.sub&&(<div style={{marginBottom:10}}><label style={S.lbl}>Sub-categoria</label><div style={{display:"flex",flexWrap:"wrap",gap:7}}>{selCat.sub.map((s:string)=>{const active=expForm.subcat===s;return<button key={s} onClick={()=>setExpForm(f=>({...f,subcat:active?"":s}))} style={{padding:"7px 13px",border:`1.5px solid ${active?T.accent:"rgba(255,255,255,0.13)"}`,borderRadius:99,background:active?`${T.accent}22`:"rgba(255,255,255,0.04)",color:active?T.accent:"#94a3b8",fontSize:12,fontWeight:active?700:500,cursor:"pointer",fontFamily:"'Sora',sans-serif"}}>{s}</button>;})}</div></div>)}
-            <label style={{...S.lbl,marginTop:4,marginBottom:7}}>Tipo</label>
+            {selCat?.sub&&(<div style={{marginBottom:12}}><label style={S.lbl}>Sub-categoria</label><div style={{display:"flex",flexWrap:"wrap",gap:8}}>{selCat.sub.map((s:string)=>{const active=expForm.subcat===s;return<button key={s} onClick={()=>setExpForm(f=>({...f,subcat:active?"":s}))} style={{padding:"8px 14px",border:`1.5px solid ${active?T.accent:"rgba(255,255,255,0.1)"}`,borderRadius:10,background:active?`${T.accent}20`:"rgba(255,255,255,0.03)",color:active?T.accent:"#9ca3af",fontSize:12,fontWeight:active?700:500,cursor:"pointer",fontFamily:"'Sora',sans-serif"}}>{s}</button>;})}</div></div>)}
+            <label style={{...S.lbl,marginTop:4,marginBottom:8}}>Tipo</label>
             <TypeSelector value={expForm.tipo} onChange={(v:TypeKey)=>setExpForm(f=>({...f,tipo:v}))}/>
             <button style={btnAdd} onClick={()=>editingExp?updateExpense(editingExp):addExpense()}>{editingExp?"✓ Guardar alterações":"+ Adicionar Despesa"}</button>
-        {editingExp&&<button onClick={()=>{setEditingExp(null);setExpForm(f=>({...f,descricao:"",valor:"",subcat:""}));}} style={{width:"100%",marginTop:8,padding:"10px 0",background:"rgba(255,255,255,0.05)",border:`1px solid ${T.cardBorder}`,borderRadius:9,color:T.subtext,fontSize:13,fontWeight:600,cursor:"pointer",fontFamily:"'Sora',sans-serif"}}>✕ Cancelar edição</button>}
+            {editingExp&&<button onClick={()=>{setEditingExp(null);setExpForm(f=>({...f,descricao:"",valor:"",subcat:""}));}} style={{width:"100%",marginTop:10,padding:"12px 0",background:"rgba(255,255,255,0.03)",border:"1px solid rgba(255,255,255,0.08)",borderRadius:12,color:"#9ca3af",fontSize:13,fontWeight:600,cursor:"pointer",fontFamily:"'Sora',sans-serif"}}>✕ Cancelar edição</button>}
           </div>
-          <div style={{...S.card,display:"flex",justifyContent:"space-between",alignItems:"center",padding:"12px 16px"}}>
-            <span style={{fontSize:12,color:T.subtext}}>{myExpenses.length} despesa(s)</span>
-            <span style={{fontSize:17,fontWeight:800,color:T.negative}}>{fmt(totalExp)}</span>
+          <div style={{...S.card,display:"flex",justifyContent:"space-between",alignItems:"center",padding:"14px 18px"}}>
+            <span style={{fontSize:12,color:"#6b7280"}}>{myExpenses.length} despesa(s)</span>
+            <span style={{fontSize:18,fontWeight:800,color:"#f87171"}}>{fmt(totalExp)}</span>
           </div>
-          {myExpenses.length>0&&(<div style={{display:"grid",gridTemplateColumns:"1fr 1fr 1fr",gap:8,marginBottom:14}}>{(Object.entries(TYPE_META) as [TypeKey,typeof TYPE_META[TypeKey]][]).map(([type,meta])=>{const actual=byType[type]||0,target=budgetTargets[type],over=actual>totalExp*(target/100)&&totalExp>0;return(<div key={type} style={{background:over?"#450a0a":meta.bg,border:`1px solid ${over?"#ef4444":meta.color}40`,borderRadius:10,padding:"10px 8px",textAlign:"center"}}><div style={{fontSize:16,marginBottom:2}}>{meta.icon}</div><div style={{fontSize:12,fontWeight:800,color:over?"#ef4444":meta.color}}>{fmt(actual)}</div><div style={{fontSize:10,color:T.subtext,marginTop:1}}>{pct(actual,totalExp)}% / {target}%</div>{over&&<div style={{fontSize:10,color:"#ef4444",fontWeight:700,marginTop:2}}>⚠️</div>}</div>);})}</div>)}
+          {myExpenses.length>0&&(<div style={{display:"grid",gridTemplateColumns:"1fr 1fr 1fr",gap:10,marginBottom:16}}>{(Object.entries(TYPE_META) as [TypeKey,typeof TYPE_META[TypeKey]][]).map(([type,meta])=>{const actual=byType[type]||0,target=budgetTargets[type],over=actual>totalExp*(target/100)&&totalExp>0;return(<div key={type} style={{background:over?"rgba(239,68,68,0.08)":"rgba(255,255,255,0.03)",border:`1px solid ${over?"rgba(239,68,68,0.3)":"rgba(255,255,255,0.08)"}`,borderRadius:14,padding:"12px 10px",textAlign:"center"}}><div style={{fontSize:18,marginBottom:4}}>{meta.icon}</div><div style={{fontSize:13,fontWeight:800,color:over?"#f87171":meta.color}}>{fmt(actual)}</div><div style={{fontSize:10,color:"#6b7280",marginTop:2}}>{pct(actual,totalExp)}% / {target}%</div></div>);})}</div>)}
           <div style={S.card}>
-            {myExpenses.length===0&&<div style={{color:T.subtext,fontSize:13,textAlign:"center",padding:"24px 0"}}>Sem despesas para este período.</div>}
-            {myExpenses.map(e=>{const cat=expCats.find(c=>c.id===e.cat);return(<div key={e.id} style={{display:"flex",alignItems:"center",gap:10,padding:"11px 0",borderBottom:`1px solid ${T.cardBorder}`}}><span style={{fontSize:20,minWidth:28,textAlign:"center"}}>{cat?.icon||"📦"}</span><div style={{flex:1,minWidth:0}}><div style={{fontSize:13,fontWeight:600,color:"#e2e8f0",whiteSpace:"nowrap",overflow:"hidden",textOverflow:"ellipsis"}}>{e.descricao}{e.subcat?<span style={{color:T.subtext}}> · {e.subcat}</span>:""}</div><div style={{display:"flex",alignItems:"center",gap:5,marginTop:3}}><span style={{fontSize:10,color:T.subtext}}>{new Date(e.data+"T12:00:00").toLocaleDateString("pt-PT")}</span><Tag type={e.tipo}/></div></div><span style={{fontSize:14,fontWeight:700,color:T.negative,minWidth:68,textAlign:"right"}}>{fmt(Number(e.valor))}</span><button onClick={()=>{setEditingExp(e.id);setExpForm({descricao:e.descricao,valor:String(e.valor),cat:e.cat,subcat:e.subcat,data:e.data,tipo:e.tipo});window.scrollTo({top:0,behavior:"smooth"});}} style={{background:"none",border:"none",cursor:"pointer",color:T.accent,fontSize:15,padding:"0 2px"}}>✏️</button>
-                <button onClick={()=>deleteExpense(e.id)} style={{background:"none",border:"none",cursor:"pointer",color:T.subtext,fontSize:15,padding:"0 2px"}}>✕</button></div>);})}
+            {myExpenses.length===0&&<div style={{color:"#6b7280",fontSize:13,textAlign:"center",padding:"24px 0"}}>Sem despesas para este período.</div>}
+            {myExpenses.map(e=>{const cat=expCats.find(c=>c.id===e.cat);return(<div key={e.id} style={{display:"flex",alignItems:"center",gap:12,padding:"14px 0",borderBottom:"1px solid rgba(255,255,255,0.06)"}}><span style={{fontSize:20,minWidth:28,textAlign:"center"}}>{cat?.icon||"📦"}</span><div style={{flex:1,minWidth:0}}><div style={{fontSize:14,fontWeight:600,color:"#e5e7eb",whiteSpace:"nowrap",overflow:"hidden",textOverflow:"ellipsis"}}>{e.descricao}{e.subcat?<span style={{color:"#6b7280"}}> · {e.subcat}</span>:""}</div><div style={{display:"flex",alignItems:"center",gap:6,marginTop:4}}><span style={{fontSize:11,color:"#6b7280"}}>{new Date(e.data+"T12:00:00").toLocaleDateString("pt-PT")}</span><Tag type={e.tipo}/></div></div><span style={{fontSize:15,fontWeight:700,color:"#f87171",minWidth:72,textAlign:"right"}}>{fmt(Number(e.valor))}</span><button onClick={()=>{setEditingExp(e.id);setExpForm({descricao:e.descricao,valor:String(e.valor),cat:e.cat,subcat:e.subcat,data:e.data,tipo:e.tipo});window.scrollTo({top:0,behavior:"smooth"});}} style={{background:"none",border:"none",cursor:"pointer",color:T.accent,fontSize:16,padding:"0 4px"}}>✏️</button>
+                <button onClick={()=>deleteExpense(e.id)} style={{background:"none",border:"none",cursor:"pointer",color:"#6b7280",fontSize:16,padding:"0 4px"}}>✕</button></div>);})}
           </div>
-        </>}
+        </div>}
 
         {/* RECORRENTES */}
         {tab==="recorrentes"&&(
-          <RecurringExpenses
-            userId={user.id} world={world} expCats={expCats}
-            accent={T.accent} accentDark={T.accentDark} cardBg={T.cardBg}
-            cardBorder={T.cardBorder} subtext={T.subtext} positive={T.positive} negative={T.negative}
-            recurring={recurring} setRecurring={setRecurring} onApplyDue={applyRecurring}
-          />
+          <div style={{padding:"0 20px 100px"}}>
+            <RecurringExpenses
+              userId={user.id} world={world} expCats={expCats}
+              accent={T.accent} accentDark={T.accentDark} cardBg={T.cardBg}
+              cardBorder={T.cardBorder} subtext={T.subtext} positive={T.positive} negative={T.negative}
+              recurring={recurring} setRecurring={setRecurring} onApplyDue={applyRecurring}
+            />
+          </div>
         )}
 
         {/* OBJETIVOS */}
         {tab==="objetivos"&&(
-          <SavingsGoals
-            userId={user.id} accent={T.accent} accentDark={T.accentDark}
-            cardBg={T.cardBg} cardBorder={T.cardBorder} subtext={T.subtext}
-            positive={T.positive} negative={T.negative}
-            goals={goals} setGoals={setGoals}
-          />
+          <div style={{padding:"0 20px 100px"}}>
+            <SavingsGoals
+              userId={user.id} accent={T.accent} accentDark={T.accentDark}
+              cardBg={T.cardBg} cardBorder={T.cardBorder} subtext={T.subtext}
+              positive={T.positive} negative={T.negative}
+              goals={goals} setGoals={setGoals}
+            />
+          </div>
         )}
 
         {/* MODO CASAL */}
         {tab==="casal"&&(
-          <CoupleMode
-            userId={user.id} userEmail={user.email||""} userName={userName}
-            expCats={expCats} accent={T.accent} accentDark={T.accentDark}
-            cardBg={T.cardBg} cardBorder={T.cardBorder} subtext={T.subtext}
-            positive={T.positive} negative={T.negative}
-          />
+          <div style={{padding:"0 20px 100px"}}>
+            <CoupleMode
+              userId={user.id} userEmail={user.email||""} userName={userName}
+              expCats={expCats} accent={T.accent} accentDark={T.accentDark}
+              cardBg={T.cardBg} cardBorder={T.cardBorder} subtext={T.subtext}
+              positive={T.positive} negative={T.negative}
+            />
+          </div>
         )}
 
         {/* COMPARAÇÃO MENSAL */}
         {tab==="comparacao"&&(
-          <MonthComparison
-            expenses={expenses} incomes={incomes} expCats={expCats} world={world}
-            accent={T.accent} cardBg={T.cardBg} cardBorder={T.cardBorder}
-            subtext={T.subtext} positive={T.positive} negative={T.negative}
-          />
+          <div style={{padding:"0 20px 100px"}}>
+            <MonthComparison
+              expenses={expenses} incomes={incomes} expCats={expCats} world={world}
+              accent={T.accent} cardBg={T.cardBg} cardBorder={T.cardBorder}
+              subtext={T.subtext} positive={T.positive} negative={T.negative}
+            />
+          </div>
         )}
 
-        {/* RENDIMENTOS */}
-        {tab==="rendimentos"&&<>
+        {/* RENDIMENTOS - Premium Style */}
+        {tab==="rendimentos"&&<div style={{padding:"0 20px 100px"}}>
           <div style={S.card}>
             <SectionTitle>Adicionar Rendimento</SectionTitle>
             <div style={S.row2}>
@@ -819,51 +771,51 @@ function MainApp({user,userName,onLogout}:{user:SBUser;userName:string;onLogout:
             </div>
             <button style={btnAdd} onClick={addIncome}>+ Adicionar Rendimento</button>
           </div>
-          <div style={{...S.card,display:"flex",justifyContent:"space-between",alignItems:"center",padding:"12px 16px"}}>
-            <span style={{fontSize:12,color:T.subtext}}>{myIncomes.length} entrada(s)</span>
-            <span style={{fontSize:17,fontWeight:800,color:T.positive}}>{fmt(totalInc)}</span>
+          <div style={{...S.card,display:"flex",justifyContent:"space-between",alignItems:"center",padding:"14px 18px"}}>
+            <span style={{fontSize:12,color:"#6b7280"}}>{myIncomes.length} entrada(s)</span>
+            <span style={{fontSize:18,fontWeight:800,color:"#10b981"}}>{fmt(totalInc)}</span>
           </div>
           <div style={S.card}>
-            {myIncomes.length===0&&<div style={{color:T.subtext,fontSize:13,textAlign:"center",padding:"24px 0"}}>Sem rendimentos registados.</div>}
-            {myIncomes.map(i=>{const cat=incCats.find(c=>c.id===i.cat);return(<div key={i.id} style={{display:"flex",alignItems:"center",gap:10,padding:"11px 0",borderBottom:`1px solid ${T.cardBorder}`}}><span style={{fontSize:20,minWidth:28,textAlign:"center"}}>{cat?.icon||"📦"}</span><div style={{flex:1,minWidth:0}}><div style={{fontSize:13,fontWeight:600,color:"#e2e8f0",whiteSpace:"nowrap",overflow:"hidden",textOverflow:"ellipsis"}}>{i.descricao}</div><div style={{fontSize:11,color:T.subtext,marginTop:2}}>{new Date(i.data+"T12:00:00").toLocaleDateString("pt-PT")} · {cat?.label}</div></div><span style={{fontSize:14,fontWeight:700,color:T.positive,minWidth:68,textAlign:"right"}}>{fmt(Number(i.valor))}</span><button onClick={()=>deleteIncome(i.id)} style={{background:"none",border:"none",cursor:"pointer",color:T.subtext,fontSize:15,padding:"0 2px"}}>✕</button></div>);})}
+            {myIncomes.length===0&&<div style={{color:"#6b7280",fontSize:13,textAlign:"center",padding:"24px 0"}}>Sem rendimentos registados.</div>}
+            {myIncomes.map(i=>{const cat=incCats.find(c=>c.id===i.cat);return(<div key={i.id} style={{display:"flex",alignItems:"center",gap:12,padding:"14px 0",borderBottom:"1px solid rgba(255,255,255,0.06)"}}><span style={{fontSize:20,minWidth:28,textAlign:"center"}}>{cat?.icon||"📦"}</span><div style={{flex:1,minWidth:0}}><div style={{fontSize:14,fontWeight:600,color:"#e5e7eb",whiteSpace:"nowrap",overflow:"hidden",textOverflow:"ellipsis"}}>{i.descricao}</div><div style={{fontSize:11,color:"#6b7280",marginTop:3}}>{new Date(i.data+"T12:00:00").toLocaleDateString("pt-PT")} · {cat?.label}</div></div><span style={{fontSize:15,fontWeight:700,color:"#10b981",minWidth:72,textAlign:"right"}}>{fmt(Number(i.valor))}</span><button onClick={()=>deleteIncome(i.id)} style={{background:"none",border:"none",cursor:"pointer",color:"#6b7280",fontSize:16,padding:"0 4px"}}>✕</button></div>);})}
           </div>
-          {myIncomes.length>0&&(<div style={S.card}><SectionTitle>Por fonte</SectionTitle>{byIncCat.filter(c=>c.total>0).map(c=>(<div key={c.id} style={{marginBottom:10}}><div style={{display:"flex",justifyContent:"space-between",marginBottom:4}}><span style={{fontSize:13}}>{c.icon} {c.label}</span><span style={{fontSize:13,fontWeight:700,color:T.positive}}>{fmt(c.total)} <span style={{fontSize:11,color:T.subtext,fontWeight:400}}>({pct(c.total,totalInc)}%)</span></span></div><ProgressBar value={c.total} max={maxInc} color={T.positive} height={4}/></div>))}</div>)}
-        </>}
+          {myIncomes.length>0&&(<div style={S.card}><SectionTitle>Por fonte</SectionTitle>{byIncCat.filter(c=>c.total>0).map(c=>(<div key={c.id} style={{marginBottom:12}}><div style={{display:"flex",justifyContent:"space-between",marginBottom:6}}><span style={{fontSize:14}}>{c.icon} {c.label}</span><span style={{fontSize:14,fontWeight:700,color:"#10b981"}}>{fmt(c.total)} <span style={{fontSize:11,color:"#6b7280",fontWeight:400}}>({pct(c.total,totalInc)}%)</span></span></div><ProgressBar value={c.total} max={maxInc} color="#10b981" height={4}/></div>))}</div>)}
+        </div>}
 
-        {/* PROGRESSÃO */}
-        {tab==="progressao"&&<>
-          <div style={{display:"flex",gap:6,marginBottom:16}}>{["2024","2025","2026"].map(y=>(<button key={y} onClick={()=>setRevYear(y)} style={{flex:1,padding:"9px 0",border:`1px solid ${revYear===y?T.accent:T.cardBorder}`,borderRadius:9,background:revYear===y?`${T.accent}22`:"transparent",color:revYear===y?T.accent:T.subtext,fontWeight:700,fontSize:13,cursor:"pointer",fontFamily:"'Sora',sans-serif"}}>{y}</button>))}</div>
+        {/* PROGRESSÃO - Premium Style */}
+        {tab==="progressao"&&<div style={{padding:"0 20px 100px"}}>
+          <div style={{display:"flex",gap:8,marginBottom:18}}>{["2024","2025","2026"].map(y=>(<button key={y} onClick={()=>setRevYear(y)} style={{flex:1,padding:"11px 0",border:revYear===y?"none":"1px solid rgba(255,255,255,0.08)",borderRadius:12,background:revYear===y?"linear-gradient(135deg,#10b981,#059669)":"rgba(255,255,255,0.03)",color:revYear===y?"#fff":"#6b7280",fontWeight:700,fontSize:13,cursor:"pointer",fontFamily:"'Sora',sans-serif"}}>{y}</button>))}</div>
           <div style={S.sg}>
-            <StatCard label={`Receita ${revYear}`} value={revArr.reduce((s:number,v:number)=>s+v,0)} color={T.positive}/>
-            <StatCard label={`Despesas ${revYear}`} value={expenses.filter(e=>e.world===world&&String(new Date(e.data).getFullYear())===revYear).reduce((s,e)=>s+Number(e.valor),0)} color={T.negative}/>
+            <StatCard label={`Receita ${revYear}`} value={revArr.reduce((s:number,v:number)=>s+v,0)} color="#10b981"/>
+            <StatCard label={`Despesas ${revYear}`} value={expenses.filter(e=>e.world===world&&String(new Date(e.data).getFullYear())===revYear).reduce((s,e)=>s+Number(e.valor),0)} color="#f87171"/>
           </div>
           <div style={S.card}>
             <SectionTitle>Receita mensal — {revYear} (toca para editar)</SectionTitle>
-            <div style={{display:"grid",gridTemplateColumns:"repeat(3,1fr)",gap:8}}>
+            <div style={{display:"grid",gridTemplateColumns:"repeat(3,1fr)",gap:10}}>
               {MONTHS.map((m,i)=>{
                 const v=revArr[i]||0,expM=expenses.filter(e=>e.world===world&&new Date(e.data).getMonth()===i&&String(new Date(e.data).getFullYear())===revYear).reduce((s,e)=>s+Number(e.valor),0),net=v-expM;
-                return(<div key={i} onClick={()=>{setRevEdit(i);setRevVal(String(v));}} style={{background:T.cardBg,border:`1px solid ${revEdit===i?T.accent:T.cardBorder}`,borderRadius:10,padding:"10px 12px",cursor:"pointer",transition:"border .2s"}}>
-                  <div style={{fontSize:11,color:T.subtext,marginBottom:4,fontWeight:600}}>{m}</div>
-                  {revEdit===i?<input autoFocus style={{...S.inp,padding:"4px 6px",fontSize:13,height:28}} type="number" value={revVal} onChange={e=>setRevVal(e.target.value)} onBlur={saveRevCell} onKeyDown={e=>{if(e.key==="Enter")saveRevCell();if(e.key==="Escape")setRevEdit(null);}}/>
-                  :<><div style={{fontSize:13,fontWeight:700,color:v>0?T.positive:T.subtext}}>{fmt(v)}</div>{v>0&&<div style={{fontSize:10,color:net>=0?T.positive:T.negative,marginTop:2}}>líq: {fmt(net)}</div>}</>}
+                return(<div key={i} onClick={()=>{setRevEdit(i);setRevVal(String(v));}} style={{background:"rgba(255,255,255,0.03)",border:`1px solid ${revEdit===i?"#10b981":"rgba(255,255,255,0.08)"}`,borderRadius:12,padding:"12px 14px",cursor:"pointer",transition:"border .2s"}}>
+                  <div style={{fontSize:11,color:"#6b7280",marginBottom:6,fontWeight:600}}>{m}</div>
+                  {revEdit===i?<input autoFocus style={{...S.inp,padding:"6px 8px",fontSize:13,height:32}} type="number" value={revVal} onChange={e=>setRevVal(e.target.value)} onBlur={saveRevCell} onKeyDown={e=>{if(e.key==="Enter")saveRevCell();if(e.key==="Escape")setRevEdit(null);}}/>
+                  :<><div style={{fontSize:14,fontWeight:700,color:v>0?"#10b981":"#6b7280"}}>{fmt(v)}</div>{v>0&&<div style={{fontSize:10,color:net>=0?"#10b981":"#f87171",marginTop:4}}>líq: {fmt(net)}</div>}</>}
                 </div>);
               })}
             </div>
           </div>
           <div style={S.card}>
             <SectionTitle>Receita vs Despesas — {revYear}</SectionTitle>
-            <div style={{display:"flex",alignItems:"flex-end",gap:4,height:90,marginBottom:8}}>
+            <div style={{display:"flex",alignItems:"flex-end",gap:6,height:100,marginBottom:12}}>
               {MONTHS.map((m,i)=>{
-                const rev=revArr[i]||0,exp=expenses.filter(e=>e.world===world&&new Date(e.data).getMonth()===i&&String(new Date(e.data).getFullYear())===revYear).reduce((s,e)=>s+Number(e.valor),0),rH=Math.round((rev/maxBar)*78)||2,eH=Math.round((exp/maxBar)*78)||2;
-                return(<div key={i} style={{flex:1,display:"flex",flexDirection:"column",alignItems:"center",gap:2}}><div style={{display:"flex",alignItems:"flex-end",gap:1,height:78}}><div style={{width:"45%",height:rH,background:T.positive,borderRadius:"3px 3px 0 0",transition:"height .4s"}}/><div style={{width:"45%",height:eH,background:T.negative,borderRadius:"3px 3px 0 0",transition:"height .4s"}}/></div><span style={{fontSize:8,color:T.subtext}}>{m}</span></div>);
+                const rev=revArr[i]||0,exp=expenses.filter(e=>e.world===world&&new Date(e.data).getMonth()===i&&String(new Date(e.data).getFullYear())===revYear).reduce((s,e)=>s+Number(e.valor),0),rH=Math.round((rev/maxBar)*85)||3,eH=Math.round((exp/maxBar)*85)||3;
+                return(<div key={i} style={{flex:1,display:"flex",flexDirection:"column",alignItems:"center",gap:3}}><div style={{display:"flex",alignItems:"flex-end",gap:2,height:85}}><div style={{width:"45%",height:rH,background:"#10b981",borderRadius:"4px 4px 0 0",transition:"height .4s"}}/><div style={{width:"45%",height:eH,background:"#f87171",borderRadius:"4px 4px 0 0",transition:"height .4s"}}/></div><span style={{fontSize:9,color:"#6b7280"}}>{m}</span></div>);
               })}
             </div>
-            <div style={{display:"flex",gap:14}}>
-              <div style={{display:"flex",alignItems:"center",gap:5,fontSize:11,color:"#94a3b8"}}><div style={{width:10,height:10,borderRadius:2,background:T.positive}}/>Receita</div>
-              <div style={{display:"flex",alignItems:"center",gap:5,fontSize:11,color:"#94a3b8"}}><div style={{width:10,height:10,borderRadius:2,background:T.negative}}/>Despesas</div>
+            <div style={{display:"flex",gap:16}}>
+              <div style={{display:"flex",alignItems:"center",gap:6,fontSize:12,color:"#9ca3af"}}><div style={{width:12,height:12,borderRadius:3,background:"#10b981"}}/>Receita</div>
+              <div style={{display:"flex",alignItems:"center",gap:6,fontSize:12,color:"#9ca3af"}}><div style={{width:12,height:12,borderRadius:3,background:"#f87171"}}/>Despesas</div>
             </div>
           </div>
-        </>}
+        </div>}
 
       </div>
     </div>
