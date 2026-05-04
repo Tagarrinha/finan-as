@@ -6,6 +6,7 @@ import MonthComparison from "./MonthComparison";
 import WorldEditor from "./WorldEditor";
 import CoupleMode from "./CoupleMode";
 import PremiumDashboard from "./PremiumDashboard";
+import LandingPage from "./LandingPage";
 
 const SUPA_URL = "https://aiifzqmwnnfnrwmacyxq.supabase.co";
 const SUPA_KEY = "sb_publishable_GaZqBKcZGXJagV9mLnM1Zw_3Dq3wm6g";
@@ -237,95 +238,97 @@ function WelcomeScreen() {
     }
     setLoading(false);
   }
-  const inp:CSSProperties={width:"100%",background:"rgba(255,255,255,0.06)",border:"1px solid rgba(255,255,255,0.1)",borderRadius:10,padding:"13px 14px",color:"#e2e8f0",fontSize:14,boxSizing:"border-box",outline:"none",fontFamily:"'Sora',sans-serif"};
-  const lbl:CSSProperties={fontSize:11,fontWeight:700,color:"#64748b",textTransform:"uppercase",letterSpacing:"0.08em",display:"block",marginBottom:6};
+  const inp:CSSProperties={width:"100%",background:"rgba(255,255,255,0.04)",border:"1px solid rgba(255,255,255,0.08)",borderRadius:12,padding:"14px 16px",color:"#e2e8f0",fontSize:14,boxSizing:"border-box",outline:"none",fontFamily:"'Sora',sans-serif"};
+  const lbl:CSSProperties={fontSize:11,fontWeight:700,color:"#6b7280",textTransform:"uppercase",letterSpacing:"0.1em",display:"block",marginBottom:8};
   if(mode==="login"||mode==="register") return(
-    <div style={{minHeight:"100vh",background:"#080810",display:"flex",flexDirection:"column",fontFamily:"'Sora',sans-serif"}}>
+    <div style={{minHeight:"100vh",background:"#0a0f14",display:"flex",flexDirection:"column",fontFamily:"'Sora',sans-serif"}}>
       <link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700;800&display=swap" rel="stylesheet"/>
-      <style>{`@keyframes fadeUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}} input::placeholder{color:#374151}`}</style>
-      <div style={{padding:"18px 20px",display:"flex",alignItems:"center",gap:10,borderBottom:"1px solid rgba(255,255,255,0.04)"}}>
-        <button onClick={()=>{setMode("welcome");setError("");}} style={{background:"rgba(255,255,255,0.06)",border:"1px solid rgba(255,255,255,0.08)",borderRadius:8,padding:"7px 12px",color:"#64748b",fontSize:13,cursor:"pointer",fontFamily:"'Sora',sans-serif"}}>←</button>
-        <span style={{fontSize:16}}>💰</span><span style={{fontSize:13,fontWeight:700,color:"#475569"}}>Finanças Pessoais</span>
+      <style>{`@keyframes fadeUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}} input::placeholder{color:#4b5563}`}</style>
+      <div style={{position:"fixed",top:-120,right:-120,width:400,height:400,borderRadius:"50%",background:"radial-gradient(circle,rgba(16,185,129,0.08) 0%,transparent 70%)",pointerEvents:"none"}}/>
+      <div style={{padding:"18px 20px",display:"flex",alignItems:"center",gap:10,borderBottom:"1px solid rgba(255,255,255,0.06)",position:"relative",zIndex:1}}>
+        <button onClick={()=>{setMode("welcome");setError("");}} style={{background:"rgba(255,255,255,0.04)",border:"1px solid rgba(255,255,255,0.08)",borderRadius:10,padding:"8px 14px",color:"#6b7280",fontSize:13,cursor:"pointer",fontFamily:"'Sora',sans-serif"}}>&#8592;</button>
+        <div style={{width:28,height:28,borderRadius:8,background:"linear-gradient(135deg,#10b981,#059669)",display:"flex",alignItems:"center",justifyContent:"center",fontSize:14}}>&#128176;</div>
+        <span style={{fontSize:14,fontWeight:700,color:"#e5e7eb"}}>MyOwnFinTrack</span>
       </div>
-      <div style={{flex:1,display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",padding:"24px 20px 40px"}}>
-        <div style={{width:"100%",maxWidth:380,animation:"fadeUp .45s ease"}}>
-          <div style={{textAlign:"center",marginBottom:28}}>
-            <div style={{fontSize:12,fontWeight:700,color:"#f97316",textTransform:"uppercase",letterSpacing:"0.12em",marginBottom:8}}>{mode==="login"?"Bem-vindo de volta":"Começa gratuitamente"}</div>
-            <div style={{fontSize:24,fontWeight:800,color:"#f1f5f9",letterSpacing:"-0.5px",lineHeight:1.25}}>{mode==="login"?"Entra na tua conta":"Cria a tua conta agora"}</div>
+      <div style={{flex:1,display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",padding:"24px 20px 40px",position:"relative",zIndex:1}}>
+        <div style={{width:"100%",maxWidth:400,animation:"fadeUp .45s ease"}}>
+          <div style={{textAlign:"center",marginBottom:32}}>
+            <div style={{fontSize:12,fontWeight:700,color:"#10b981",textTransform:"uppercase",letterSpacing:"0.12em",marginBottom:10}}>{mode==="login"?"Bem-vindo de volta":"Comeca gratuitamente"}</div>
+            <div style={{fontSize:28,fontWeight:800,color:"#f1f5f9",letterSpacing:"-0.5px",lineHeight:1.25}}>{mode==="login"?"Entra na tua conta":"Cria a tua conta agora"}</div>
           </div>
-          <div style={{background:"rgba(255,255,255,0.03)",border:"1px solid rgba(255,255,255,0.08)",borderRadius:20,padding:"26px 22px"}}>
-            <div style={{display:"flex",background:"rgba(255,255,255,0.05)",borderRadius:12,padding:4,marginBottom:22}}>
+          <div style={{background:"rgba(255,255,255,0.02)",border:"1px solid rgba(255,255,255,0.08)",borderRadius:20,padding:"28px 24px"}}>
+            <div style={{display:"flex",background:"rgba(255,255,255,0.04)",borderRadius:12,padding:4,marginBottom:24}}>
               {(["login","register"] as const).map(s=>(
-                <button key={s} onClick={()=>{setMode(s);setError("");}} style={{flex:1,padding:"9px 0",border:"none",borderRadius:9,background:mode===s?"rgba(249,115,22,0.25)":"transparent",color:mode===s?"#f97316":"#475569",fontWeight:700,fontSize:13,cursor:"pointer",fontFamily:"'Sora',sans-serif"}}>{s==="login"?"Entrar":"Criar conta"}</button>
+                <button key={s} onClick={()=>{setMode(s);setError("");}} style={{flex:1,padding:"10px 0",border:"none",borderRadius:10,background:mode===s?"rgba(16,185,129,0.2)":"transparent",color:mode===s?"#10b981":"#6b7280",fontWeight:700,fontSize:13,cursor:"pointer",fontFamily:"'Sora',sans-serif"}}>{s==="login"?"Entrar":"Criar conta"}</button>
               ))}
             </div>
-            {mode==="register"&&<div style={{marginBottom:12}}><label style={lbl}>Nome</label><input style={inp} placeholder="O teu nome" value={name} onChange={e=>setName(e.target.value)}/></div>}
-            <div style={{marginBottom:12}}><label style={lbl}>Email</label><input style={inp} type="email" placeholder="email@exemplo.com" value={email} onChange={e=>setEmail(e.target.value)}/></div>
-            <div style={{marginBottom:error?12:22}}><label style={lbl}>Password</label><input style={inp} type="password" placeholder="••••••••" value={password} onChange={e=>setPassword(e.target.value)} onKeyDown={e=>e.key==="Enter"&&handleAuth()}/></div>
-            {error&&<div style={{background:"#450a0a",border:"1px solid rgba(239,68,68,0.3)",borderRadius:9,padding:"10px 13px",marginBottom:16,fontSize:12,color:"#f87171"}}>⚠️ {error}</div>}
-            <button onClick={handleAuth} disabled={loading} style={{width:"100%",padding:"14px 0",background:"linear-gradient(135deg,#f97316,#ef4444)",border:"none",borderRadius:12,color:"#fff",fontWeight:800,fontSize:15,cursor:loading?"not-allowed":"pointer",fontFamily:"'Sora',sans-serif",opacity:loading?0.7:1}}>
-              {loading?"A processar...":mode==="login"?"Entrar →":"Criar conta →"}
+            {mode==="register"&&<div style={{marginBottom:14}}><label style={lbl}>Nome</label><input style={inp} placeholder="O teu nome" value={name} onChange={e=>setName(e.target.value)}/></div>}
+            <div style={{marginBottom:14}}><label style={lbl}>Email</label><input style={inp} type="email" placeholder="email@exemplo.com" value={email} onChange={e=>setEmail(e.target.value)}/></div>
+            <div style={{marginBottom:error?14:24}}><label style={lbl}>Password</label><input style={inp} type="password" placeholder="&#8226;&#8226;&#8226;&#8226;&#8226;&#8226;&#8226;&#8226;" value={password} onChange={e=>setPassword(e.target.value)} onKeyDown={e=>e.key==="Enter"&&handleAuth()}/></div>
+            {error&&<div style={{background:"rgba(239,68,68,0.1)",border:"1px solid rgba(239,68,68,0.25)",borderRadius:12,padding:"12px 14px",marginBottom:18,fontSize:12,color:"#f87171"}}>&#9888;&#65039; {error}</div>}
+            <button onClick={handleAuth} disabled={loading} style={{width:"100%",padding:"16px 0",background:"linear-gradient(135deg,#10b981,#059669)",border:"none",borderRadius:14,color:"#fff",fontWeight:800,fontSize:15,cursor:loading?"not-allowed":"pointer",fontFamily:"'Sora',sans-serif",opacity:loading?0.7:1,boxShadow:"0 8px 30px rgba(16,185,129,0.25)"}}>
+              {loading?"A processar...":mode==="login"?"Entrar &#8594;":"Criar conta &#8594;"}
             </button>
           </div>
-          <div style={{textAlign:"center",marginTop:18,fontSize:11,color:"#1f2937"}}>🔒 Dados privados e encriptados</div>
+          <div style={{textAlign:"center",marginTop:20,fontSize:12,color:"#6b7280"}}>&#128274; Dados privados e encriptados</div>
         </div>
       </div>
     </div>
   );
   const feature=FEATURES[featIdx];
   return(
-    <div style={{minHeight:"100vh",background:"#080810",fontFamily:"'Sora',sans-serif",color:"#e2e8f0",overflowX:"hidden"}}>
+    <div style={{minHeight:"100vh",background:"#0a0f14",fontFamily:"'Sora',sans-serif",color:"#e2e8f0",overflowX:"hidden"}}>
       <link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700;800&display=swap" rel="stylesheet"/>
       <style>{`@keyframes fadeUp{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:translateY(0)}} @keyframes pulse{0%,100%{opacity:.5}50%{opacity:1}}`}</style>
-      <div style={{position:"fixed",top:-80,right:-80,width:300,height:300,borderRadius:"50%",background:"radial-gradient(circle,rgba(249,115,22,0.12) 0%,transparent 70%)",pointerEvents:"none"}}/>
-      <div style={{padding:"20px 20px 0",display:"flex",justifyContent:"space-between",alignItems:"center"}}>
-        <div style={{display:"flex",alignItems:"center",gap:8}}>
-          <div style={{width:32,height:32,borderRadius:9,background:"linear-gradient(135deg,#f97316,#ef4444)",display:"flex",alignItems:"center",justifyContent:"center",fontSize:16}}>💰</div>
-          <span style={{fontSize:13,fontWeight:700,color:"#475569"}}>Finanças Pessoais</span>
+      <div style={{position:"fixed",top:-100,right:-100,width:350,height:350,borderRadius:"50%",background:"radial-gradient(circle,rgba(16,185,129,0.08) 0%,transparent 70%)",pointerEvents:"none"}}/>
+      <div style={{padding:"20px 20px 0",display:"flex",justifyContent:"space-between",alignItems:"center",position:"relative",zIndex:1}}>
+        <div style={{display:"flex",alignItems:"center",gap:10}}>
+          <div style={{width:36,height:36,borderRadius:10,background:"linear-gradient(135deg,#10b981,#059669)",display:"flex",alignItems:"center",justifyContent:"center",fontSize:18}}>&#128176;</div>
+          <span style={{fontSize:15,fontWeight:700,color:"#e5e7eb"}}>MyOwnFinTrack</span>
         </div>
-        <button onClick={()=>setMode("login")} style={{background:"rgba(255,255,255,0.05)",border:"1px solid rgba(255,255,255,0.1)",borderRadius:9,padding:"8px 16px",color:"#94a3b8",fontSize:13,fontWeight:600,cursor:"pointer",fontFamily:"'Sora',sans-serif"}}>Entrar</button>
+        <button onClick={()=>setMode("login")} style={{background:"rgba(255,255,255,0.04)",border:"1px solid rgba(255,255,255,0.08)",borderRadius:10,padding:"10px 18px",color:"#e5e7eb",fontSize:13,fontWeight:600,cursor:"pointer",fontFamily:"'Sora',sans-serif"}}>Entrar</button>
       </div>
-      <div style={{padding:"40px 20px 0",textAlign:"center"}}>
-        <div style={{display:"inline-flex",alignItems:"center",gap:8,background:"rgba(249,115,22,0.1)",border:"1px solid rgba(249,115,22,0.2)",borderRadius:99,padding:"6px 14px",marginBottom:28}}>
-          <div style={{width:6,height:6,borderRadius:"50%",background:"#f97316",animation:"pulse 1.5s ease infinite"}}/>
-          <span style={{fontSize:12,color:"#f97316",fontWeight:600}}>O teu dinheiro, o teu controlo</span>
+      <div style={{padding:"50px 20px 0",textAlign:"center",position:"relative",zIndex:1}}>
+        <div style={{display:"inline-flex",alignItems:"center",gap:8,background:"rgba(16,185,129,0.1)",border:"1px solid rgba(16,185,129,0.2)",borderRadius:99,padding:"6px 16px",marginBottom:32}}>
+          <div style={{width:6,height:6,borderRadius:"50%",background:"#10b981",animation:"pulse 1.5s ease infinite"}}/>
+          <span style={{fontSize:12,color:"#10b981",fontWeight:600}}>Controlo financeiro inteligente</span>
         </div>
-        <h1 style={{fontSize:32,fontWeight:800,color:"#f1f5f9",letterSpacing:"-1px",lineHeight:1.15,margin:"0 0 16px",padding:"0 8px"}}>
-          Bem-vindo ao<br/>
-          <span style={{background:"linear-gradient(135deg,#f97316,#fbbf24)",WebkitBackgroundClip:"text",WebkitTextFillColor:"transparent"}}>controlo das<br/>tuas finanças</span>
+        <h1 style={{fontSize:36,fontWeight:800,color:"#f1f5f9",letterSpacing:"-1px",lineHeight:1.15,margin:"0 0 20px",padding:"0 8px"}}>
+          Toma o controlo total<br/>das tuas{" "}
+          <span style={{color:"#10b981"}}>financas</span>
         </h1>
-        <p style={{fontSize:14,color:"#475569",lineHeight:1.6,margin:"0 0 32px",padding:"0 12px"}}>Despesas, poupanças, contas e recorrentes —<br/>tudo num só lugar, sempre sincronizado.</p>
-        <div style={{display:"flex",flexDirection:"column",gap:10,padding:"0 4px",marginBottom:36}}>
-          <button onClick={()=>setMode("register")} style={{width:"100%",padding:"15px 0",background:"linear-gradient(135deg,#f97316,#ef4444)",border:"none",borderRadius:14,color:"#fff",fontWeight:800,fontSize:16,cursor:"pointer",fontFamily:"'Sora',sans-serif",boxShadow:"0 8px 32px rgba(249,115,22,0.35)"}}>Começar gratuitamente →</button>
-          <button onClick={()=>setMode("login")} style={{width:"100%",padding:"13px 0",background:"rgba(255,255,255,0.04)",border:"1px solid rgba(255,255,255,0.1)",borderRadius:14,color:"#94a3b8",fontWeight:700,fontSize:14,cursor:"pointer",fontFamily:"'Sora',sans-serif"}}>Já tenho conta — Entrar</button>
+        <p style={{fontSize:15,color:"#6b7280",lineHeight:1.7,margin:"0 0 36px",padding:"0 12px"}}>Despesas, poupancas, contas e recorrentes —<br/>tudo num so lugar, sempre sincronizado.</p>
+        <div style={{display:"flex",flexDirection:"column",gap:12,padding:"0 4px",marginBottom:40}}>
+          <button onClick={()=>setMode("register")} style={{width:"100%",padding:"16px 0",background:"linear-gradient(135deg,#10b981,#059669)",border:"none",borderRadius:14,color:"#fff",fontWeight:800,fontSize:16,cursor:"pointer",fontFamily:"'Sora',sans-serif",boxShadow:"0 8px 30px rgba(16,185,129,0.3)"}}>Comecar gratuitamente &#8594;</button>
+          <button onClick={()=>setMode("login")} style={{width:"100%",padding:"14px 0",background:"rgba(255,255,255,0.03)",border:"1px solid rgba(255,255,255,0.08)",borderRadius:14,color:"#9ca3af",fontWeight:700,fontSize:14,cursor:"pointer",fontFamily:"'Sora',sans-serif"}}>Ja tenho conta - Entrar</button>
         </div>
       </div>
-      <div style={{margin:"0 20px 28px",background:"rgba(255,255,255,0.03)",border:"1px solid rgba(255,255,255,0.07)",borderRadius:18,padding:"20px"}}>
+      <div style={{margin:"0 20px 28px",background:"rgba(255,255,255,0.02)",border:"1px solid rgba(255,255,255,0.06)",borderRadius:18,padding:"22px",position:"relative",zIndex:1}}>
         <div key={animKey} style={{animation:"fadeUp .4s ease"}}>
-          <div style={{display:"flex",alignItems:"center",gap:12,marginBottom:10}}>
-            <div style={{width:44,height:44,borderRadius:13,background:"linear-gradient(135deg,rgba(249,115,22,0.2),rgba(239,68,68,0.2))",display:"flex",alignItems:"center",justifyContent:"center",fontSize:22}}>{feature.icon}</div>
-            <div><div style={{fontSize:14,fontWeight:700,color:"#f1f5f9"}}>{feature.title}</div><div style={{fontSize:12,color:"#475569",marginTop:2}}>{feature.desc}</div></div>
+          <div style={{display:"flex",alignItems:"center",gap:14,marginBottom:10}}>
+            <div style={{width:48,height:48,borderRadius:14,background:"rgba(16,185,129,0.15)",display:"flex",alignItems:"center",justifyContent:"center",fontSize:24}}>{feature.icon}</div>
+            <div><div style={{fontSize:15,fontWeight:700,color:"#f1f5f9"}}>{feature.title}</div><div style={{fontSize:13,color:"#6b7280",marginTop:3}}>{feature.desc}</div></div>
           </div>
-          <div style={{display:"flex",gap:5,justifyContent:"center",marginTop:14}}>
-            {FEATURES.map((_,i)=><div key={i} style={{width:i===featIdx?20:6,height:6,borderRadius:99,background:i===featIdx?"#f97316":"rgba(255,255,255,0.1)",transition:"all .3s ease"}}/>)}
+          <div style={{display:"flex",gap:6,justifyContent:"center",marginTop:16}}>
+            {FEATURES.map((_,i)=><div key={i} style={{width:i===featIdx?22:6,height:6,borderRadius:99,background:i===featIdx?"#10b981":"rgba(255,255,255,0.1)",transition:"all .3s ease"}}/>)}
           </div>
         </div>
       </div>
-      <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:10,padding:"0 20px",marginBottom:40}}>
+      <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:12,padding:"0 20px",marginBottom:40,position:"relative",zIndex:1}}>
         {FEATURES.map((f,i)=>(
-          <div key={i} style={{background:"rgba(255,255,255,0.03)",border:"1px solid rgba(255,255,255,0.06)",borderRadius:14,padding:"14px 12px"}}>
-            <div style={{fontSize:22,marginBottom:8}}>{f.icon}</div>
-            <div style={{fontSize:12,fontWeight:700,color:"#e2e8f0",marginBottom:4}}>{f.title}</div>
-            <div style={{fontSize:11,color:"#374151",lineHeight:1.4}}>{f.desc}</div>
+          <div key={i} style={{background:"rgba(255,255,255,0.02)",border:"1px solid rgba(255,255,255,0.06)",borderRadius:16,padding:"16px 14px"}}>
+            <div style={{fontSize:24,marginBottom:10}}>{f.icon}</div>
+            <div style={{fontSize:13,fontWeight:700,color:"#e5e7eb",marginBottom:6}}>{f.title}</div>
+            <div style={{fontSize:12,color:"#6b7280",lineHeight:1.5}}>{f.desc}</div>
           </div>
         ))}
       </div>
-      <div style={{padding:"0 20px 48px",textAlign:"center"}}>
-        <div style={{background:"linear-gradient(135deg,rgba(249,115,22,0.08),rgba(239,68,68,0.08))",border:"1px solid rgba(249,115,22,0.2)",borderRadius:20,padding:"24px 20px"}}>
-          <div style={{fontSize:18,fontWeight:800,color:"#f1f5f9",marginBottom:8}}>Pronto para começar?</div>
-          <div style={{fontSize:13,color:"#64748b",marginBottom:18}}>Grátis, seguro e sempre contigo.</div>
-          <button onClick={()=>setMode("register")} style={{width:"100%",padding:"14px 0",background:"linear-gradient(135deg,#f97316,#ef4444)",border:"none",borderRadius:12,color:"#fff",fontWeight:800,fontSize:15,cursor:"pointer",fontFamily:"'Sora',sans-serif"}}>Criar conta gratuita →</button>
-          <div style={{fontSize:11,color:"#1f2937",marginTop:12}}>🔒 Grátis para sempre · Sem cartão de crédito</div>
+      <div style={{padding:"0 20px 60px",textAlign:"center",position:"relative",zIndex:1}}>
+        <div style={{background:"linear-gradient(145deg,rgba(16,185,129,0.12),rgba(16,185,129,0.04))",border:"1px solid rgba(16,185,129,0.2)",borderRadius:20,padding:"28px 24px"}}>
+          <div style={{fontSize:20,fontWeight:800,color:"#f1f5f9",marginBottom:10}}>Pronto para comecar?</div>
+          <div style={{fontSize:14,color:"#6b7280",marginBottom:20}}>Gratis, seguro e sempre contigo.</div>
+          <button onClick={()=>setMode("register")} style={{width:"100%",padding:"15px 0",background:"linear-gradient(135deg,#10b981,#059669)",border:"none",borderRadius:14,color:"#fff",fontWeight:800,fontSize:15,cursor:"pointer",fontFamily:"'Sora',sans-serif",boxShadow:"0 6px 24px rgba(16,185,129,0.25)"}}>Criar conta gratuita &#8594;</button>
+          <div style={{fontSize:12,color:"#6b7280",marginTop:14}}>&#128274; Gratis para sempre &#183; Sem cartao de credito</div>
         </div>
       </div>
     </div>
@@ -342,7 +345,9 @@ export default function Financas() {
     return ()=>subscription.unsubscribe();
   },[]);
   async function loadProfile(uid:string){const{data}=await supabase.from("profiles").select("name").eq("id",uid).single();if(data)setUserName(data.name);}
-  if(loading)return(<div style={{minHeight:"100vh",background:"#080810",display:"flex",alignItems:"center",justifyContent:"center",fontFamily:"'Sora',sans-serif"}}><div style={{textAlign:"center"}}><div style={{fontSize:40,marginBottom:12}}>💰</div><div style={{fontSize:14,color:"#475569"}}>A carregar...</div></div></div>);
+  const [showLanding, setShowLanding] = useState(true);
+  if(loading)return(<div style={{minHeight:"100vh",background:"#0a0f14",display:"flex",alignItems:"center",justifyContent:"center",fontFamily:"'Sora',sans-serif"}}><div style={{textAlign:"center"}}><div style={{fontSize:40,marginBottom:12}}>&#128176;</div><div style={{fontSize:14,color:"#6b7280"}}>A carregar...</div></div></div>);
+  if(!sbUser && showLanding) return <LandingPage onGetStarted={() => setShowLanding(false)} />;
   if(!sbUser)return <WelcomeScreen/>;
   return <MainApp user={sbUser} userName={userName} onLogout={()=>supabase.auth.signOut()}/>;
 }
