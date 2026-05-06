@@ -95,11 +95,221 @@ const TOUR_STEPS = [
 const fmt = (n:number) => new Intl.NumberFormat("pt-PT",{style:"currency",currency:"EUR"}).format(n||0);
 const pct = (part:number,total:number) => total>0?Math.round((part/total)*100):0;
 
+// ─── LEFT NAV DRAWER ──────────────────────────────────────────────────────────
+
+type NavTab = "resumo"|"despesas"|"rendimentos"|"casal"|"objetivos";
+
+interface NavItem { id: NavTab; label: string; icon: string; }
+
+const LEFT_NAV_ITEMS: NavItem[] = [
+  { id:"despesas",    label:"Despesas",    icon:"📥" },
+  { id:"rendimentos", label:"Rendimentos", icon:"💶" },
+  { id:"casal",       label:"Modo Casal",  icon:"👫" },
+  { id:"objetivos",   label:"Metas",       icon:"🎯" },
+];
+
+function LeftNav({ isOpen, onClose, activeTab, onNavigate, accent, accentDark }: {
+  isOpen: boolean;
+  onClose: () => void;
+  activeTab: string;
+  onNavigate: (tab: string) => void;
+  accent: string;
+  accentDark: string;
+}) {
+  useEffect(() => {
+    const handler = (e: KeyboardEvent) => { if (e.key === "Escape" && isOpen) onClose(); };
+    document.addEventListener("keydown", handler);
+    return () => document.removeEventListener("keydown", handler);
+  }, [isOpen, onClose]);
+
+  useEffect(() => {
+    document.body.style.overflow = isOpen ? "hidden" : "";
+    return () => { document.body.style.overflow = ""; };
+  }, [isOpen]);
+
+  const handleNav = (tab: string) => { onNavigate(tab); onClose(); };
+
+  return (
+    <>
+      <style>{`
+        .lnav-backdrop {
+          position: fixed; inset: 0; z-index: 40;
+          background: rgba(5,10,20,0.72);
+          backdrop-filter: blur(3px);
+          opacity: 0; pointer-events: none;
+          transition: opacity 0.25s ease;
+        }
+        .lnav-backdrop.open { opacity: 1; pointer-events: all; }
+
+        .lnav-drawer {
+          position: fixed; top: 0; left: 0; bottom: 0;
+          width: 260px; max-width: 82vw;
+          z-index: 50;
+          background: #0b0e18;
+          border-right: 1px solid rgba(255,255,255,0.07);
+          display: flex; flex-direction: column;
+          transform: translateX(-100%);
+          transition: transform 0.28s cubic-bezier(0.4,0,0.2,1);
+          will-change: transform;
+        }
+        .lnav-drawer.open {
+          transform: translateX(0);
+          box-shadow: 6px 0 40px rgba(0,0,0,0.55);
+        }
+
+        .lnav-header {
+          display: flex; align-items: center; justify-content: space-between;
+          padding: 18px 18px 14px;
+          border-bottom: 1px solid rgba(255,255,255,0.06);
+        }
+        .lnav-logo { display: flex; align-items: center; gap: 9px; }
+        .lnav-logo-icon {
+          width: 30px; height: 30px; border-radius: 8px;
+          background: linear-gradient(135deg, var(--lnav-accent), var(--lnav-accent-dark));
+          display: flex; align-items: center; justify-content: center;
+          font-size: 15px;
+          box-shadow: 0 0 14px color-mix(in srgb, var(--lnav-accent) 40%, transparent);
+        }
+        .lnav-logo-text {
+          font-family: 'Sora', sans-serif; font-size: 13px;
+          font-weight: 700; color: #f0f0f0; line-height: 1.2;
+        }
+        .lnav-logo-sub {
+          font-size: 10px; font-weight: 400;
+          color: rgba(255,255,255,0.3); display: block; margin-top: 1px;
+        }
+        .lnav-close {
+          width: 30px; height: 30px; border-radius: 7px;
+          border: 1px solid rgba(255,255,255,0.08);
+          background: transparent; color: rgba(255,255,255,0.35);
+          cursor: pointer; display: flex; align-items: center; justify-content: center;
+          font-size: 14px; transition: all 0.15s ease;
+          flex-shrink: 0;
+        }
+        .lnav-close:hover { background: rgba(255,255,255,0.07); color: rgba(255,255,255,0.8); }
+
+        .lnav-section-label {
+          font-family: 'Sora', sans-serif; font-size: 10px; font-weight: 700;
+          letter-spacing: 0.11em; text-transform: uppercase;
+          color: rgba(255,255,255,0.22);
+          padding: 12px 16px 6px;
+        }
+        .lnav-nav { flex: 1; padding: 6px 10px; overflow-y: auto; display: flex; flex-direction: column; gap: 2px; }
+
+        .lnav-item {
+          display: flex; align-items: center; gap: 11px;
+          padding: 11px 12px; border-radius: 10px;
+          border: 1px solid transparent;
+          background: transparent; width: 100%; text-align: left;
+          cursor: pointer; transition: all 0.15s ease;
+          position: relative; overflow: hidden;
+          font-family: 'Sora', sans-serif;
+        }
+        .lnav-item:hover:not(.active) {
+          background: rgba(255,255,255,0.04);
+          border-color: rgba(255,255,255,0.06);
+        }
+        .lnav-item.active {
+          background: color-mix(in srgb, var(--lnav-accent) 12%, transparent);
+          border-color: color-mix(in srgb, var(--lnav-accent) 28%, transparent);
+        }
+        .lnav-item.active::before {
+          content: ''; position: absolute; left: 0; top: 22%; bottom: 22%;
+          width: 3px; border-radius: 0 3px 3px 0;
+          background: var(--lnav-accent);
+          box-shadow: 0 0 8px color-mix(in srgb, var(--lnav-accent) 60%, transparent);
+        }
+        .lnav-item-icon {
+          width: 34px; height: 34px; border-radius: 9px; flex-shrink: 0;
+          background: rgba(255,255,255,0.05);
+          display: flex; align-items: center; justify-content: center;
+          font-size: 17px; transition: background 0.15s;
+        }
+        .lnav-item.active .lnav-item-icon {
+          background: color-mix(in srgb, var(--lnav-accent) 20%, transparent);
+        }
+        .lnav-item-label {
+          font-size: 13px; font-weight: 500;
+          color: rgba(255,255,255,0.5);
+          transition: color 0.15s; line-height: 1;
+        }
+        .lnav-item:hover .lnav-item-label { color: rgba(255,255,255,0.88); }
+        .lnav-item.active .lnav-item-label { color: #fff; font-weight: 700; }
+
+        .lnav-footer {
+          padding: 12px 18px;
+          border-top: 1px solid rgba(255,255,255,0.05);
+          font-family: 'Sora', sans-serif;
+          font-size: 10px; color: rgba(255,255,255,0.18);
+          text-align: center; letter-spacing: 0.02em;
+        }
+
+        .lnav-hamburger {
+          width: 36px; height: 36px; border-radius: 9px;
+          border: 1px solid rgba(255,255,255,0.1);
+          background: rgba(255,255,255,0.04);
+          color: rgba(255,255,255,0.65);
+          cursor: pointer; display: flex; align-items: center; justify-content: center;
+          font-size: 18px; transition: all 0.16s ease;
+          flex-shrink: 0;
+        }
+        .lnav-hamburger:hover {
+          background: color-mix(in srgb, var(--lnav-accent) 12%, transparent);
+          border-color: color-mix(in srgb, var(--lnav-accent) 35%, transparent);
+          color: var(--lnav-accent);
+        }
+      `}</style>
+
+      {/* Backdrop */}
+      <div className={`lnav-backdrop${isOpen ? " open" : ""}`} onClick={onClose} aria-hidden="true" />
+
+      {/* Drawer */}
+      <div
+        className={`lnav-drawer${isOpen ? " open" : ""}`}
+        role="dialog" aria-modal="true" aria-label="Menu de navegação"
+        style={{ "--lnav-accent": accent, "--lnav-accent-dark": accentDark } as React.CSSProperties}
+      >
+        {/* Header */}
+        <div className="lnav-header">
+          <div className="lnav-logo">
+            <div className="lnav-logo-icon">💰</div>
+            <div className="lnav-logo-text">
+              FinTrack
+              <span className="lnav-logo-sub">myownfintrack</span>
+            </div>
+          </div>
+          <button className="lnav-close" onClick={onClose} aria-label="Fechar menu">✕</button>
+        </div>
+
+        {/* Nav */}
+        <nav className="lnav-nav" aria-label="Navegação principal">
+          <div className="lnav-section-label">Menu</div>
+          {LEFT_NAV_ITEMS.map(item => (
+            <button
+              key={item.id}
+              className={`lnav-item${activeTab === item.id ? " active" : ""}`}
+              onClick={() => handleNav(item.id)}
+              aria-current={activeTab === item.id ? "page" : undefined}
+            >
+              <span className="lnav-item-icon">{item.icon}</span>
+              <span className="lnav-item-label">{item.label}</span>
+            </button>
+          ))}
+        </nav>
+
+        {/* Footer */}
+        <div className="lnav-footer">myownfintrack.netlify.app</div>
+      </div>
+    </>
+  );
+}
+
+// ─── END LEFT NAV ─────────────────────────────────────────────────────────────
+
 function Tour({userName,accent,onFinish}:{userName:string;accent:string;onFinish:()=>void}) {
   const [step,setStep]=useState(0);
   const cur=TOUR_STEPS[step];
   const isLast=step===TOUR_STEPS.length-1;
-  const isIOS = /iphone|ipad|ipod/i.test(navigator.userAgent);
   return (
     <>
       <div style={{position:"fixed",inset:0,background:"rgba(0,0,0,0.75)",zIndex:100,pointerEvents:"none"}}/>
@@ -117,28 +327,18 @@ function Tour({userName,accent,onFinish}:{userName:string;accent:string;onFinish
           <div style={{marginBottom:16}}>
             <div style={{fontSize:15,fontWeight:800,color:"#f1f5f9",marginBottom:8}}>Instala a app no telemóvel 📱</div>
             <div style={{fontSize:13,color:"#94a3b8",marginBottom:14,lineHeight:1.6}}>Adiciona o FinTrack ao ecrã inicial — funciona como uma app nativa, sem precisar de app store!</div>
-            {/* iOS */}
             <div style={{background:"rgba(255,255,255,0.05)",border:"1px solid rgba(255,255,255,0.08)",borderRadius:12,padding:"12px 14px",marginBottom:8}}>
               <div style={{fontSize:11,fontWeight:700,color:"#94a3b8",textTransform:"uppercase" as const,letterSpacing:"0.08em",marginBottom:8}}>🍎 iPhone / iPad (Safari)</div>
-              {[
-                {icon:"📤", text:"Toca no ícone de partilha em baixo"},
-                {icon:"➕", text:"\"Adicionar ao ecrã de início\""},
-                {icon:"✅", text:"Toca em \"Adicionar\" — pronto!"},
-              ].map((s,i)=>(
+              {[{icon:"📤",text:"Toca no ícone de partilha em baixo"},{icon:"➕",text:"\"Adicionar ao ecrã de início\""},{icon:"✅",text:"Toca em \"Adicionar\" — pronto!"}].map((s,i)=>(
                 <div key={i} style={{display:"flex",alignItems:"center",gap:10,marginBottom:6}}>
                   <div style={{width:28,height:28,borderRadius:8,background:`${accent}20`,display:"flex",alignItems:"center",justifyContent:"center",fontSize:14,flexShrink:0}}>{s.icon}</div>
                   <span style={{fontSize:12,color:"#cbd5e1"}}>{s.text}</span>
                 </div>
               ))}
             </div>
-            {/* Android */}
             <div style={{background:"rgba(255,255,255,0.05)",border:"1px solid rgba(255,255,255,0.08)",borderRadius:12,padding:"12px 14px"}}>
               <div style={{fontSize:11,fontWeight:700,color:"#94a3b8",textTransform:"uppercase" as const,letterSpacing:"0.08em",marginBottom:8}}>🤖 Android (Chrome)</div>
-              {[
-                {icon:"⋮", text:"Toca nos 3 pontos no canto superior"},
-                {icon:"➕", text:"\"Adicionar ao ecrã principal\""},
-                {icon:"✅", text:"Confirma — o ícone aparece!"},
-              ].map((s,i)=>(
+              {[{icon:"⋮",text:"Toca nos 3 pontos no canto superior"},{icon:"➕",text:"\"Adicionar ao ecrã principal\""},{icon:"✅",text:"Confirma — o ícone aparece!"}].map((s,i)=>(
                 <div key={i} style={{display:"flex",alignItems:"center",gap:10,marginBottom:6}}>
                   <div style={{width:28,height:28,borderRadius:8,background:`${accent}20`,display:"flex",alignItems:"center",justifyContent:"center",fontSize:14,flexShrink:0}}>{s.icon}</div>
                   <span style={{fontSize:12,color:"#cbd5e1"}}>{s.text}</span>
@@ -349,7 +549,8 @@ export default function Financas() {
 function MainApp({user,userName,onLogout}:{user:SBUser;userName:string;onLogout:()=>void}) {
   const [world,setWorld]=useState("pessoal");
   const [tab,setTab]=useState("resumo");
-  const [sidebarOpen,setSidebarOpen]=useState(false);
+  const [sidebarOpen,setSidebarOpen]=useState(false);      // existing right sidebar (⚙️)
+  const [leftNavOpen,setLeftNavOpen]=useState(false);       // ← NEW left nav drawer
   const [themeKey,setThemeKey]=useState<ThemeKey>("original");
   const T=THEMES[themeKey];
   const [showTour,setShowTour]=useState(false);
@@ -500,7 +701,17 @@ function MainApp({user,userName,onLogout}:{user:SBUser;userName:string;onLogout:
 
       {showTour&&<Tour userName={userName} accent={T.accent} onFinish={finishTour}/>}
 
-      {/* SIDEBAR */}
+      {/* ── LEFT NAV DRAWER (NEW) ── */}
+      <LeftNav
+        isOpen={leftNavOpen}
+        onClose={() => setLeftNavOpen(false)}
+        activeTab={tab}
+        onNavigate={setTab}
+        accent={T.accent}
+        accentDark={T.accentDark}
+      />
+
+      {/* SIDEBAR (existing right ⚙️ panel — unchanged) */}
       {sidebarOpen&&<div onClick={()=>setSidebarOpen(false)} style={{position:"fixed",inset:0,background:"rgba(0,0,0,0.6)",zIndex:40}}/>}
       <div style={{position:"fixed",top:0,right:0,bottom:0,width:300,background:"#0f1117",borderLeft:`1px solid ${T.cardBorder}`,zIndex:50,transform:sidebarOpen?"translateX(0)":"translateX(100%)",transition:"transform .3s ease",display:"flex",flexDirection:"column" as const,fontFamily:"'Sora',sans-serif"}}>
         <div style={{padding:"18px 20px 0",borderBottom:`1px solid ${T.cardBorder}`,flexShrink:0}}>
@@ -624,10 +835,26 @@ function MainApp({user,userName,onLogout}:{user:SBUser;userName:string;onLogout:
       {/* HEADER */}
       <div style={{...S.header,position:"relative",zIndex:1}}>
         <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:14}}>
-          <div>
-            <div style={{fontSize:16,fontWeight:800,color:"#f1f5f9",letterSpacing:"-0.3px"}}>💰 As Minhas Finanças</div>
-            <div style={{fontSize:11,color:T.subtext,marginTop:1}}>Olá, <span style={{color:T.accent,fontWeight:700}}>{userName}</span> · <span style={{color:T.positive}}>sincronizado ✓</span></div>
+          {/* ── LEFT: hamburger + title ── */}
+          <div style={{display:"flex",alignItems:"center",gap:10}}>
+            {/* Hamburger button — opens left nav */}
+            <button
+              className="lnav-hamburger"
+              onClick={() => setLeftNavOpen(true)}
+              aria-label="Abrir menu"
+              style={{
+                "--lnav-accent": T.accent,
+                "--lnav-accent-dark": T.accentDark,
+              } as React.CSSProperties}
+            >
+              ☰
+            </button>
+            <div>
+              <div style={{fontSize:16,fontWeight:800,color:"#f1f5f9",letterSpacing:"-0.3px"}}>💰 As Minhas Finanças</div>
+              <div style={{fontSize:11,color:T.subtext,marginTop:1}}>Olá, <span style={{color:T.accent,fontWeight:700}}>{userName}</span> · <span style={{color:T.positive}}>sincronizado ✓</span></div>
+            </div>
           </div>
+          {/* RIGHT: settings ⚙️ — unchanged */}
           <button onClick={()=>setSidebarOpen(true)} style={{background:`${T.accent}15`,border:`1px solid ${T.accent}30`,borderRadius:9,padding:"7px 11px",color:T.accent,fontSize:16,cursor:"pointer"}}>⚙️</button>
         </div>
         <div style={{display:"flex",gap:4,marginBottom:14}}>
@@ -670,8 +897,6 @@ function MainApp({user,userName,onLogout}:{user:SBUser;userName:string;onLogout:
             </div>
           )}
           {accounts.length>0&&(<div style={{display:"flex",gap:8,overflowX:"auto",marginBottom:14,paddingBottom:4}}>{accounts.map(a=>(<div key={a.id} style={{background:T.cardBg,border:`1px solid ${T.accent}25`,borderRadius:12,padding:"10px 14px",flexShrink:0,minWidth:130}}><div style={{fontSize:12,fontWeight:600,color:T.subtext,marginBottom:2}}>{a.icon} {a.nome}</div><div style={{fontSize:16,fontWeight:800,color:Number(a.saldo)>=0?T.positive:T.negative}}>{fmt(Number(a.saldo))}</div></div>))}</div>)}
-
-          {/* NET WORTH */}
           {accounts.length>0&&(()=>{
             const totalCorrente   = accounts.filter(a=>a.tipo==="corrente").reduce((s,a)=>s+Number(a.saldo),0);
             const totalPoupanca   = accounts.filter(a=>a.tipo==="poupanca").reduce((s,a)=>s+Number(a.saldo),0);
@@ -679,10 +904,10 @@ function MainApp({user,userName,onLogout}:{user:SBUser;userName:string;onLogout:
             const totalOutro      = accounts.filter(a=>a.tipo==="outro").reduce((s,a)=>s+Number(a.saldo),0);
             const netWorth        = totalSaldo;
             const rows = [
-              {label:"Conta Corrente",    icon:"💳", val:totalCorrente,  color:"#3b82f6", show:totalCorrente!==0},
-              {label:"Conta Poupança",    icon:"🏦", val:totalPoupanca,  color:"#10b981", show:totalPoupanca!==0},
-              {label:"Investimentos",     icon:"📈", val:totalInvest,    color:"#a78bfa", show:totalInvest!==0},
-              {label:"Outros",            icon:"📂", val:totalOutro,     color:"#f59e0b", show:totalOutro!==0},
+              {label:"Conta Corrente",icon:"💳",val:totalCorrente, color:"#3b82f6",show:totalCorrente!==0},
+              {label:"Conta Poupança",icon:"🏦",val:totalPoupanca, color:"#10b981",show:totalPoupanca!==0},
+              {label:"Investimentos", icon:"📈",val:totalInvest,   color:"#a78bfa",show:totalInvest!==0},
+              {label:"Outros",        icon:"📂",val:totalOutro,    color:"#f59e0b",show:totalOutro!==0},
             ].filter(r=>r.show);
             return(
               <div style={{...S.card,marginBottom:14}}>
@@ -690,17 +915,7 @@ function MainApp({user,userName,onLogout}:{user:SBUser;userName:string;onLogout:
                   <SectionTitle>💎 Net Worth</SectionTitle>
                   <span style={{fontSize:18,fontWeight:800,color:netWorth>=0?T.positive:T.negative,letterSpacing:"-0.5px"}}>{fmt(netWorth)}</span>
                 </div>
-                {rows.map(r=>(
-                  <div key={r.label} style={{marginBottom:10}}>
-                    <div style={{display:"flex",justifyContent:"space-between",marginBottom:4}}>
-                      <span style={{fontSize:13}}>{r.icon} {r.label}</span>
-                      <span style={{fontSize:13,fontWeight:700,color:r.color}}>{fmt(r.val)}</span>
-                    </div>
-                    <div style={{height:5,borderRadius:99,background:"rgba(255,255,255,0.07)",overflow:"hidden"}}>
-                      <div style={{width:`${Math.min(100,Math.abs(r.val)/Math.max(Math.abs(netWorth),1)*100)}%`,height:"100%",background:r.color,borderRadius:99,transition:"width .5s"}}/>
-                    </div>
-                  </div>
-                ))}
+                {rows.map(r=>(<div key={r.label} style={{marginBottom:10}}><div style={{display:"flex",justifyContent:"space-between",marginBottom:4}}><span style={{fontSize:13}}>{r.icon} {r.label}</span><span style={{fontSize:13,fontWeight:700,color:r.color}}>{fmt(r.val)}</span></div><div style={{height:5,borderRadius:99,background:"rgba(255,255,255,0.07)",overflow:"hidden"}}><div style={{width:`${Math.min(100,Math.abs(r.val)/Math.max(Math.abs(netWorth),1)*100)}%`,height:"100%",background:r.color,borderRadius:99,transition:"width .5s"}}/></div></div>))}
                 <div style={{marginTop:10,paddingTop:10,borderTop:`1px solid ${T.cardBorder}`,display:"flex",justifyContent:"space-between",alignItems:"center"}}>
                   <span style={{fontSize:12,color:T.subtext,fontWeight:600}}>Total</span>
                   <span style={{fontSize:16,fontWeight:800,color:netWorth>=0?T.positive:T.negative}}>{fmt(netWorth)}</span>
@@ -752,7 +967,7 @@ function MainApp({user,userName,onLogout}:{user:SBUser;userName:string;onLogout:
             <label style={{...S.lbl,marginTop:4,marginBottom:7}}>Tipo</label>
             <TypeSelector value={expForm.tipo} onChange={(v:TypeKey)=>setExpForm(f=>({...f,tipo:v}))}/>
             <button style={btnAdd} onClick={()=>editingExp?updateExpense(editingExp):addExpense()}>{editingExp?"✓ Guardar alterações":"+ Adicionar Despesa"}</button>
-        {editingExp&&<button onClick={()=>{setEditingExp(null);setExpForm(f=>({...f,descricao:"",valor:"",subcat:""}));}} style={{width:"100%",marginTop:8,padding:"10px 0",background:"rgba(255,255,255,0.05)",border:`1px solid ${T.cardBorder}`,borderRadius:9,color:T.subtext,fontSize:13,fontWeight:600,cursor:"pointer",fontFamily:"'Sora',sans-serif"}}>✕ Cancelar edição</button>}
+            {editingExp&&<button onClick={()=>{setEditingExp(null);setExpForm(f=>({...f,descricao:"",valor:"",subcat:""}));}} style={{width:"100%",marginTop:8,padding:"10px 0",background:"rgba(255,255,255,0.05)",border:`1px solid ${T.cardBorder}`,borderRadius:9,color:T.subtext,fontSize:13,fontWeight:600,cursor:"pointer",fontFamily:"'Sora',sans-serif"}}>✕ Cancelar edição</button>}
           </div>
           <div style={{...S.card,display:"flex",justifyContent:"space-between",alignItems:"center",padding:"12px 16px"}}>
             <span style={{fontSize:12,color:T.subtext}}>{myExpenses.length} despesa(s)</span>
