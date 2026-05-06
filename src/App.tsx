@@ -998,6 +998,7 @@ function MainApp({user,userName,onLogout}:{user:SBUser;userName:string;onLogout:
             cardBg={T.cardBg} cardBorder={T.cardBorder} subtext={T.subtext}
             positive={T.positive} negative={T.negative}
             goals={goals} setGoals={setGoals}
+            monthlyIncome={totalInc}
           />
         )}
 
