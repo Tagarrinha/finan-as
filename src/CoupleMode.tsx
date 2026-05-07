@@ -505,6 +505,7 @@ export default function CoupleMode({ userId, userEmail, userName, expCats, accen
 </div>
 <button onClick={()=>deleteExpense(e)} style={{width:"100%",marginTop:8,padding:"7px 0",background:"rgba(239,68,68,0.08)",border:"1px solid rgba(239,68,68,0.2)",borderRadius:9,color:"#f87171",fontSize:12,cursor:"pointer",fontFamily:"'Sora',sans-serif"}}>🗑️ Apagar</button>
 </div>
+</div>
               );
             })}
           </>
