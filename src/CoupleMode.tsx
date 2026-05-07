@@ -45,6 +45,7 @@ export default function CoupleMode({ userId, userEmail, userName, expCats, accen
     splitMy:"", splitPartner:"", liquidado:true,
   });
   const [saving,     setSaving]     = useState(false);
+  const [editingExpenseId, setEditingExpenseId] = useState<number|null>(null);
   const [syncMsg,    setSyncMsg]    = useState("");
   const [editContrib,setEditContrib]= useState(false);
   const [myContrib,  setMyContrib]  = useState("");
@@ -184,7 +185,7 @@ export default function CoupleMode({ userId, userEmail, userName, expCats, accen
   setExpenses(p => p.filter(x => x.id !== e.id));
 }
 
-  async function saveContrib() {
+ async function saveContrib() {
     if(!couple||!account) return;
     const isUser1=couple.user1_id===userId;
     const u1=isUser1?Number(myContrib):Number(partnerContrib);
@@ -193,7 +194,53 @@ export default function CoupleMode({ userId, userEmail, userName, expCats, accen
     setAccount(a=>a?{...a,contribuicao_user1:u1,contribuicao_user2:u2}:a);
     setEditContrib(false);
   }
-
+  function openEditExpense(e: CoupleExpense) {
+  const isUser1local = couple?.user1_id === userId;
+  setEditingExpenseId(e.id);
+  setForm({
+    descricao: e.descricao,
+    valor: String(e.valor),
+    cat: e.cat,
+    subcat: e.subcat,
+    tipo: e.tipo,
+    data: e.data,
+    split: "custom",
+    splitMy: String(isUser1local ? e.split_user1 : e.split_user2),
+    splitPartner: String(isUser1local ? e.split_user2 : e.split_user1),
+    liquidado: e.liquidado,
+  });
+  setShowForm(true);
+  window.scrollTo({ top: 0, behavior: "smooth" });
+}
+  async function updateExpense() {
+  if(!couple||!editingExpenseId||!form.descricao.trim()||!form.valor||!form.cat) return;
+  setSaving(true);
+  const total = Number(form.valor);
+  const isUser1local = couple.user1_id === userId;
+  const my = Number(form.splitMy)||0;
+  const pt = Number(form.splitPartner)||0;
+  const s1 = isUser1local ? my : pt;
+  const s2 = isUser1local ? pt : my;
+  await supabase.from("couple_expenses").update({
+    descricao: form.descricao.trim(),
+    valor: total, cat: form.cat, subcat: form.subcat,
+    tipo: form.tipo, data: form.data,
+    split_user1: s1, split_user2: s2,
+  }).eq("id", editingExpenseId);
+  await supabase.from("expenses").delete().eq("couple_expense_id", editingExpenseId);
+  if(form.liquidado) {
+    const updated = expenses.find(x => x.id === editingExpenseId);
+    if(updated) await syncToPersonal({...updated, valor:total, split_user1:s1, split_user2:s2, cat:form.cat, subcat:form.subcat, data:form.data});
+  }
+  setExpenses(p => p.map(x => x.id === editingExpenseId
+    ? {...x, descricao:form.descricao.trim(), valor:total, cat:form.cat, subcat:form.subcat, tipo:form.tipo, data:form.data, split_user1:s1, split_user2:s2}
+    : x
+  ));
+  setEditingExpenseId(null);
+  setForm(f => ({...f, descricao:"", valor:"", subcat:""}));
+  setShowForm(false);
+  setSaving(false);
+}
   async function dissolveCouple() {
     if(!couple||!window.confirm("Tens a certeza? Todos os dados conjuntos serão apagados.")) return;
     await supabase.from("couples").delete().eq("id",couple.id);
@@ -375,9 +422,12 @@ export default function CoupleMode({ userId, userEmail, userName, expCats, accen
 
       {/* ── DESPESAS ── */}
       {tab==="despesas"&&<>
-        <button onClick={()=>setShowForm(!showForm)} style={{width:"100%",marginBottom:14,padding:"11px 0",background:showForm?`${accent}18`:`linear-gradient(135deg,${accent},${accentDark})`,border:showForm?`1px solid ${accent}40`:"none",borderRadius:10,color:showForm?accent:"#fff",fontWeight:700,fontSize:13,cursor:"pointer",fontFamily:"'Sora',sans-serif"}}>
-          {showForm?"✕ Cancelar":"+ Adicionar despesa conjunta"}
-        </button>
+        <button onClick={()=>{
+  if(showForm){setShowForm(false);setEditingExpenseId(null);setForm(f=>({...f,descricao:"",valor:"",subcat:""}));}
+  else setShowForm(true);
+}} style={{width:"100%",marginBottom:14,padding:"11px 0",background:showForm?`${accent}18`:`linear-gradient(135deg,${accent},${accentDark})`,border:showForm?`1px solid ${accent}40`:"none",borderRadius:10,color:showForm?accent:"#fff",fontWeight:700,fontSize:13,cursor:"pointer",fontFamily:"'Sora',sans-serif"}}>
+  {showForm?(editingExpenseId?"✕ Cancelar edição":"✕ Cancelar"):"+ Adicionar despesa conjunta"}
+</button>
         {showForm&&(
           <div style={{background:cardBg,border:`1px solid ${accent}30`,borderRadius:14,padding:"16px",marginBottom:14}}>
             <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:8,marginBottom:10}}>
@@ -435,9 +485,9 @@ export default function CoupleMode({ userId, userEmail, userName, expCats, accen
                 </button>
               </div>
             </div>
-            <button onClick={addExpense} disabled={saving} style={{width:"100%",padding:"11px 0",background:`linear-gradient(135deg,${accent},${accentDark})`,border:"none",borderRadius:9,color:"#fff",fontWeight:700,fontSize:13,cursor:saving?"not-allowed":"pointer",fontFamily:"'Sora',sans-serif",opacity:saving?0.7:1}}>
-              {saving?"A guardar...":"+ Adicionar despesa"}
-            </button>
+            <button onClick={editingExpenseId ? updateExpense : addExpense} disabled={saving} style={{width:"100%",padding:"11px 0",background:`linear-gradient(135deg,${editingExpenseId?"#f59e0b":accent},${editingExpenseId?"#d97706":accentDark})`,border:"none",borderRadius:9,color:"#fff",fontWeight:700,fontSize:13,cursor:saving?"not-allowed":"pointer",fontFamily:"'Sora',sans-serif",opacity:saving?0.7:1}}>
+  {saving?"A guardar...":(editingExpenseId?"✓ Guardar alterações":"+ Adicionar despesa")}
+</button>
           </div>
         )}
 
@@ -473,6 +523,7 @@ export default function CoupleMode({ userId, userEmail, userName, expCats, accen
                   </div>
                   <div style={{display:"flex",gap:8}}>
   <button onClick={()=>marcarLiquidado(e)} style={{flex:1,padding:"8px 0",background:"rgba(52,211,153,0.15)",border:"1px solid rgba(52,211,153,0.3)",borderRadius:9,color:"#34d399",fontSize:12,fontWeight:700,cursor:"pointer",fontFamily:"'Sora',sans-serif"}}>✓ Marcar como liquidado</button>
+  <button onClick={()=>openEditExpense(e)} style={{padding:"8px 12px",background:"rgba(245,158,11,0.08)",border:"1px solid rgba(245,158,11,0.2)",borderRadius:9,color:"#f59e0b",fontSize:12,cursor:"pointer"}}>✏️</button>
   <button onClick={()=>deleteExpense(e)} style={{padding:"8px 12px",background:"rgba(239,68,68,0.08)",border:"1px solid rgba(239,68,68,0.2)",borderRadius:9,color:"#f87171",fontSize:12,cursor:"pointer"}}>🗑️</button>
 </div>
                 </div>
@@ -504,7 +555,10 @@ export default function CoupleMode({ userId, userEmail, userName, expCats, accen
   <div style={{background:`${MY_COLOR}10`,borderRadius:8,padding:"5px 10px",display:"flex",justifyContent:"space-between"}}><span style={{fontSize:11,color:MY_COLOR}}>{userName}</span><span style={{fontSize:11,fontWeight:700,color:MY_COLOR}}>{fmt(myShare)}</span></div>
   <div style={{background:`${PARTNER_COLOR}10`,borderRadius:8,padding:"5px 10px",display:"flex",justifyContent:"space-between"}}><span style={{fontSize:11,color:PARTNER_COLOR}}>{partnerName}</span><span style={{fontSize:11,fontWeight:700,color:PARTNER_COLOR}}>{fmt(ptShare)}</span></div>
 </div>
-<button onClick={()=>deleteExpense(e)} style={{width:"100%",marginTop:8,padding:"7px 0",background:"rgba(239,68,68,0.08)",border:"1px solid rgba(239,68,68,0.2)",borderRadius:9,color:"#f87171",fontSize:12,cursor:"pointer",fontFamily:"'Sora',sans-serif"}}>🗑️ Apagar</button>
+<div style={{display:"flex",gap:8,marginTop:8}}>
+  <button onClick={()=>openEditExpense(e)} style={{flex:1,padding:"7px 0",background:"rgba(245,158,11,0.08)",border:"1px solid rgba(245,158,11,0.2)",borderRadius:9,color:"#f59e0b",fontSize:12,fontWeight:600,cursor:"pointer",fontFamily:"'Sora',sans-serif"}}>✏️ Editar</button>
+  <button onClick={()=>deleteExpense(e)} style={{flex:1,padding:"7px 0",background:"rgba(239,68,68,0.08)",border:"1px solid rgba(239,68,68,0.2)",borderRadius:9,color:"#f87171",fontSize:12,cursor:"pointer",fontFamily:"'Sora',sans-serif"}}>🗑️ Apagar</button>
+</div>
 </div>
               );
             })}

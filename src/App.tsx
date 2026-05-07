@@ -11,7 +11,7 @@ const SUPA_KEY = "sb_publishable_GaZqBKcZGXJagV9mLnM1Zw_3Dq3wm6g";
 const supabase = createClient(SUPA_URL, SUPA_KEY);
 
 type TypeKey = "necessidade"|"desejo"|"investimento";
-type ThemeKey = "original"|"aurora"|"ocean"|"nebula";
+type ThemeKey = "original"|"aurora"|"ocean"|"nebula"|"verde";
 interface ExpCat    { id:string; label:string; icon:string; type:TypeKey; sub?:string[]; custom?:boolean; }
 interface IncCat    { id:string; label:string; icon:string; custom?:boolean; }
 interface Expense   { id:number; descricao:string; valor:number; cat:string; subcat:string; data:string; tipo:TypeKey; world:string; }
@@ -26,6 +26,7 @@ const THEMES: Record<ThemeKey,AppTheme> = {
   aurora:   { name:"Aurora",  emoji:"🟢", root:"#050d12", header:"linear-gradient(135deg,#0a1f1a,#0f2d1f)", accent:"#00d4aa", accentDark:"#00a884", accent2:"#7c3aed", positive:"#00d4aa", negative:"#ff6b9d", subtext:"#4a7a6d", worldBtn:"linear-gradient(135deg,#00d4aa,#7c3aed)", cardBg:"rgba(0,212,170,0.04)", cardBorder:"rgba(0,212,170,0.1)", glow1:"rgba(0,212,170,0.12)", glow2:"rgba(124,58,237,0.08)" },
   ocean:    { name:"Ocean",   emoji:"🔵", root:"#030d14", header:"linear-gradient(135deg,#061828,#091f30)", accent:"#00c8ff", accentDark:"#0066ff", accent2:"#0066ff", positive:"#00e5b3", negative:"#ff4f7b", subtext:"#2a6080", worldBtn:"linear-gradient(135deg,#00c8ff,#0066ff)", cardBg:"rgba(0,200,255,0.04)", cardBorder:"rgba(0,200,255,0.1)", glow1:"rgba(0,200,255,0.13)", glow2:"rgba(0,102,255,0.08)" },
   nebula:   { name:"Nebula",  emoji:"🟣", root:"#07050f", header:"linear-gradient(135deg,#110a22,#160d2e)", accent:"#b06eff", accentDark:"#7c3aed", accent2:"#4fc3f7", positive:"#64ffda", negative:"#ff5c8d", subtext:"#5a4080", worldBtn:"linear-gradient(135deg,#b06eff,#4fc3f7)", cardBg:"rgba(176,110,255,0.04)", cardBorder:"rgba(176,110,255,0.1)", glow1:"rgba(176,110,255,0.13)", glow2:"rgba(79,195,247,0.08)" },
+  verde: { name:"Verde", emoji:"🌿", root:"#080f0d", header:"linear-gradient(135deg,#061a12,#0a2218)", accent:"#00c37a", accentDark:"#009960", accent2:"#7c3aed", positive:"#00c37a", negative:"#ff5c8d", subtext:"#3d7a5f", worldBtn:"linear-gradient(135deg,#00c37a,#7c3aed)", cardBg:"rgba(0,195,122,0.04)", cardBorder:"rgba(0,195,122,0.1)", glow1:"rgba(0,195,122,0.12)", glow2:"rgba(124,58,237,0.08)" },
 };
 
 const BASE_PERSONAL_EXP: ExpCat[] = [
@@ -709,16 +710,16 @@ async function handleCoupleSettlement(valor: number) {
   setAccounts(p => p.map(a => a.id === conta.id ? { ...a, saldo: novoSaldo } : a));
 }
   const S:Record<string,CSSProperties>={
-    root:{minHeight:"100vh",background:T.root,color:"#e2e8f0",fontFamily:"'Sora',sans-serif",paddingBottom:64},
-    header:{background:T.header,padding:"20px 20px 16px",borderBottom:`1px solid ${T.cardBorder}`},
-    body:{padding:"16px 20px"},
-    card:{background:T.cardBg,border:`1px solid ${T.cardBorder}`,borderRadius:14,padding:"16px 18px",marginBottom:14},
-    inp:{width:"100%",background:"rgba(255,255,255,0.06)",border:"1px solid rgba(255,255,255,0.1)",borderRadius:8,padding:"10px 12px",color:"#e2e8f0",fontSize:13,boxSizing:"border-box",outline:"none",fontFamily:"'Sora',sans-serif"},
-    sel:{width:"100%",background:"#111827",border:"1px solid rgba(255,255,255,0.1)",borderRadius:8,padding:"10px 12px",color:"#e2e8f0",fontSize:13,boxSizing:"border-box",outline:"none"},
-    lbl:{fontSize:10,fontWeight:700,color:"#64748b",textTransform:"uppercase",letterSpacing:"0.08em",display:"block",marginBottom:5},
-    row2:{display:"grid",gridTemplateColumns:"1fr 1fr",gap:10,marginBottom:10},
-    sg:{display:"grid",gridTemplateColumns:"1fr 1fr",gap:10,marginBottom:14},
-  };
+  root:{minHeight:"100vh",background:T.root,color:"#e2e8f0",fontFamily:"'Sora',sans-serif",paddingBottom:64},
+  header:{background:T.header,padding:"20px clamp(20px, 5vw, 48px) 16px",borderBottom:`1px solid ${T.cardBorder}`},
+  body:{padding:"16px clamp(20px, 5vw, 48px)",maxWidth:900,margin:"0 auto"},
+  card:{background:T.cardBg,border:`1px solid ${T.cardBorder}`,borderRadius:14,padding:"16px 18px",marginBottom:14},
+  inp:{width:"100%",background:"rgba(255,255,255,0.06)",border:"1px solid rgba(255,255,255,0.1)",borderRadius:8,padding:"10px 12px",color:"#e2e8f0",fontSize:13,boxSizing:"border-box",outline:"none",fontFamily:"'Sora',sans-serif"},
+  sel:{width:"100%",background:"#111827",border:"1px solid rgba(255,255,255,0.1)",borderRadius:8,padding:"10px 12px",color:"#e2e8f0",fontSize:13,boxSizing:"border-box",outline:"none"},
+  lbl:{fontSize:10,fontWeight:700,color:"#64748b",textTransform:"uppercase",letterSpacing:"0.08em",display:"block",marginBottom:5},
+  row2:{display:"grid",gridTemplateColumns:"1fr 1fr",gap:10,marginBottom:10},
+  sg:{display:"grid",gridTemplateColumns:"1fr 1fr",gap:10,marginBottom:14},
+};
   const wBtn=(a:boolean):CSSProperties=>({flex:1,padding:"10px 0",border:"none",borderRadius:10,cursor:"pointer",fontWeight:700,fontSize:13,fontFamily:"'Sora',sans-serif",background:a?T.worldBtn:"rgba(255,255,255,0.05)",color:a?"#fff":T.subtext});
   const tBtn=(a:boolean):CSSProperties=>({padding:"9px 10px",border:"none",borderRadius:"8px 8px 0 0",cursor:"pointer",fontSize:11,fontWeight:700,whiteSpace:"nowrap",fontFamily:"'Sora',sans-serif",background:a?"rgba(255,255,255,0.07)":"transparent",color:a?T.accent:T.subtext,borderBottom:a?`2px solid ${T.accent}`:"2px solid transparent",position:"relative"});
   const btnAdd:CSSProperties={background:`linear-gradient(135deg,${T.accent},${T.accentDark})`,color:"#fff",border:"none",borderRadius:9,padding:"12px 0",fontWeight:700,fontSize:13,cursor:"pointer",width:"100%",fontFamily:"'Sora',sans-serif",marginTop:6};
@@ -869,35 +870,27 @@ async function handleCoupleSettlement(valor: number) {
       </div>
 
       {/* HEADER */}
-      <div style={{...S.header,position:"relative",zIndex:1}}>
-        <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:14}}>
-          {/* ── LEFT: hamburger + title ── */}
-          <div style={{display:"flex",alignItems:"center",gap:10}}>
-            {/* Hamburger button — opens left nav */}
-            <button
-              className="lnav-hamburger"
-              onClick={() => setLeftNavOpen(true)}
-              aria-label="Abrir menu"
-              style={{
-                "--lnav-accent": T.accent,
-                "--lnav-accent-dark": T.accentDark,
-              } as React.CSSProperties}
-            >
-              ☰
-            </button>
-            <div>
-              <div style={{fontSize:16,fontWeight:800,color:"#f1f5f9",letterSpacing:"-0.3px"}}>💰 As Minhas Finanças</div>
-              <div style={{fontSize:11,color:T.subtext,marginTop:1}}>Olá, <span style={{color:T.accent,fontWeight:700}}>{userName}</span> · <span style={{color:T.positive}}>sincronizado ✓</span></div>
-            </div>
-          </div>
-          {/* RIGHT: settings ⚙️ — unchanged */}
-          <button onClick={()=>setSidebarOpen(true)} style={{background:`${T.accent}15`,border:`1px solid ${T.accent}30`,borderRadius:9,padding:"7px 11px",color:T.accent,fontSize:16,cursor:"pointer"}}>⚙️</button>
-        </div>
-        <div style={{display:"flex",gap:4,marginBottom:14}}>
-          <button style={wBtn(world==="pessoal")} onClick={()=>{setWorld("pessoal");setTab("resumo");}}>{world1Icon} {world1Name}</button>
-          <button style={wBtn(world==="clinica")} onClick={()=>{setWorld("clinica");setTab("resumo");}}>{world2Icon} {world2Name}</button>
-        </div>
+<div style={{...S.header,position:"relative",zIndex:1}}>
+  <div style={{display:"flex",justifyContent:"space-between",alignItems:"center"}}>
+    {/* LEFT: hamburger + title */}
+    <div style={{display:"flex",alignItems:"center",gap:10}}>
+      <button
+        className="lnav-hamburger"
+        onClick={() => setLeftNavOpen(true)}
+        aria-label="Abrir menu"
+        style={{"--lnav-accent":T.accent,"--lnav-accent-dark":T.accentDark} as React.CSSProperties}
+      >
+        ☰
+      </button>
+      <div>
+        <div style={{fontSize:16,fontWeight:800,color:"#f1f5f9",letterSpacing:"-0.3px"}}>💰 As Minhas Finanças</div>
+        <div style={{fontSize:11,color:T.subtext,marginTop:1}}>Olá, <span style={{color:T.accent,fontWeight:700}}>{userName}</span> · <span style={{color:T.positive}}>sincronizado ✓</span></div>
       </div>
+    </div>
+    {/* RIGHT: settings */}
+    <button onClick={()=>setSidebarOpen(true)} style={{background:`${T.accent}15`,border:`1px solid ${T.accent}30`,borderRadius:9,padding:"7px 11px",color:T.accent,fontSize:16,cursor:"pointer"}}>⚙️</button>
+  </div>
+</div>
 
       {/* FILTERS */}
       <div style={{padding:"12px 20px 0",display:"flex",gap:8,position:"relative",zIndex:1}}>
@@ -1003,7 +996,7 @@ async function handleCoupleSettlement(valor: number) {
 
         {/* DESPESAS */}
         {tab==="despesas"&&<>
-          {overBudget.length>0&&(<div style={{background:"#450a0a",border:"1px solid #ef4444",borderRadius:12,padding:"12px 14px",marginBottom:14}}><div style={{fontSize:12,fontWeight:700,color:"#fca5a5",marginBottom:5}}>⚠️ Orçamento excedido</div>{overBudget.map(([type])=>{const actual=byType[type]||0,target=budgetTargets[type],targetAmt=totalInc*(target/100),meta=TYPE_META[type];return<div key={type} style={{fontSize:11,color:"#f87171",marginBottom:2}}>{meta.icon} {meta.label}: {pct(actual,totalExp)}% (meta {target}%) · excesso {fmt(actual-targetAmt)}</div>;})}</div>)}
+          {overBudget.length>0&&(<div style={{background:"#450a0a",border:"1px solid #ef4444",borderRadius:12,padding:"12px 14px",marginBottom:14}}><div style={{fontSize:12,fontWeight:700,color:"#fca5a5",marginBottom:5}}>⚠️ Orçamento excedido</div>{overBudget.map(([type])=>{const actual=byType[type]||0,target=budgetTargets[type],targetAmt=totalInc*(target/100),meta=TYPE_META[type];return<div key={type} style={{fontSize:11,color:"#f87171",marginBottom:2}}>{meta.icon} {meta.label}: {pct(actual,totalInc)}% (meta {target}%) · excesso {fmt(actual-targetAmt)}</div>;})}</div>)}
           <div style={S.card}>
             <SectionTitle>Adicionar Despesa</SectionTitle>
             <div style={S.row2}>
@@ -1037,7 +1030,7 @@ async function handleCoupleSettlement(valor: number) {
             <span style={{fontSize:12,color:T.subtext}}>{myExpenses.length} despesa(s)</span>
             <span style={{fontSize:17,fontWeight:800,color:T.negative}}>{fmt(totalExp)}</span>
           </div>
-          {myExpenses.length>0&&(<div style={{display:"grid",gridTemplateColumns:"1fr 1fr 1fr",gap:8,marginBottom:14}}>{(Object.entries(TYPE_META) as [TypeKey,typeof TYPE_META[TypeKey]][]).map(([type,meta])=>{const actual=byType[type]||0,target=budgetTargets[type],over=actual>totalInc*(target/100)&&totalInc>0;return(<div key={type} style={{background:over?"#450a0a":meta.bg,border:`1px solid ${over?"#ef4444":meta.color}40`,borderRadius:10,padding:"10px 8px",textAlign:"center"}}><div style={{fontSize:16,marginBottom:2}}>{meta.icon}</div><div style={{fontSize:12,fontWeight:800,color:over?"#ef4444":meta.color}}>{fmt(actual)}</div><div style={{fontSize:10,color:T.subtext,marginTop:1}}>{pct(actual,totalExp)}% / {target}%</div>{over&&<div style={{fontSize:10,color:"#ef4444",fontWeight:700,marginTop:2}}>⚠️</div>}</div>);})}</div>)}
+          {myExpenses.length>0&&(<div style={{display:"grid",gridTemplateColumns:"1fr 1fr 1fr",gap:8,marginBottom:14}}>{(Object.entries(TYPE_META) as [TypeKey,typeof TYPE_META[TypeKey]][]).map(([type,meta])=>{const actual=byType[type]||0,target=budgetTargets[type],over=actual>totalInc*(target/100)&&totalInc>0;return(<div key={type} style={{background:over?"#450a0a":meta.bg,border:`1px solid ${over?"#ef4444":meta.color}40`,borderRadius:10,padding:"10px 8px",textAlign:"center"}}><div style={{fontSize:16,marginBottom:2}}>{meta.icon}</div><div style={{fontSize:12,fontWeight:800,color:over?"#ef4444":meta.color}}>{fmt(actual)}</div><div style={{fontSize:10,color:T.subtext,marginTop:1}}>{pct(actual,totalInc)}% / {target}%</div>{over&&<div style={{fontSize:10,color:"#ef4444",fontWeight:700,marginTop:2}}>⚠️</div>}</div>);})}</div>)}
           <div style={S.card}>
             {myExpenses.length===0&&<div style={{color:T.subtext,fontSize:13,textAlign:"center",padding:"24px 0"}}>Sem despesas para este período.</div>}
             {myExpenses.map(e=>{const cat=expCats.find(c=>c.id===e.cat);return(<div key={e.id} style={{display:"flex",alignItems:"center",gap:10,padding:"11px 0",borderBottom:`1px solid ${T.cardBorder}`}}><span style={{fontSize:20,minWidth:28,textAlign:"center"}}>{cat?.icon||"📦"}</span><div style={{flex:1,minWidth:0}}><div style={{fontSize:13,fontWeight:600,color:"#e2e8f0",whiteSpace:"nowrap",overflow:"hidden",textOverflow:"ellipsis"}}>{e.descricao}{e.subcat?<span style={{color:T.subtext}}> · {e.subcat}</span>:""}</div><div style={{display:"flex",alignItems:"center",gap:5,marginTop:3}}><span style={{fontSize:10,color:T.subtext}}>{new Date(e.data+"T12:00:00").toLocaleDateString("pt-PT")}</span><Tag type={e.tipo}/></div></div><span style={{fontSize:14,fontWeight:700,color:T.negative,minWidth:68,textAlign:"right"}}>{fmt(Number(e.valor))}</span><button onClick={()=>{setEditingExp(e.id);setExpForm({descricao:e.descricao,valor:String(e.valor),cat:e.cat,subcat:e.subcat,data:e.data,tipo:e.tipo});window.scrollTo({top:0,behavior:"smooth"});}} style={{background:"none",border:"none",cursor:"pointer",color:T.accent,fontSize:15,padding:"0 2px"}}>✏️</button>
