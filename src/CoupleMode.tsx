@@ -105,15 +105,43 @@ export default function CoupleMode({ userId, userEmail, userName, expCats, accen
   }
 
   // Sync despesa conjunta para contas pessoais de ambos via Edge Function
-  async function syncToPersonal(expenseId:number) {
-    setSyncMsg("A sincronizar com contas pessoais...");
-    try {
-      const res=await supabase.functions.invoke("couple-expense-sync",{body:{couple_expense_id:expenseId}});
-      if(res.error) setSyncMsg("⚠️ Erro na sincronização pessoal.");
-      else setSyncMsg("✓ Registado nas contas pessoais de ambos!");
-    } catch { setSyncMsg("⚠️ Sincronização falhou."); }
-    setTimeout(()=>setSyncMsg(""),3500);
+ async function syncToPersonal(e: CoupleExpense) {
+  setSyncMsg("A sincronizar com contas pessoais...");
+  try {
+    const rows = [
+  {
+    user_id: couple!.user1_id,
+    descricao: e.descricao,
+    valor: e.split_user1,
+    cat: e.cat,
+    subcat: "👫 Casal",
+    data: e.data,
+    tipo: "necessidade" as TypeKey,
+    world: "pessoal",
+    from_couple: true,
+    couple_expense_id: e.id,
+  },
+  ...(couple!.user2_id ? [{
+    user_id: couple!.user2_id,
+    descricao: e.descricao,
+    valor: e.split_user2,
+    cat: e.cat,
+    subcat: "👫 Casal",
+    data: e.data,
+    tipo: "necessidade" as TypeKey,
+    world: "pessoal",
+    from_couple: true,
+    couple_expense_id: e.id,
+  }] : []),
+];
+    const { error } = await supabase.from("expenses").insert(rows);
+    if (error) setSyncMsg("⚠️ Erro na sincronização pessoal.");
+    else setSyncMsg("✓ Registado nas contas pessoais de ambos!");
+  } catch {
+    setSyncMsg("⚠️ Sincronização falhou.");
   }
+  setTimeout(() => setSyncMsg(""), 3500);
+}
 
   async function addExpense() {
     if(!couple||!form.descricao.trim()||!form.valor||!form.cat) return;
@@ -131,7 +159,7 @@ export default function CoupleMode({ userId, userEmail, userName, expCats, accen
     if(!error&&data){
       setExpenses(p=>[data as CoupleExpense,...p]);
       // Se liquidado — sync imediato para contas pessoais
-      if(form.liquidado) await syncToPersonal(data.id);
+      if(form.liquidado) await syncToPersonal(data as CoupleExpense);
       setForm(f=>({...f,descricao:"",valor:"",subcat:""}));
       setShowForm(false);
     }
@@ -142,10 +170,18 @@ export default function CoupleMode({ userId, userEmail, userName, expCats, accen
   async function marcarLiquidado(e: CoupleExpense) {
   await supabase.from("couple_expenses").update({liquidado:true}).eq("id",e.id);
   setExpenses(p=>p.map(x=>x.id===e.id?{...x,liquidado:true}:x));
-  await syncToPersonal(e.id);
+  await syncToPersonal(e);
   // Deduz a parte do utilizador actual da conta pessoal
   const myShare = isUser1 ? e.split_user1 : e.split_user2;
   if(myShare > 0) onSettlement(myShare);
+}
+  async function deleteExpense(e: CoupleExpense) {
+  if(!window.confirm(`Apagar "${e.descricao}"? Esta despesa será removida das contas pessoais de ambos.`)) return;
+  // Apaga despesas pessoais sincronizadas
+  await supabase.from("expenses").delete().eq("couple_expense_id", e.id);
+  // Apaga despesa conjunta
+  await supabase.from("couple_expenses").delete().eq("id", e.id);
+  setExpenses(p => p.filter(x => x.id !== e.id));
 }
 
   async function saveContrib() {
@@ -435,8 +471,10 @@ export default function CoupleMode({ userId, userEmail, userName, expCats, accen
                     <div style={{background:`${MY_COLOR}12`,borderRadius:8,padding:"6px 10px",display:"flex",justifyContent:"space-between"}}><span style={{fontSize:11,color:MY_COLOR,fontWeight:600}}>{userName}</span><span style={{fontSize:12,fontWeight:700,color:MY_COLOR}}>{fmt(myShare)}</span></div>
                     <div style={{background:`${PARTNER_COLOR}12`,borderRadius:8,padding:"6px 10px",display:"flex",justifyContent:"space-between"}}><span style={{fontSize:11,color:PARTNER_COLOR,fontWeight:600}}>{partnerName}</span><span style={{fontSize:12,fontWeight:700,color:PARTNER_COLOR}}>{fmt(ptShare)}</span></div>
                   </div>
-                  <button onClick={()=>marcarLiquidado(e)} style={{width:"100%",padding:"8px 0",background:"rgba(52,211,153,0.15)",border:"1px solid rgba(52,211,153,0.3)",borderRadius:9,color:"#34d399",fontSize:12,fontWeight:700,cursor:"pointer",fontFamily:"'Sora',sans-serif"}}>✓ Marcar como liquidado</button>
-                </div>
+                  <div style={{display:"flex",gap:8}}>
+  <button onClick={()=>marcarLiquidado(e)} style={{flex:1,padding:"8px 0",background:"rgba(52,211,153,0.15)",border:"1px solid rgba(52,211,153,0.3)",borderRadius:9,color:"#34d399",fontSize:12,fontWeight:700,cursor:"pointer",fontFamily:"'Sora',sans-serif"}}>✓ Marcar como liquidado</button>
+  <button onClick={()=>deleteExpense(e)} style={{padding:"8px 12px",background:"rgba(239,68,68,0.08)",border:"1px solid rgba(239,68,68,0.2)",borderRadius:9,color:"#f87171",fontSize:12,cursor:"pointer"}}>🗑️</button>
+</div>
               );
             })}
           </>
@@ -461,11 +499,12 @@ export default function CoupleMode({ userId, userEmail, userName, expCats, accen
                     </div>
                     <span style={{fontSize:13,fontWeight:700,color:negative}}>{fmt(e.valor)}</span>
                   </div>
-                  <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:6}}>
-                    <div style={{background:`${MY_COLOR}10`,borderRadius:8,padding:"5px 10px",display:"flex",justifyContent:"space-between"}}><span style={{fontSize:11,color:MY_COLOR}}>{userName}</span><span style={{fontSize:11,fontWeight:700,color:MY_COLOR}}>{fmt(myShare)}</span></div>
-                    <div style={{background:`${PARTNER_COLOR}10`,borderRadius:8,padding:"5px 10px",display:"flex",justifyContent:"space-between"}}><span style={{fontSize:11,color:PARTNER_COLOR}}>{partnerName}</span><span style={{fontSize:11,fontWeight:700,color:PARTNER_COLOR}}>{fmt(ptShare)}</span></div>
-                  </div>
-                </div>
+                <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:6}}>
+  <div style={{background:`${MY_COLOR}10`,borderRadius:8,padding:"5px 10px",display:"flex",justifyContent:"space-between"}}><span style={{fontSize:11,color:MY_COLOR}}>{userName}</span><span style={{fontSize:11,fontWeight:700,color:MY_COLOR}}>{fmt(myShare)}</span></div>
+  <div style={{background:`${PARTNER_COLOR}10`,borderRadius:8,padding:"5px 10px",display:"flex",justifyContent:"space-between"}}><span style={{fontSize:11,color:PARTNER_COLOR}}>{partnerName}</span><span style={{fontSize:11,fontWeight:700,color:PARTNER_COLOR}}>{fmt(ptShare)}</span></div>
+</div>
+<button onClick={()=>deleteExpense(e)} style={{width:"100%",marginTop:8,padding:"7px 0",background:"rgba(239,68,68,0.08)",border:"1px solid rgba(239,68,68,0.2)",borderRadius:9,color:"#f87171",fontSize:12,cursor:"pointer",fontFamily:"'Sora',sans-serif"}}>🗑️ Apagar</button>
+</div>
               );
             })}
           </>

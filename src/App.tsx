@@ -102,10 +102,13 @@ type NavTab = "resumo"|"despesas"|"rendimentos"|"casal"|"objetivos";
 interface NavItem { id: NavTab; label: string; icon: string; }
 
 const LEFT_NAV_ITEMS: NavItem[] = [
+  { id:"resumo",      label:"Dashboard",   icon:"📊" },
   { id:"despesas",    label:"Despesas",    icon:"📥" },
   { id:"rendimentos", label:"Rendimentos", icon:"💶" },
-  { id:"casal",       label:"Modo Casal",  icon:"👫" },
   { id:"objetivos",   label:"Metas",       icon:"🎯" },
+  { id:"comparacao",  label:"Comparação",  icon:"📈" },
+  { id:"casal",       label:"Modo Casal",  icon:"👫" },
+  { id:"definicoes",  label:"Definições",  icon:"⚙️" },
 ];
 
 function LeftNav({ isOpen, onClose, activeTab, onNavigate, accent, accentDark }: {
@@ -115,6 +118,7 @@ function LeftNav({ isOpen, onClose, activeTab, onNavigate, accent, accentDark }:
   onNavigate: (tab: string) => void;
   accent: string;
   accentDark: string;
+  onSettings: () => void;
 }) {
   useEffect(() => {
     const handler = (e: KeyboardEvent) => { if (e.key === "Escape" && isOpen) onClose(); };
@@ -127,7 +131,11 @@ function LeftNav({ isOpen, onClose, activeTab, onNavigate, accent, accentDark }:
     return () => { document.body.style.overflow = ""; };
   }, [isOpen]);
 
-  const handleNav = (tab: string) => { onNavigate(tab); onClose(); };
+  const handleNav = (tab: string) => {
+  if(tab === "definicoes") { onSettings(); return; }
+  onNavigate(tab);
+  onClose();
+};
 
   return (
     <>
@@ -702,7 +710,7 @@ async function handleCoupleSettlement(valor: number) {
 }
   const S:Record<string,CSSProperties>={
     root:{minHeight:"100vh",background:T.root,color:"#e2e8f0",fontFamily:"'Sora',sans-serif",paddingBottom:64},
-    header:{background:T.header,padding:"20px 20px 0",borderBottom:`1px solid ${T.cardBorder}`},
+    header:{background:T.header,padding:"20px 20px 16px",borderBottom:`1px solid ${T.cardBorder}`},
     body:{padding:"16px 20px"},
     card:{background:T.cardBg,border:`1px solid ${T.cardBorder}`,borderRadius:14,padding:"16px 18px",marginBottom:14},
     inp:{width:"100%",background:"rgba(255,255,255,0.06)",border:"1px solid rgba(255,255,255,0.1)",borderRadius:8,padding:"10px 12px",color:"#e2e8f0",fontSize:13,boxSizing:"border-box",outline:"none",fontFamily:"'Sora',sans-serif"},
@@ -736,6 +744,7 @@ async function handleCoupleSettlement(valor: number) {
         onNavigate={setTab}
         accent={T.accent}
         accentDark={T.accentDark}
+        onSettings={() => { setLeftNavOpen(false); setSidebarOpen(true); }}
       />
 
       {/* SIDEBAR (existing right ⚙️ panel — unchanged) */}
@@ -888,14 +897,6 @@ async function handleCoupleSettlement(valor: number) {
           <button style={wBtn(world==="pessoal")} onClick={()=>{setWorld("pessoal");setTab("resumo");}}>{world1Icon} {world1Name}</button>
           <button style={wBtn(world==="clinica")} onClick={()=>{setWorld("clinica");setTab("resumo");}}>{world2Icon} {world2Name}</button>
         </div>
-        <div style={{display:"flex",gap:1,overflowX:"auto"}}>
-          {[["resumo","📊"],["despesas","📥"],["recorrentes","🔄"],["objetivos","🎯"],["comparacao","📈"],["casal","👫"],["rendimentos","💶"],["progressao","📉"]].map(([id,icon])=>(
-            <button key={id} style={tBtn(tab===id)} onClick={()=>setTab(id)}>
-              {icon} {id.charAt(0).toUpperCase()+id.slice(1)}
-              {id==="recorrentes"&&dueRecurring>0&&<span style={{position:"absolute",top:4,right:4,width:8,height:8,borderRadius:"50%",background:"#f59e0b"}}/>}
-            </button>
-          ))}
-        </div>
       </div>
 
       {/* FILTERS */}
@@ -972,6 +973,31 @@ async function handleCoupleSettlement(valor: number) {
             <SectionTitle>Top categorias</SectionTitle>
             {byCat.filter(c=>c.total>0).slice(0,6).map(c=>(<div key={c.id} style={{marginBottom:10}}><div style={{display:"flex",justifyContent:"space-between",marginBottom:4}}><span style={{fontSize:13}}>{c.icon} {c.label}</span><span style={{fontSize:13,fontWeight:700}}>{fmt(c.total)}</span></div><ProgressBar value={c.total} max={maxCat} color={TYPE_META[c.type]?.color||"#6b7280"} height={4}/></div>))}
             {byCat.filter(c=>c.total>0).length===0&&<div style={{color:T.subtext,fontSize:13,textAlign:"center",padding:"16px 0"}}>Sem despesas.</div>}
+          </div>
+          <div style={S.card}>
+            <SectionTitle>📈 Receitas vs Despesas — {new Date().getFullYear()}</SectionTitle>
+            <div style={{display:"flex",alignItems:"flex-end",gap:4,height:90,marginBottom:8}}>
+              {MONTHS.map((m,i)=>{
+                const rev=monthlyRev[world]?.[String(new Date().getFullYear())]?.[i]||0;
+                const exp=expenses.filter(e=>e.world===world&&new Date(e.data).getMonth()===i&&new Date(e.data).getFullYear()===new Date().getFullYear()).reduce((s,e)=>s+Number(e.valor),0);
+                const maxVal=Math.max(...MONTHS.map((_,j)=>{const r=monthlyRev[world]?.[String(new Date().getFullYear())]?.[j]||0;const ex=expenses.filter(e=>e.world===world&&new Date(e.data).getMonth()===j&&new Date(e.data).getFullYear()===new Date().getFullYear()).reduce((s,e)=>s+Number(e.valor),0);return Math.max(r,ex);}),1);
+                const rH=Math.round((rev/maxVal)*78)||2;
+                const eH=Math.round((exp/maxVal)*78)||2;
+                return(
+                  <div key={i} style={{flex:1,display:"flex",flexDirection:"column",alignItems:"center",gap:2}}>
+                    <div style={{display:"flex",alignItems:"flex-end",gap:1,height:78}}>
+                      <div style={{width:"45%",height:rH,background:T.positive,borderRadius:"3px 3px 0 0",transition:"height .4s"}}/>
+                      <div style={{width:"45%",height:eH,background:T.negative,borderRadius:"3px 3px 0 0",transition:"height .4s"}}/>
+                    </div>
+                    <span style={{fontSize:8,color:T.subtext}}>{m}</span>
+                  </div>
+                );
+              })}
+            </div>
+            <div style={{display:"flex",gap:14}}>
+              <div style={{display:"flex",alignItems:"center",gap:5,fontSize:11,color:"#94a3b8"}}><div style={{width:10,height:10,borderRadius:2,background:T.positive}}/>Receitas</div>
+              <div style={{display:"flex",alignItems:"center",gap:5,fontSize:11,color:"#94a3b8"}}><div style={{width:10,height:10,borderRadius:2,background:T.negative}}/>Despesas</div>
+            </div>
           </div>
         </>}
 
