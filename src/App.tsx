@@ -11,7 +11,7 @@ const SUPA_KEY = "sb_publishable_GaZqBKcZGXJagV9mLnM1Zw_3Dq3wm6g";
 const supabase = createClient(SUPA_URL, SUPA_KEY);
 
 type TypeKey = "necessidade"|"desejo"|"investimento";
-type ThemeKey = "original"|"aurora"|"ocean"|"nebula"|"verde";
+type ThemeKey = "original"|"aurora"|"ocean"|"nebula"|"verde"|"premium";
 interface ExpCat    { id:string; label:string; icon:string; type:TypeKey; sub?:string[]; custom?:boolean; }
 interface IncCat    { id:string; label:string; icon:string; custom?:boolean; }
 interface Expense   { id:number; descricao:string; valor:number; cat:string; subcat:string; data:string; tipo:TypeKey; world:string; }
@@ -27,6 +27,7 @@ const THEMES: Record<ThemeKey,AppTheme> = {
   ocean:    { name:"Ocean",   emoji:"🔵", root:"#030d14", header:"linear-gradient(135deg,#061828,#091f30)", accent:"#00c8ff", accentDark:"#0066ff", accent2:"#0066ff", positive:"#00e5b3", negative:"#ff4f7b", subtext:"#2a6080", worldBtn:"linear-gradient(135deg,#00c8ff,#0066ff)", cardBg:"rgba(0,200,255,0.04)", cardBorder:"rgba(0,200,255,0.1)", glow1:"rgba(0,200,255,0.13)", glow2:"rgba(0,102,255,0.08)" },
   nebula:   { name:"Nebula",  emoji:"🟣", root:"#07050f", header:"linear-gradient(135deg,#110a22,#160d2e)", accent:"#b06eff", accentDark:"#7c3aed", accent2:"#4fc3f7", positive:"#64ffda", negative:"#ff5c8d", subtext:"#5a4080", worldBtn:"linear-gradient(135deg,#b06eff,#4fc3f7)", cardBg:"rgba(176,110,255,0.04)", cardBorder:"rgba(176,110,255,0.1)", glow1:"rgba(176,110,255,0.13)", glow2:"rgba(79,195,247,0.08)" },
   verde: { name:"Verde", emoji:"🌿", root:"#080f0d", header:"linear-gradient(135deg,#061a12,#0a2218)", accent:"#00c37a", accentDark:"#009960", accent2:"#7c3aed", positive:"#00c37a", negative:"#ff5c8d", subtext:"#3d7a5f", worldBtn:"linear-gradient(135deg,#00c37a,#7c3aed)", cardBg:"rgba(0,195,122,0.04)", cardBorder:"rgba(0,195,122,0.1)", glow1:"rgba(0,195,122,0.12)", glow2:"rgba(124,58,237,0.08)" },
+premium: { name:"Premium", emoji:"🖤", root:"#0A0D14", header:"linear-gradient(135deg,#0A0D14,#0F1420)", accent:"#5DA9FF", accentDark:"#3d8fd9", accent2:"#8B6DFF", positive:"#57E3A0", negative:"#FF7D7D", subtext:"#667085", worldBtn:"linear-gradient(135deg,#5DA9FF,#8B6DFF)", cardBg:"#151B2D", cardBorder:"rgba(255,255,255,0.08)", glow1:"rgba(139,109,255,0.08)", glow2:"rgba(93,169,255,0.06)" },
 };
 
 const BASE_PERSONAL_EXP: ExpCat[] = [
@@ -104,11 +105,11 @@ interface NavItem { id: NavTab; label: string; icon: string; }
 
 const LEFT_NAV_ITEMS: NavItem[] = [
   { id:"resumo",      label:"Dashboard",   icon:"📊" },
-  { id:"despesas",    label:"Despesas",    icon:"📥" },
-  { id:"rendimentos", label:"Rendimentos", icon:"💶" },
+  { id:"casal",       label:"Modo Casal",  icon:"�" },
   { id:"objetivos",   label:"Metas",       icon:"🎯" },
-  { id:"comparacao",  label:"Comparação",  icon:"📈" },
-  { id:"casal",       label:"Modo Casal",  icon:"👫" },
+  { id:"despesas",    label:"Despesas",    icon:"📥" },
+  { id:"rendimentos", label:"Rendimentos", icon:"�" },
+  { id:"comparacao",  label:"Comparação",  icon:"�" },
   { id:"definicoes",  label:"Definições",  icon:"⚙️" },
 ];
 
@@ -560,6 +561,8 @@ function MainApp({user,userName,onLogout}:{user:SBUser;userName:string;onLogout:
   const [tab,setTab]=useState("resumo");
   const [sidebarOpen,setSidebarOpen]=useState(false);      // existing right sidebar (⚙️)
   const [leftNavOpen,setLeftNavOpen]=useState(false);       // ← NEW left nav drawer
+  const [showFilterMenu,setShowFilterMenu]=useState(false);
+  const [showAddModal,setShowAddModal]=useState(false);
   const [themeKey,setThemeKey]=useState<ThemeKey>("original");
   const T=THEMES[themeKey];
   const [showTour,setShowTour]=useState(false);
@@ -710,10 +713,10 @@ async function handleCoupleSettlement(valor: number) {
   setAccounts(p => p.map(a => a.id === conta.id ? { ...a, saldo: novoSaldo } : a));
 }
   const S:Record<string,CSSProperties>={
-  root:{minHeight:"100vh",background:T.root,color:"#e2e8f0",fontFamily:"'Sora',sans-serif",paddingBottom:64},
+  root:{minHeight:"100vh",background:T.root,color:"#e2e8f0",fontFamily:"'Sora',sans-serif",paddingBottom:100},
   header:{background:T.header,padding:"20px clamp(20px, 5vw, 48px) 16px",borderBottom:`1px solid ${T.cardBorder}`},
   body:{padding:"16px clamp(20px, 5vw, 48px)",maxWidth:900,margin:"0 auto"},
-  card:{background:T.cardBg,border:`1px solid ${T.cardBorder}`,borderRadius:14,padding:"16px 18px",marginBottom:14},
+  card:{background:T.cardBg,border:`1px solid ${T.cardBorder}`,borderRadius:14,padding:"16px 18px",marginBottom:14,boxShadow:"0 1px 3px rgba(0,0,0,0.3),0 4px 16px rgba(0,0,0,0.2)"},
   inp:{width:"100%",background:"rgba(255,255,255,0.06)",border:"1px solid rgba(255,255,255,0.1)",borderRadius:8,padding:"10px 12px",color:"#e2e8f0",fontSize:13,boxSizing:"border-box",outline:"none",fontFamily:"'Sora',sans-serif"},
   sel:{width:"100%",background:"#111827",border:"1px solid rgba(255,255,255,0.1)",borderRadius:8,padding:"10px 12px",color:"#e2e8f0",fontSize:13,boxSizing:"border-box",outline:"none"},
   lbl:{fontSize:10,fontWeight:700,color:"#64748b",textTransform:"uppercase",letterSpacing:"0.08em",display:"block",marginBottom:5},
@@ -838,16 +841,6 @@ async function handleCoupleSettlement(valor: number) {
           </>}
           {sidebarTab==="config"&&<>
             <div style={{marginBottom:24}}>
-              <div style={{fontSize:11,fontWeight:700,color:T.accent,textTransform:"uppercase" as const,letterSpacing:"0.08em",marginBottom:12}}>🌍 Os meus mundos</div>
-              <div style={{background:T.cardBg,border:`1px solid ${T.cardBorder}`,borderRadius:12,padding:"14px"}}>
-                {!editingWorlds?(
-                  <><div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:12}}><div style={{display:"flex",alignItems:"center",gap:8}}><span style={{fontSize:22}}>{world1Icon}</span><div><div style={{fontSize:13,fontWeight:700,color:"#e2e8f0"}}>{world1Name}</div><div style={{fontSize:10,color:T.subtext}}>Mundo 1</div></div></div><div style={{display:"flex",alignItems:"center",gap:8}}><span style={{fontSize:22}}>{world2Icon}</span><div><div style={{fontSize:13,fontWeight:700,color:"#e2e8f0"}}>{world2Name}</div><div style={{fontSize:10,color:T.subtext}}>Mundo 2</div></div></div></div><button onClick={()=>setEditingWorlds(true)} style={{width:"100%",padding:"8px 0",background:`${T.accent}18`,border:`1px solid ${T.accent}35`,borderRadius:8,color:T.accent,fontSize:12,fontWeight:700,cursor:"pointer",fontFamily:"'Sora',sans-serif"}}>✏️ Editar nomes</button></>
-                ):(
-                  <WorldEditor world1Name={world1Name} setWorld1Name={setWorld1Name} world1Icon={world1Icon} setWorld1Icon={setWorld1Icon} world2Name={world2Name} setWorld2Name={setWorld2Name} world2Icon={world2Icon} setWorld2Icon={setWorld2Icon} accent={T.accent} accentDark={T.accentDark} cardBorder={T.cardBorder} subtext={T.subtext} onSave={saveWorlds} onCancel={()=>setEditingWorlds(false)}/>
-                )}
-              </div>
-            </div>
-            <div style={{marginBottom:24}}>
               <div style={{fontSize:11,fontWeight:700,color:T.accent,textTransform:"uppercase" as const,letterSpacing:"0.08em",marginBottom:12}}>🎨 Tema</div>
               <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:8}}>
                 {(Object.entries(THEMES) as [ThemeKey,AppTheme][]).map(([key,theme])=>{const active=themeKey===key;return(<button key={key} onClick={()=>changeTheme(key)} style={{padding:"12px 8px",background:active?`${theme.accent}20`:"rgba(255,255,255,0.04)",border:`1.5px solid ${active?theme.accent:"rgba(255,255,255,0.08)"}`,borderRadius:12,cursor:"pointer",fontFamily:"'Sora',sans-serif",textAlign:"center" as const,transition:"all .2s"}}><div style={{fontSize:20,marginBottom:4}}>{theme.emoji}</div><div style={{fontSize:12,fontWeight:700,color:active?theme.accent:"#94a3b8"}}>{theme.name}</div><div style={{display:"flex",justifyContent:"center",gap:3,marginTop:6}}>{[theme.accent,theme.accent2,theme.positive].map((c,i)=><div key={i} style={{width:10,height:10,borderRadius:"50%",background:c}}/>)}</div>{active&&<div style={{fontSize:9,color:theme.accent,marginTop:4,fontWeight:700}}>✓ Ativo</div>}</button>);})}
@@ -888,21 +881,52 @@ async function handleCoupleSettlement(valor: number) {
       </div>
     </div>
     {/* RIGHT: settings */}
-    <button onClick={()=>setSidebarOpen(true)} style={{background:`${T.accent}15`,border:`1px solid ${T.accent}30`,borderRadius:9,padding:"7px 11px",color:T.accent,fontSize:16,cursor:"pointer"}}>⚙️</button>
   </div>
 </div>
 
       {/* FILTERS */}
-      <div style={{padding:"12px 20px 0",display:"flex",gap:8,position:"relative",zIndex:1}}>
-        <select style={{...S.sel,flex:1}} value={fYear} onChange={e=>setFYear(e.target.value)}><option value="todos">Todos os anos</option>{["2024","2025","2026"].map(y=><option key={y} value={y}>{y}</option>)}</select>
-        <select style={{...S.sel,flex:1}} value={fMonth} onChange={e=>setFMonth(e.target.value)}><option value="todos">Todos os meses</option>{MONTHS.map((m,i)=><option key={i} value={String(i)}>{m}</option>)}</select>
+<div style={{padding:"10px 20px 0",display:"flex",justifyContent:"flex-end",position:"relative",zIndex:10}}>
+  <button
+    onClick={()=>setShowFilterMenu(v=>!v)}
+    style={{display:"flex",alignItems:"center",gap:6,padding:"7px 12px",background:showFilterMenu||fYear!=="todos"||fMonth!=="todos"?`${T.accent}20`:"rgba(255,255,255,0.05)",border:`1px solid ${showFilterMenu||fYear!=="todos"||fMonth!=="todos"?T.accent:"rgba(255,255,255,0.1)"}`,borderRadius:99,cursor:"pointer",fontFamily:"'Sora',sans-serif"}}
+  >
+    <svg width="14" height="14" viewBox="0 0 24 24" fill={fYear!=="todos"||fMonth!=="todos"?T.accent:"rgba(255,255,255,0.5)"}><path d="M4.25 5.61C6.27 8.2 10 13 10 13v6c0 .55.45 1 1 1h2c.55 0 1-.45 1-1v-6s3.72-4.8 5.74-7.39A.998.998 0 0019 4H5a1 1 0 00-.75 1.61z"/></svg>
+    <span style={{fontSize:11,fontWeight:700,color:fYear!=="todos"||fMonth!=="todos"?T.accent:"rgba(255,255,255,0.5)"}}>
+      {fYear==="todos"&&fMonth==="todos"?"Filtro":`${fMonth!=="todos"?MONTHS[Number(fMonth)]:"Todo o ano"} ${fYear!=="todos"?fYear:""}`}
+    </span>
+    {(fYear!=="todos"||fMonth!=="todos")&&(
+      <span onClick={e=>{e.stopPropagation();setFYear("todos");setFMonth("todos");}} style={{fontSize:11,color:T.accent,marginLeft:2,fontWeight:700}}>✕</span>
+    )}
+  </button>
+  {showFilterMenu&&(
+    <>
+      <div onClick={()=>setShowFilterMenu(false)} style={{position:"fixed",inset:0,zIndex:9}}/>
+      <div style={{position:"absolute",top:"calc(100% + 8px)",right:20,zIndex:20,background:"#0f1117",border:`1px solid ${T.cardBorder}`,borderRadius:16,padding:"16px",minWidth:240,boxShadow:"0 8px 32px rgba(0,0,0,0.5)"}}>
+        <div style={{fontSize:10,fontWeight:700,color:T.subtext,textTransform:"uppercase" as const,letterSpacing:"0.1em",marginBottom:10}}>Ano</div>
+        <div style={{display:"flex",gap:6,flexWrap:"wrap" as const,marginBottom:14}}>
+          {["todos","2024","2025","2026"].map(y=>(
+            <button key={y} onClick={()=>setFYear(y)} style={{padding:"6px 12px",borderRadius:99,border:`1px solid ${fYear===y?T.accent:"rgba(255,255,255,0.1)"}`,background:fYear===y?`${T.accent}20`:"transparent",color:fYear===y?T.accent:"#94a3b8",fontSize:12,fontWeight:700,cursor:"pointer",fontFamily:"'Sora',sans-serif"}}>
+              {y==="todos"?"Todos":y}
+            </button>
+          ))}
+        </div>
+        <div style={{fontSize:10,fontWeight:700,color:T.subtext,textTransform:"uppercase" as const,letterSpacing:"0.1em",marginBottom:10}}>Mês</div>
+        <div style={{display:"grid",gridTemplateColumns:"1fr 1fr 1fr",gap:6}}>
+          <button onClick={()=>setFMonth("todos")} style={{padding:"6px 8px",borderRadius:99,border:`1px solid ${fMonth==="todos"?T.accent:"rgba(255,255,255,0.1)"}`,background:fMonth==="todos"?`${T.accent}20`:"transparent",color:fMonth==="todos"?T.accent:"#94a3b8",fontSize:11,fontWeight:700,cursor:"pointer",fontFamily:"'Sora',sans-serif"}}>Todos</button>
+          {MONTHS.map((m,i)=>(
+            <button key={i} onClick={()=>setFMonth(String(i))} style={{padding:"6px 8px",borderRadius:99,border:`1px solid ${fMonth===String(i)?T.accent:"rgba(255,255,255,0.1)"}`,background:fMonth===String(i)?`${T.accent}20`:"transparent",color:fMonth===String(i)?T.accent:"#94a3b8",fontSize:11,fontWeight:700,cursor:"pointer",fontFamily:"'Sora',sans-serif"}}>{m}</button>
+          ))}
+        </div>
+        <button onClick={()=>setShowFilterMenu(false)} style={{width:"100%",marginTop:14,padding:"9px 0",background:`linear-gradient(135deg,${T.accent},${T.accentDark})`,border:"none",borderRadius:10,color:"#fff",fontSize:12,fontWeight:700,cursor:"pointer",fontFamily:"'Sora',sans-serif"}}>Aplicar</button>
       </div>
-
-      <div style={{...S.body,position:"relative",zIndex:1}}>
+    </>
+  )}
+</div>
+<div style={{...S.body,position:"relative",zIndex:1}}>
 
         {/* RESUMO */}
         {tab==="resumo"&&<>
-  {/* ── HERO: Resultado do mês ── */}
+  {/* ── HERO ── */}
   <div style={{padding:"24px 0 20px",textAlign:"center"}}>
     <div style={{fontSize:11,fontWeight:700,color:T.subtext,letterSpacing:"0.15em",textTransform:"uppercase",marginBottom:8}}>
       {new Date().toLocaleString("pt-PT",{month:"short"}).toUpperCase()} · {new Date().getFullYear()}
@@ -930,58 +954,42 @@ async function handleCoupleSettlement(valor: number) {
     })()}
   </div>
 
-  {/* ── 01 FLUXO ── */}
+  {/* ── FLUXO ── */}
   <div style={{marginBottom:14}}>
-    <div style={{display:"flex",alignItems:"center",gap:8,marginBottom:10}}>
-      <span style={{fontSize:11,fontWeight:700,color:T.subtext,letterSpacing:"0.1em"}}>01</span>
-      <div style={{width:32,height:1,background:T.cardBorder}}/>
-      <span style={{fontSize:11,fontWeight:700,color:T.subtext,letterSpacing:"0.1em",textTransform:"uppercase"}}>Fluxo</span>
-    </div>
+    <div style={{fontSize:11,fontWeight:700,color:T.subtext,letterSpacing:"0.1em",textTransform:"uppercase",marginBottom:10}}>Fluxo</div>
     <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:10}}>
-      <div style={{background:T.cardBg,border:`1px solid ${T.cardBorder}`,borderRadius:16,padding:"18px 16px"}}>
-        <div style={{display:"flex",alignItems:"center",gap:8,marginBottom:12}}>
-          <div style={{width:28,height:28,borderRadius:8,background:"rgba(52,211,153,0.15)",display:"flex",alignItems:"center",justifyContent:"center"}}>
-            <span style={{fontSize:14,color:T.positive}}>↙</span>
-          </div>
-          <span style={{fontSize:10,fontWeight:700,color:T.subtext,letterSpacing:"0.1em",textTransform:"uppercase"}}>Receitas</span>
+      <div style={{background:T.cardBg,border:`1px solid ${T.cardBorder}`,borderRadius:16,padding:"12px 14px",display:"flex",alignItems:"center",gap:10}}>
+        <div style={{width:36,height:36,borderRadius:10,background:"rgba(52,211,153,0.15)",display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0}}>
+          <svg width="18" height="18" viewBox="0 0 24 24" fill={T.positive}><path d="M20 12l-1.41-1.41L13 16.17V4h-2v12.17l-5.58-5.59L4 12l8 8 8-8z"/></svg>
         </div>
-        <div style={{fontSize:22,fontWeight:800,color:"#f1f5f9",letterSpacing:"-0.5px"}}>{fmt(totalInc)}</div>
-        <div style={{fontSize:11,color:T.subtext,marginTop:4}}>{myIncomes.length} entrada{myIncomes.length!==1?"s":""}</div>
+        <div>
+          <div style={{fontSize:10,fontWeight:700,color:T.subtext,letterSpacing:"0.08em",textTransform:"uppercase",marginBottom:2}}>Receitas</div>
+          <div style={{fontSize:16,fontWeight:800,color:"#f1f5f9"}}>{fmt(totalInc)}</div>
+          <div style={{fontSize:10,color:T.subtext}}>{myIncomes.length} entrada{myIncomes.length!==1?"s":""}</div>
+        </div>
       </div>
-      <div style={{background:T.cardBg,border:`1px solid ${T.cardBorder}`,borderRadius:16,padding:"18px 16px"}}>
-        <div style={{display:"flex",alignItems:"center",gap:8,marginBottom:12}}>
-          <div style={{width:28,height:28,borderRadius:8,background:"rgba(251,113,133,0.15)",display:"flex",alignItems:"center",justifyContent:"center"}}>
-            <span style={{fontSize:14,color:T.negative}}>↗</span>
-          </div>
-          <span style={{fontSize:10,fontWeight:700,color:T.subtext,letterSpacing:"0.1em",textTransform:"uppercase"}}>Despesas</span>
+      <div style={{background:T.cardBg,border:`1px solid ${T.cardBorder}`,borderRadius:16,padding:"12px 14px",display:"flex",alignItems:"center",gap:10}}>
+        <div style={{width:36,height:36,borderRadius:10,background:"rgba(251,113,133,0.15)",display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0}}>
+          <svg width="18" height="18" viewBox="0 0 24 24" fill={T.negative}><path d="M4 12l1.41 1.41L11 7.83V20h2V7.83l5.58 5.59L20 12l-8-8-8 8z"/></svg>
         </div>
-        <div style={{fontSize:22,fontWeight:800,color:"#f1f5f9",letterSpacing:"-0.5px"}}>{fmt(totalExp)}</div>
-        <div style={{fontSize:11,color:T.subtext,marginTop:4}}>{myExpenses.length} item{myExpenses.length!==1?"s":""}</div>
+        <div>
+          <div style={{fontSize:10,fontWeight:700,color:T.subtext,letterSpacing:"0.08em",textTransform:"uppercase",marginBottom:2}}>Despesas</div>
+          <div style={{fontSize:16,fontWeight:800,color:"#f1f5f9"}}>{fmt(totalExp)}</div>
+          <div style={{fontSize:10,color:T.subtext}}>{myExpenses.length} item{myExpenses.length!==1?"s":""}</div>
+        </div>
       </div>
     </div>
   </div>
 
   {/* ── ALERTA RECORRENTES ── */}
   {dueRecurring>0&&(
-    <div onClick={()=>setTab("recorrentes")} style={{background:"rgba(245,158,11,0.08)",border:"1px solid rgba(245,158,11,0.3)",borderRadius:14,padding:"14px 16px",marginBottom:14,cursor:"pointer",display:"flex",alignItems:"center",gap:12}}>
-      <div style={{width:36,height:36,borderRadius:10,background:"rgba(245,158,11,0.15)",display:"flex",alignItems:"center",justifyContent:"center",fontSize:18,flexShrink:0}}>🔔</div>
+    <div onClick={()=>setTab("recorrentes")} style={{background:"rgba(245,158,11,0.08)",border:"1px solid rgba(245,158,11,0.3)",borderRadius:14,padding:"12px 14px",marginBottom:14,cursor:"pointer",display:"flex",alignItems:"center",gap:12}}>
+      <div style={{width:32,height:32,borderRadius:9,background:"rgba(245,158,11,0.15)",display:"flex",alignItems:"center",justifyContent:"center",fontSize:16,flexShrink:0}}>🔔</div>
       <div style={{flex:1}}>
         <div style={{fontSize:13,fontWeight:700,color:"#f59e0b"}}>{dueRecurring} despesa{dueRecurring>1?"s":""} recorrente{dueRecurring>1?"s":""} a vencer</div>
-        <div style={{fontSize:11,color:"#78350f",marginTop:2}}>Toca para ver e registar</div>
+        <div style={{fontSize:11,color:"#78350f",marginTop:1}}>Toca para ver e registar</div>
       </div>
-      <span style={{color:"#f59e0b",fontSize:16}}>→</span>
-    </div>
-  )}
-
-  {/* ── CONTAS ── */}
-  {accounts.length>0&&(
-    <div style={{display:"flex",gap:8,overflowX:"auto",marginBottom:14,paddingBottom:4}}>
-      {accounts.map(a=>(
-        <div key={a.id} style={{background:T.cardBg,border:`1px solid ${T.accent}25`,borderRadius:12,padding:"10px 14px",flexShrink:0,minWidth:130}}>
-          <div style={{fontSize:12,fontWeight:600,color:T.subtext,marginBottom:2}}>{a.icon} {a.nome}</div>
-          <div style={{fontSize:16,fontWeight:800,color:Number(a.saldo)>=0?T.positive:T.negative}}>{fmt(Number(a.saldo))}</div>
-        </div>
-      ))}
+      <span style={{color:"#f59e0b"}}>→</span>
     </div>
   )}
 
@@ -997,23 +1005,19 @@ async function handleCoupleSettlement(valor: number) {
     const target=budgetTargets[type];
     const actualPct=pct(actual,totalInc);
     return(
-      <div style={{background:"rgba(245,158,11,0.08)",border:"1px solid rgba(245,158,11,0.3)",borderRadius:14,padding:"14px 16px",marginBottom:14,display:"flex",alignItems:"flex-start",gap:12}}>
-        <div style={{width:36,height:36,borderRadius:10,background:"rgba(245,158,11,0.15)",display:"flex",alignItems:"center",justifyContent:"center",fontSize:18,flexShrink:0}}>⚠️</div>
+      <div style={{background:"rgba(245,158,11,0.08)",border:"1px solid rgba(245,158,11,0.3)",borderRadius:14,padding:"12px 14px",marginBottom:14,display:"flex",alignItems:"flex-start",gap:12}}>
+        <div style={{width:32,height:32,borderRadius:9,background:"rgba(245,158,11,0.15)",display:"flex",alignItems:"center",justifyContent:"center",fontSize:16,flexShrink:0}}>⚠️</div>
         <div>
-          <div style={{fontSize:13,fontWeight:700,color:"#f59e0b",marginBottom:4}}>{meta.label} acima do orçamento</div>
-          <div style={{fontSize:12,color:T.subtext}}>Estás em {actualPct}% — alvo {target}%. Considera reduzir esta semana.</div>
+          <div style={{fontSize:13,fontWeight:700,color:"#f59e0b",marginBottom:2}}>{meta.label} acima do orçamento</div>
+          <div style={{fontSize:12,color:T.subtext}}>Estás em {actualPct}% — alvo {target}%.</div>
         </div>
       </div>
     );
   })()}
 
-  {/* ── 02 COMPOSIÇÃO ── */}
+  {/* ── COMPOSIÇÃO ── */}
   <div style={{marginBottom:14}}>
-    <div style={{display:"flex",alignItems:"center",gap:8,marginBottom:10}}>
-      <span style={{fontSize:11,fontWeight:700,color:T.subtext,letterSpacing:"0.1em"}}>02</span>
-      <div style={{width:32,height:1,background:T.cardBorder}}/>
-      <span style={{fontSize:11,fontWeight:700,color:T.subtext,letterSpacing:"0.1em",textTransform:"uppercase"}}>Composição</span>
-    </div>
+    <div style={{fontSize:11,fontWeight:700,color:T.subtext,letterSpacing:"0.1em",textTransform:"uppercase",marginBottom:10}}>Composição</div>
     <div style={S.card}>
       {(Object.entries(TYPE_META) as [TypeKey,typeof TYPE_META[TypeKey]][]).map(([type,meta])=>{
         const actual=byType[type]||0,target=budgetTargets[type],targetAmt=totalInc*(target/100),actualPct=pct(actual,totalInc),over=actual>targetAmt&&totalInc>0;
@@ -1038,58 +1042,52 @@ async function handleCoupleSettlement(valor: number) {
     </div>
   </div>
 
-  {/* ── 03 NET WORTH ── */}
-  {accounts.length>0&&(()=>{
-    const totalCorrente=accounts.filter(a=>a.tipo==="corrente").reduce((s,a)=>s+Number(a.saldo),0);
-    const totalPoupanca=accounts.filter(a=>a.tipo==="poupanca").reduce((s,a)=>s+Number(a.saldo),0);
-    const totalInvest=accounts.filter(a=>a.tipo==="investimento").reduce((s,a)=>s+Number(a.saldo),0);
-    const totalOutro=accounts.filter(a=>a.tipo==="outro").reduce((s,a)=>s+Number(a.saldo),0);
-    const netWorth=totalSaldo;
-    const rows=[
-      {label:"Conta Corrente",icon:"💳",val:totalCorrente,color:"#3b82f6",show:totalCorrente!==0},
-      {label:"Conta Poupança",icon:"🏦",val:totalPoupanca,color:"#10b981",show:totalPoupanca!==0},
-      {label:"Investimentos",icon:"📈",val:totalInvest,color:"#a78bfa",show:totalInvest!==0},
-      {label:"Outros",icon:"📂",val:totalOutro,color:"#f59e0b",show:totalOutro!==0},
-    ].filter(r=>r.show);
-    if(!rows.length) return null;
-    return(
-      <div style={{marginBottom:14}}>
-        <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:10}}>
-          <div style={{display:"flex",alignItems:"center",gap:8}}>
-            <span style={{fontSize:11,fontWeight:700,color:T.subtext,letterSpacing:"0.1em"}}>03</span>
-            <div style={{width:32,height:1,background:T.cardBorder}}/>
-            <span style={{fontSize:11,fontWeight:700,color:T.subtext,letterSpacing:"0.1em",textTransform:"uppercase"}}>Net Worth</span>
+  {/* ── TOP CATEGORIAS ── */}
+  <div style={{marginBottom:14}}>
+    <div style={{fontSize:11,fontWeight:700,color:T.subtext,letterSpacing:"0.1em",textTransform:"uppercase",marginBottom:10}}>Top categorias</div>
+    <div style={S.card}>
+      {byCat.filter(c=>c.total>0).slice(0,6).map(c=>(
+        <div key={c.id} style={{marginBottom:12}}>
+          <div style={{display:"flex",justifyContent:"space-between",marginBottom:5}}>
+            <span style={{fontSize:13,color:"#e2e8f0"}}>{c.icon} {c.label}</span>
+            <span style={{fontSize:13,fontWeight:700,color:"#f1f5f9"}}>{fmt(c.total)}</span>
           </div>
-          <span style={{fontSize:18,fontWeight:800,color:netWorth>=0?T.positive:T.negative}}>{fmt(netWorth)}</span>
+          <ProgressBar value={c.total} max={maxCat} color={TYPE_META[c.type]?.color||"#6b7280"} height={4}/>
         </div>
-        <div style={S.card}>
-          {rows.map(r=>(
-            <div key={r.label} style={{marginBottom:12}}>
-              <div style={{display:"flex",justifyContent:"space-between",marginBottom:5}}>
-                <span style={{fontSize:13,color:"#e2e8f0"}}>{r.icon} {r.label}</span>
-                <span style={{fontSize:13,fontWeight:700,color:r.color}}>{fmt(r.val)}</span>
-              </div>
-              <div style={{height:4,borderRadius:99,background:"rgba(255,255,255,0.07)",overflow:"hidden"}}>
-                <div style={{width:`${Math.min(100,Math.abs(r.val)/Math.max(Math.abs(netWorth),1)*100)}%`,height:"100%",background:r.color,borderRadius:99,transition:"width .5s"}}/>
-              </div>
-            </div>
-          ))}
-        </div>
-      </div>
-    );
-  })()}
+      ))}
+      {byCat.filter(c=>c.total>0).length===0&&<div style={{color:T.subtext,fontSize:13,textAlign:"center",padding:"16px 0"}}>Sem despesas registadas.</div>}
+    </div>
+  </div>
 
-  {/* ── 04 EVOLUÇÃO ── */}
+  {/* ── EVOLUÇÃO + NET WORTH ── */}
   <div style={{marginBottom:14}}>
     <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:10}}>
-      <div style={{display:"flex",alignItems:"center",gap:8}}>
-        <span style={{fontSize:11,fontWeight:700,color:T.subtext,letterSpacing:"0.1em"}}>04</span>
-        <div style={{width:32,height:1,background:T.cardBorder}}/>
-        <span style={{fontSize:11,fontWeight:700,color:T.subtext,letterSpacing:"0.1em",textTransform:"uppercase"}}>Evolução</span>
-      </div>
+      <div style={{fontSize:11,fontWeight:700,color:T.subtext,letterSpacing:"0.1em",textTransform:"uppercase"}}>Evolução</div>
       <span style={{fontSize:11,color:T.subtext}}>{new Date().getFullYear()}</span>
     </div>
     <div style={S.card}>
+      {/* Net Worth summary */}
+      {accounts.length>0&&(()=>{
+        const nw=totalSaldo;
+        const prevNW=accounts.reduce((s,a)=>s+Number(a.saldo),0);
+        return(
+          <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:14,paddingBottom:12,borderBottom:`1px solid ${T.cardBorder}`}}>
+            <div>
+              <div style={{fontSize:10,fontWeight:700,color:T.subtext,letterSpacing:"0.08em",textTransform:"uppercase",marginBottom:2}}>💎 Net Worth</div>
+              <div style={{fontSize:22,fontWeight:800,color:nw>=0?T.positive:T.negative,letterSpacing:"-0.5px"}}>{fmt(nw)}</div>
+            </div>
+            <div style={{display:"flex",gap:6}}>
+              {accounts.map(a=>(
+                <div key={a.id} style={{background:`${T.accent}15`,borderRadius:8,padding:"4px 8px",textAlign:"center" as const}}>
+                  <div style={{fontSize:10,color:T.subtext}}>{a.icon}</div>
+                  <div style={{fontSize:11,fontWeight:700,color:Number(a.saldo)>=0?T.positive:T.negative}}>{fmt(Number(a.saldo))}</div>
+                </div>
+              ))}
+            </div>
+          </div>
+        );
+      })()}
+      {/* Gráfico */}
       <div style={{display:"flex",alignItems:"flex-end",gap:4,height:100,marginBottom:10}}>
         {MONTHS.map((m,i)=>{
           const rev=monthlyRev[world]?.[String(new Date().getFullYear())]?.[i]||0;
@@ -1117,26 +1115,17 @@ async function handleCoupleSettlement(valor: number) {
     </div>
   </div>
 
-  {/* ── 05 TOP CATEGORIAS ── */}
-  <div style={{marginBottom:14}}>
-    <div style={{display:"flex",alignItems:"center",gap:8,marginBottom:10}}>
-      <span style={{fontSize:11,fontWeight:700,color:T.subtext,letterSpacing:"0.1em"}}>05</span>
-      <div style={{width:32,height:1,background:T.cardBorder}}/>
-      <span style={{fontSize:11,fontWeight:700,color:T.subtext,letterSpacing:"0.1em",textTransform:"uppercase"}}>Top categorias</span>
-    </div>
-    <div style={S.card}>
-      {byCat.filter(c=>c.total>0).slice(0,6).map(c=>(
-        <div key={c.id} style={{marginBottom:12}}>
-          <div style={{display:"flex",justifyContent:"space-between",marginBottom:5}}>
-            <span style={{fontSize:13,color:"#e2e8f0"}}>{c.icon} {c.label}</span>
-            <span style={{fontSize:13,fontWeight:700,color:"#f1f5f9"}}>{fmt(c.total)}</span>
-          </div>
-          <ProgressBar value={c.total} max={maxCat} color={TYPE_META[c.type]?.color||"#6b7280"} height={4}/>
+  {/* ── CONTAS ── */}
+  {accounts.length>0&&(
+    <div style={{display:"flex",gap:8,overflowX:"auto",marginBottom:14,paddingBottom:4}}>
+      {accounts.map(a=>(
+        <div key={a.id} style={{background:T.cardBg,border:`1px solid ${T.accent}25`,borderRadius:12,padding:"10px 14px",flexShrink:0,minWidth:130}}>
+          <div style={{fontSize:12,fontWeight:600,color:T.subtext,marginBottom:2}}>{a.icon} {a.nome}</div>
+          <div style={{fontSize:16,fontWeight:800,color:Number(a.saldo)>=0?T.positive:T.negative}}>{fmt(Number(a.saldo))}</div>
         </div>
       ))}
-      {byCat.filter(c=>c.total>0).length===0&&<div style={{color:T.subtext,fontSize:13,textAlign:"center",padding:"16px 0"}}>Sem despesas registadas.</div>}
     </div>
-  </div>
+  )}
 </>}
 
         {/* DESPESAS */}
@@ -1285,6 +1274,84 @@ async function handleCoupleSettlement(valor: number) {
         </>}
 
       </div>
+
+      {/* ── BOTTOM NAV ── */}
+      <div style={{position:"fixed",bottom:16,left:"50%",transform:"translateX(-50%)",zIndex:60,width:"calc(100% - 32px)",maxWidth:420}}>
+        <div style={{background:"rgba(15,18,30,0.85)",backdropFilter:"blur(20px)",WebkitBackdropFilter:"blur(20px)",border:"1px solid rgba(255,255,255,0.08)",borderRadius:24,padding:"10px 8px",display:"flex",alignItems:"center",justifyContent:"space-around",boxShadow:"0 8px 32px rgba(0,0,0,0.5)"}}>
+
+          {/* Dashboard */}
+          <button onClick={()=>setTab("resumo")} style={{display:"flex",flexDirection:"column" as const,alignItems:"center",gap:4,padding:"8px 16px",borderRadius:16,border:"none",background:tab==="resumo"?`${T.accent}20`:"transparent",cursor:"pointer",transition:"all .2s",minWidth:60}}>
+            <svg width="22" height="22" viewBox="0 0 24 24" fill={tab==="resumo"?T.accent:"rgba(255,255,255,0.4)"}>
+              <path d="M3 13h8V3H3v10zm0 8h8v-6H3v6zm10 0h8V11h-8v10zm0-18v6h8V3h-8z"/>
+            </svg>
+            <span style={{fontSize:10,fontWeight:tab==="resumo"?700:500,color:tab==="resumo"?T.accent:"rgba(255,255,255,0.4)"}}>Dashboard</span>
+          </button>
+
+          {/* Modo Casal */}
+          <button onClick={()=>setTab("casal")} style={{display:"flex",flexDirection:"column" as const,alignItems:"center",gap:4,padding:"8px 16px",borderRadius:16,border:"none",background:tab==="casal"?`${T.accent}20`:"transparent",cursor:"pointer",transition:"all .2s",minWidth:60}}>
+            <svg width="22" height="22" viewBox="0 0 24 24" fill={tab==="casal"?T.accent:"rgba(255,255,255,0.4)"}>
+              <path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z"/>
+            </svg>
+            <span style={{fontSize:10,fontWeight:tab==="casal"?700:500,color:tab==="casal"?T.accent:"rgba(255,255,255,0.4)"}}>Casal</span>
+          </button>
+
+          {/* Botão + central */}
+          <button onClick={()=>setShowAddModal(true)} style={{width:52,height:52,borderRadius:"50%",background:`linear-gradient(135deg,${T.accent},${T.accentDark})`,border:"none",display:"flex",alignItems:"center",justifyContent:"center",cursor:"pointer",boxShadow:`0 4px 20px ${T.accent}50`,flexShrink:0,transition:"transform .2s"}}
+            onMouseDown={e=>(e.currentTarget.style.transform="scale(0.92)")}
+            onMouseUp={e=>(e.currentTarget.style.transform="scale(1)")}
+          >
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="#fff">
+              <path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/>
+            </svg>
+          </button>
+
+          {/* Metas */}
+          <button onClick={()=>setTab("objetivos")} style={{display:"flex",flexDirection:"column" as const,alignItems:"center",gap:4,padding:"8px 16px",borderRadius:16,border:"none",background:tab==="objetivos"?`${T.accent}20`:"transparent",cursor:"pointer",transition:"all .2s",minWidth:60}}>
+            <svg width="22" height="22" viewBox="0 0 24 24" fill={tab==="objetivos"?T.accent:"rgba(255,255,255,0.4)"}>
+              <path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-7 14l-5-5 1.41-1.41L12 14.17l7.59-7.59L21 8l-9 9z"/>
+            </svg>
+            <span style={{fontSize:10,fontWeight:tab==="objetivos"?700:500,color:tab==="objetivos"?T.accent:"rgba(255,255,255,0.4)"}}>Metas</span>
+          </button>
+
+          {/* Definições */}
+          <button onClick={()=>setSidebarOpen(true)} style={{display:"flex",flexDirection:"column" as const,alignItems:"center",gap:4,padding:"8px 16px",borderRadius:16,border:"none",background:"transparent",cursor:"pointer",transition:"all .2s",minWidth:60}}>
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="rgba(255,255,255,0.4)">
+              <path d="M19.14,12.94c0.04-0.3,0.06-0.61,0.06-0.94c0-0.32-0.02-0.64-0.07-0.94l2.03-1.58c0.18-0.14,0.23-0.41,0.12-0.61 l-1.92-3.32c-0.12-0.22-0.37-0.29-0.59-0.22l-2.39,0.96c-0.5-0.38-1.03-0.7-1.62-0.94L14.4,2.81c-0.04-0.24-0.24-0.41-0.48-0.41 h-3.84c-0.24,0-0.43,0.17-0.47,0.41L9.25,5.35C8.66,5.59,8.12,5.92,7.63,6.29L5.24,5.33c-0.22-0.08-0.47,0-0.59,0.22L2.74,8.87 C2.62,9.08,2.66,9.34,2.86,9.48l2.03,1.58C4.84,11.36,4.8,11.69,4.8,12s0.02,0.64,0.07,0.94l-2.03,1.58 c-0.18,0.14-0.23,0.41-0.12,0.61l1.92,3.32c0.12,0.22,0.37,0.29,0.59,0.22l2.39-0.96c0.5,0.38,1.03,0.7,1.62,0.94l0.36,2.54 c0.05,0.24,0.24,0.41,0.48,0.41h3.84c0.24,0,0.44-0.17,0.47-0.41l0.36-2.54c0.59-0.24,1.13-0.56,1.62-0.94l2.39,0.96 c0.22,0.08,0.47,0,0.59-0.22l1.92-3.32c0.12-0.22,0.07-0.47-0.12-0.61L19.14,12.94z M12,15.6c-1.98,0-3.6-1.62-3.6-3.6 s1.62-3.6,3.6-3.6s3.6,1.62,3.6,3.6S13.98,15.6,12,15.6z"/>
+            </svg>
+            <span style={{fontSize:10,fontWeight:500,color:"rgba(255,255,255,0.4)"}}>Definições</span>
+          </button>
+
+        </div>
+      </div>
+
+      {/* ── MODAL ADICIONAR ── */}
+      {showAddModal&&(
+        <>
+          <div onClick={()=>setShowAddModal(false)} style={{position:"fixed",inset:0,background:"rgba(0,0,0,0.6)",zIndex:70,backdropFilter:"blur(4px)"}}/>
+          <div style={{position:"fixed",bottom:100,left:"50%",transform:"translateX(-50%)",zIndex:80,width:"calc(100% - 32px)",maxWidth:420}}>
+            <div style={{background:"rgba(15,18,30,0.95)",border:"1px solid rgba(255,255,255,0.1)",borderRadius:24,padding:"20px",boxShadow:"0 -8px 40px rgba(0,0,0,0.5)"}}>
+              <div style={{fontSize:12,fontWeight:700,color:"rgba(255,255,255,0.4)",textTransform:"uppercase" as const,letterSpacing:"0.1em",marginBottom:16,textAlign:"center" as const}}>O que queres adicionar?</div>
+              <div style={{display:"flex",flexDirection:"column" as const,gap:10}}>
+                <button onClick={()=>{setTab("despesas");setShowAddModal(false);}} style={{width:"100%",padding:"14px 20px",background:`linear-gradient(135deg,${T.accent},${T.accentDark})`,border:"none",borderRadius:14,color:"#fff",fontWeight:700,fontSize:14,cursor:"pointer",fontFamily:"'Sora',sans-serif",display:"flex",alignItems:"center",gap:12}}>
+                  <span style={{fontSize:20}}>📥</span>
+                  <div style={{textAlign:"left" as const}}>
+                    <div>Despesa</div>
+                    <div style={{fontSize:11,fontWeight:400,opacity:0.8}}>Regista uma nova despesa</div>
+                  </div>
+                </button>
+                <button onClick={()=>{setTab("rendimentos");setShowAddModal(false);}} style={{width:"100%",padding:"14px 20px",background:"rgba(52,211,153,0.15)",border:"1px solid rgba(52,211,153,0.3)",borderRadius:14,color:"#34d399",fontWeight:700,fontSize:14,cursor:"pointer",fontFamily:"'Sora',sans-serif",display:"flex",alignItems:"center",gap:12}}>
+                  <span style={{fontSize:20}}>💶</span>
+                  <div style={{textAlign:"left" as const}}>
+                    <div>Rendimento</div>
+                    <div style={{fontSize:11,fontWeight:400,opacity:0.8}}>Regista um novo rendimento</div>
+                  </div>
+                </button>
+              </div>
+            </div>
+          </div>
+        </>
+      )}
+
     </div>
   );
 }
