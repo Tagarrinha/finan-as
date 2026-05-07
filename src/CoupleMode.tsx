@@ -423,27 +423,14 @@ export default function CoupleMode({ userId, userEmail, userName, expCats, accen
       })()}
 
       <div style={{display:"flex",flexDirection:"column" as const,gap:10,marginBottom:14}}>
-        <button onClick={()=>{}} style={{width:"100%",padding:"14px 0",background:"linear-gradient(135deg,#00c37a,#00a86b)",border:"none",borderRadius:14,color:"#fff",fontWeight:700,fontSize:14,cursor:"pointer",fontFamily:"'Sora',sans-serif",display:"flex",alignItems:"center",justifyContent:"center",gap:8}}>
+        <button onClick={()=>setTab("acerto")} style={{width:"100%",padding:"14px 0",background:"linear-gradient(135deg,#00c37a,#00a86b)",border:"none",borderRadius:14,color:"#fff",fontWeight:700,fontSize:14,cursor:"pointer",fontFamily:"'Sora',sans-serif",display:"flex",alignItems:"center",justifyContent:"center",gap:8}}>
           ⇄ Acertar contas
         </button>
-        <button onClick={()=>setTab("acerto")} style={{width:"100%",padding:"14px 0",background:"linear-gradient(135deg,#00c37a,#00a86b)",border:"none",borderRadius:14,color:"#fff",fontWeight:700,fontSize:14,cursor:"pointer",fontFamily:"'Sora',sans-serif",display:"flex",alignItems:"center",justifyContent:"center",gap:8}}>
+        <button onClick={()=>{setEditContrib(true);setMyContrib(String(isUser1?account?.contribuicao_user1||0:account?.contribuicao_user2||0));setPartnerContrib(String(isUser1?account?.contribuicao_user2||0:account?.contribuicao_user1||0));}} style={{width:"100%",padding:"13px 0",background:"rgba(255,255,255,0.05)",border:"1px solid rgba(255,255,255,0.1)",borderRadius:14,color:"#e2e8f0",fontWeight:600,fontSize:13,cursor:"pointer",fontFamily:"'Sora',sans-serif",display:"flex",alignItems:"center",justifyContent:"center",gap:8}}>
           ✏️ Editar contribuições
         </button>
       </div>
     </>
-        {!editContrib?(
-          <>
-            <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:10,marginBottom:10}}>
-              {[{nome:userName,cor:MY_COLOR,contrib:isUser1?account?.contribuicao_user1:account?.contribuicao_user2},{nome:partnerName,cor:PARTNER_COLOR,contrib:isUser1?account?.contribuicao_user2:account?.contribuicao_user1}].map((p,i)=>(
-                <div key={i} style={{background:`${p.cor}0d`,border:`1px solid ${p.cor}25`,borderRadius:12,padding:"12px",textAlign:"center" as const}}>
-                  <div style={{fontSize:12,fontWeight:700,color:p.cor,marginBottom:6}}>{p.nome}</div>
-                  <div style={{fontSize:18,fontWeight:800,color:"#e2e8f0"}}>{fmt(p.contrib||0)}</div>
-                  <div style={{fontSize:10,color:subtext,marginTop:2}}>contribuição/mês</div>
-                </div>
-              ))}
-            </div>
-            <button onClick={()=>{setEditContrib(true);setMyContrib(String(isUser1?account?.contribuicao_user1||0:account?.contribuicao_user2||0));setPartnerContrib(String(isUser1?account?.contribuicao_user2||0:account?.contribuicao_user1||0));}} style={{width:"100%",padding:"9px 0",background:`${accent}18`,border:`1px solid ${accent}35`,borderRadius:9,color:accent,fontSize:12,fontWeight:700,cursor:"pointer",fontFamily:"'Sora',sans-serif",marginBottom:14}}>✏️ Editar contribuições</button>
-          </>
         ):(
           <div style={{background:cardBg,border:`1px solid ${cardBorder}`,borderRadius:12,padding:"14px",marginBottom:14}}>
             <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:8,marginBottom:10}}>
