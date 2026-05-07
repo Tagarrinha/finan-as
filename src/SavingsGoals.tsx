@@ -15,13 +15,14 @@ interface Props {
   cardBg: string; cardBorder: string; subtext: string;
   positive: string; negative: string;
   goals: SavingsGoal[]; setGoals: (v: SavingsGoal[]) => void;
+  monthlyIncome: number; // ← NOVO
 }
 
 const fmt = (n: number) => new Intl.NumberFormat("pt-PT", { style: "currency", currency: "EUR" }).format(n || 0);
 const CORES = ["#f97316","#3b82f6","#8b5cf6","#10b981","#f59e0b","#ec4899","#06b6d4","#ef4444"];
 const EMPTY_FORM = { descricao:"", emoji:"🎯", meta:"", prazo:"", cor:"#f97316" };
 
-export default function SavingsGoals({ userId, accent, accentDark, cardBg, cardBorder, subtext, positive, negative, goals, setGoals }: Props) {
+export default function SavingsGoals({ userId, accent, accentDark, cardBg, cardBorder, subtext, positive, negative, goals, setGoals, monthlyIncome }: Props) { // ← monthlyIncome adicionado
   const today = new Date().toISOString().slice(0,10);
   const [showForm,     setShowForm]     = useState(false);
   const [editingId,    setEditingId]    = useState<number|null>(null);
@@ -53,14 +54,12 @@ export default function SavingsGoals({ userId, accent, accentDark, cardBg, cardB
     if(!form.descricao.trim()||!form.meta||!form.prazo) return;
     setSaving(true);
     if(editingId) {
-      // UPDATE
       await supabase.from("savings_goals").update({
         descricao:form.descricao.trim(), emoji:form.emoji,
         meta:Number(form.meta), prazo:form.prazo, cor:form.cor,
       }).eq("id",editingId);
       setGoals(goals.map(g=>g.id===editingId?{...g,descricao:form.descricao.trim(),emoji:form.emoji,meta:Number(form.meta),prazo:form.prazo,cor:form.cor}:g));
     } else {
-      // INSERT
       const row = { user_id:userId, descricao:form.descricao.trim(), emoji:form.emoji, meta:Number(form.meta), atual:0, prazo:form.prazo, cor:form.cor, ativa:true };
       const {data,error} = await supabase.from("savings_goals").insert(row).select().single();
       if(!error&&data) setGoals([...goals, data as SavingsGoal]);
@@ -160,8 +159,14 @@ export default function SavingsGoals({ userId, accent, accentDark, cardBg, cardB
 
       {/* Goals list */}
       {goals.map(g=>{
-        const pct    = Math.min(100,Math.round((g.atual/g.meta)*100));
-        const isDone = pct >= 100;
+        // ── CÁLCULO CORRIGIDO ──────────────────────────────────────────
+        // Se há rendimento mensal, a % reflecte quanto do rendimento já foi poupado.
+        // Fallback para g.meta quando monthlyIncome = 0 (evita divisão por zero).
+        const pct = monthlyIncome > 0
+          ? Math.min(100, Math.round((g.atual / monthlyIncome) * 100))
+          : Math.min(100, Math.round((g.atual / g.meta) * 100));
+        // ──────────────────────────────────────────────────────────────
+        const isDone = g.atual >= g.meta; // isDone continua baseado na meta absoluta
         const falta  = Math.max(0, g.meta - g.atual);
         const prazo  = new Date(g.prazo+"T12:00:00");
         const meses  = Math.max(0, Math.round((prazo.getTime()-Date.now())/(1000*60*60*24*30)));
@@ -191,7 +196,9 @@ export default function SavingsGoals({ userId, accent, accentDark, cardBg, cardB
                 <div style={{width:`${pct}%`,height:"100%",background:isDone?`linear-gradient(90deg,${g.cor},${g.cor}bb)`:g.cor,borderRadius:99,transition:"width .6s ease"}}/>
               </div>
               <div style={{display:"flex",justifyContent:"space-between",marginTop:4}}>
-                <span style={{fontSize:11,color:subtext}}>{pct}% concluído</span>
+                <span style={{fontSize:11,color:subtext}}>
+                  {pct}% {monthlyIncome > 0 ? "do rendimento mensal" : "concluído"}
+                </span>
                 {!isDone&&meses>0&&<span style={{fontSize:11,color:subtext}}>{meses} {meses===1?"mês":"meses"} restantes</span>}
               </div>
             </div>
