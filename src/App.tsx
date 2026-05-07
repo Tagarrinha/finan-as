@@ -97,7 +97,7 @@ const pct = (part:number,total:number) => total>0?Math.round((part/total)*100):0
 
 // ─── LEFT NAV DRAWER ──────────────────────────────────────────────────────────
 
-type NavTab = "resumo"|"despesas"|"rendimentos"|"casal"|"objetivos";
+type NavTab = "resumo"|"despesas"|"rendimentos"|"objetivos"|"comparacao"|"casal"|"definicoes";
 
 interface NavItem { id: NavTab; label: string; icon: string; }
 
