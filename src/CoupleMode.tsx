@@ -16,6 +16,7 @@ interface Props {
   userId:string; userEmail:string; userName:string;
   expCats:ExpCat[]; accent:string; accentDark:string;
   cardBg:string; cardBorder:string; subtext:string; positive:string; negative:string;
+  onSettlement: (valor: number) => void;
 }
 
 const fmt = (n:number) => new Intl.NumberFormat("pt-PT",{style:"currency",currency:"EUR"}).format(n||0);
@@ -27,7 +28,7 @@ const TYPE_META: Record<TypeKey,{label:string;color:string;bg:string}> = {
 const MY_COLOR      = "#f97316";
 const PARTNER_COLOR = "#ec4899";
 
-export default function CoupleMode({ userId, userEmail, userName, expCats, accent, accentDark, cardBg, cardBorder, subtext, positive, negative }: Props) {
+export default function CoupleMode({ userId, userEmail, userName, expCats, accent, accentDark, cardBg, cardBorder, subtext, positive, negative, onSettlement }: Props) {
   const [couple,      setCouple]      = useState<Couple|null>(null);
   const [account,     setAccount]     = useState<CoupleAccount|null>(null);
   const [expenses,    setExpenses]    = useState<CoupleExpense[]>([]);
@@ -138,11 +139,14 @@ export default function CoupleMode({ userId, userEmail, userName, expCats, accen
   }
 
   // Marcar despesa como liquidada e sync para pessoal
-  async function marcarLiquidado(e:CoupleExpense) {
-    await supabase.from("couple_expenses").update({liquidado:true}).eq("id",e.id);
-    setExpenses(p=>p.map(x=>x.id===e.id?{...x,liquidado:true}:x));
-    await syncToPersonal(e.id);
-  }
+  async function marcarLiquidado(e: CoupleExpense) {
+  await supabase.from("couple_expenses").update({liquidado:true}).eq("id",e.id);
+  setExpenses(p=>p.map(x=>x.id===e.id?{...x,liquidado:true}:x));
+  await syncToPersonal(e.id);
+  // Deduz a parte do utilizador actual da conta pessoal
+  const myShare = isUser1 ? e.split_user1 : e.split_user2;
+  if(myShare > 0) onSettlement(myShare);
+}
 
   async function saveContrib() {
     if(!couple||!account) return;

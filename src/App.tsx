@@ -587,6 +587,7 @@ function MainApp({user,userName,onLogout}:{user:SBUser;userName:string;onLogout:
   const [newExpLabel,setNewExpLabel]=useState("");const [newExpIcon,setNewExpIcon]=useState("📦");const [newExpType,setNewExpType]=useState<TypeKey>("desejo");
   const [newIncLabel,setNewIncLabel]=useState("");const [newIncIcon,setNewIncIcon]=useState("💰");
   const [expForm,setExpForm]=useState({descricao:"",valor:"",cat:"",subcat:"",data:today,tipo:"necessidade" as TypeKey});
+  const [expIsRecurring,setExpIsRecurring]=useState(false);
   const [incForm,setIncForm]=useState({descricao:"",valor:"",cat:"",data:today});
   const [revEdit,setRevEdit]=useState<number|null>(null);const [revVal,setRevVal]=useState("");
   const [revYear,setRevYear]=useState(String(new Date().getFullYear()));
@@ -650,7 +651,25 @@ function MainApp({user,userName,onLogout}:{user:SBUser;userName:string;onLogout:
 
   async function updateExpense(id:number){if(!expForm.descricao.trim()||!expForm.valor||!expForm.cat)return;await supabase.from("expenses").update({descricao:expForm.descricao.trim(),valor:Number(expForm.valor),cat:expForm.cat,subcat:expForm.subcat,data:expForm.data,tipo:expForm.tipo}).eq("id",id);setExpenses(p=>p.map(e=>e.id===id?{...e,descricao:expForm.descricao.trim(),valor:Number(expForm.valor),cat:expForm.cat,subcat:expForm.subcat,data:expForm.data,tipo:expForm.tipo}:e));setEditingExp(null);setExpForm(f=>({...f,descricao:"",valor:"",subcat:""}));}
   async function updateIncome(id:number){if(!incForm.descricao.trim()||!incForm.valor||!incForm.cat)return;await supabase.from("incomes").update({descricao:incForm.descricao.trim(),valor:Number(incForm.valor),cat:incForm.cat,data:incForm.data}).eq("id",id);setIncomes(p=>p.map(i=>i.id===id?{...i,descricao:incForm.descricao.trim(),valor:Number(incForm.valor),cat:incForm.cat,data:incForm.data}:i));setEditingInc(null);setIncForm(f=>({...f,descricao:"",valor:""}));}
-  async function addExpense(){if(!expForm.descricao.trim()||!expForm.valor||!expForm.cat)return;const{data,error}=await supabase.from("expenses").insert({user_id:user.id,...expForm,valor:Number(expForm.valor),world}).select().single();if(!error&&data){setExpenses(p=>[data as Expense,...p]);setExpForm(f=>({...f,descricao:"",valor:"",subcat:""}));}}
+  async function addExpense(){
+  if(!expForm.descricao.trim()||!expForm.valor||!expForm.cat)return;
+  const{data,error}=await supabase.from("expenses").insert({user_id:user.id,...expForm,valor:Number(expForm.valor),world}).select().single();
+  if(!error&&data){
+    setExpenses(p=>[data as Expense,...p]);
+    if(expIsRecurring){
+      await supabase.from("recurring_expenses").insert({
+        user_id:user.id, descricao:expForm.descricao.trim(),
+        valor:Number(expForm.valor), cat:expForm.cat, subcat:expForm.subcat,
+        tipo:expForm.tipo, frequencia:"mensal", dia_do_mes:null,
+        proxima_data:expForm.data, world, ativa:true,
+      });
+      const{data:rec}=await supabase.from("recurring_expenses").select("*").eq("user_id",user.id).order("proxima_data");
+      if(rec)setRecurring(rec as RecurringExpense[]);
+    }
+    setExpForm(f=>({...f,descricao:"",valor:"",subcat:""}));
+    setExpIsRecurring(false);
+  }
+}
   async function deleteExpense(id:number){await supabase.from("expenses").delete().eq("id",id);setExpenses(p=>p.filter(e=>e.id!==id));}
   async function addIncome(){if(!incForm.descricao.trim()||!incForm.valor||!incForm.cat)return;const{data,error}=await supabase.from("incomes").insert({user_id:user.id,...incForm,valor:Number(incForm.valor),world}).select().single();if(!error&&data){setIncomes(p=>[data as Income,...p]);setIncForm(f=>({...f,descricao:"",valor:""}));}}
   async function deleteIncome(id:number){await supabase.from("incomes").delete().eq("id",id);setIncomes(p=>p.filter(i=>i.id!==id));}
@@ -668,11 +687,19 @@ function MainApp({user,userName,onLogout}:{user:SBUser;userName:string;onLogout:
   function deleteCustomInc(id:string){const next=customIncCats.filter(c=>c.id!==id);setCustomIncCats(next);saveSettings({custom_inc_cats:next});toggleInc(id);}
 
   async function applyRecurring(r:RecurringExpense){
-    const row={user_id:user.id,descricao:r.descricao,valor:r.valor,cat:r.cat,subcat:r.subcat,data:today,tipo:r.tipo,world:r.world};
-    const{data,error}=await supabase.from("expenses").insert(row).select().single();
-    if(!error&&data)setExpenses(p=>[data as Expense,...p]);
-  }
+  const row={user_id:user.id,descricao:r.descricao,valor:r.valor,cat:r.cat,subcat:r.subcat,data:today,tipo:r.tipo,world:r.world};
+  const{data,error}=await supabase.from("expenses").insert(row).select().single();
+  if(!error&&data)setExpenses(p=>[data as Expense,...p]);
+}
 
+async function handleCoupleSettlement(valor: number) {
+  if(!accounts.length) return;
+  const conta = accounts.find(a => a.tipo === "corrente") || accounts[0];
+  if(!conta) return;
+  const novoSaldo = Number(conta.saldo) - valor;
+  await supabase.from("accounts").update({ saldo: novoSaldo }).eq("id", conta.id);
+  setAccounts(p => p.map(a => a.id === conta.id ? { ...a, saldo: novoSaldo } : a));
+}
   const S:Record<string,CSSProperties>={
     root:{minHeight:"100vh",background:T.root,color:"#e2e8f0",fontFamily:"'Sora',sans-serif",paddingBottom:64},
     header:{background:T.header,padding:"20px 20px 0",borderBottom:`1px solid ${T.cardBorder}`},
@@ -966,6 +993,17 @@ function MainApp({user,userName,onLogout}:{user:SBUser;userName:string;onLogout:
             {selCat?.sub&&(<div style={{marginBottom:10}}><label style={S.lbl}>Sub-categoria</label><div style={{display:"flex",flexWrap:"wrap",gap:7}}>{selCat.sub.map((s:string)=>{const active=expForm.subcat===s;return<button key={s} onClick={()=>setExpForm(f=>({...f,subcat:active?"":s}))} style={{padding:"7px 13px",border:`1.5px solid ${active?T.accent:"rgba(255,255,255,0.13)"}`,borderRadius:99,background:active?`${T.accent}22`:"rgba(255,255,255,0.04)",color:active?T.accent:"#94a3b8",fontSize:12,fontWeight:active?700:500,cursor:"pointer",fontFamily:"'Sora',sans-serif"}}>{s}</button>;})}</div></div>)}
             <label style={{...S.lbl,marginTop:4,marginBottom:7}}>Tipo</label>
             <TypeSelector value={expForm.tipo} onChange={(v:TypeKey)=>setExpForm(f=>({...f,tipo:v}))}/>
+            {!editingExp&&(
+  <div onClick={()=>setExpIsRecurring(v=>!v)} style={{display:"flex",alignItems:"center",gap:10,padding:"10px 12px",background:expIsRecurring?`${T.accent}15`:"rgba(255,255,255,0.03)",border:`1px solid ${expIsRecurring?T.accent:"rgba(255,255,255,0.08)"}`,borderRadius:9,cursor:"pointer",marginTop:10,marginBottom:6,userSelect:"none"}}>
+    <div style={{width:36,height:20,borderRadius:99,background:expIsRecurring?T.accent:"rgba(255,255,255,0.12)",transition:"background .2s",position:"relative",flexShrink:0}}>
+      <div style={{position:"absolute",top:3,left:expIsRecurring?18:3,width:14,height:14,borderRadius:"50%",background:"#fff",transition:"left .2s"}}/>
+    </div>
+    <div>
+      <div style={{fontSize:13,fontWeight:600,color:expIsRecurring?"#f1f5f9":"#94a3b8"}}>🔄 Despesa recorrente</div>
+      <div style={{fontSize:11,color:"#475569",marginTop:1}}>{expIsRecurring?"Será guardada como mensal":"Toca para activar"}</div>
+    </div>
+  </div>
+)}
             <button style={btnAdd} onClick={()=>editingExp?updateExpense(editingExp):addExpense()}>{editingExp?"✓ Guardar alterações":"+ Adicionar Despesa"}</button>
             {editingExp&&<button onClick={()=>{setEditingExp(null);setExpForm(f=>({...f,descricao:"",valor:"",subcat:""}));}} style={{width:"100%",marginTop:8,padding:"10px 0",background:"rgba(255,255,255,0.05)",border:`1px solid ${T.cardBorder}`,borderRadius:9,color:T.subtext,fontSize:13,fontWeight:600,cursor:"pointer",fontFamily:"'Sora',sans-serif"}}>✕ Cancelar edição</button>}
           </div>
@@ -1009,6 +1047,7 @@ function MainApp({user,userName,onLogout}:{user:SBUser;userName:string;onLogout:
             expCats={expCats} accent={T.accent} accentDark={T.accentDark}
             cardBg={T.cardBg} cardBorder={T.cardBorder} subtext={T.subtext}
             positive={T.positive} negative={T.negative}
+            onSettlement={handleCoupleSettlement}
           />
         )}
 
