@@ -111,7 +111,7 @@ const LEFT_NAV_ITEMS: NavItem[] = [
   { id:"definicoes",  label:"Definições",  icon:"⚙️" },
 ];
 
-function LeftNav({ isOpen, onClose, activeTab, onNavigate, accent, accentDark }: {
+function LeftNav({ isOpen, onClose, activeTab, onNavigate, accent, accentDark, onSettings }: {
   isOpen: boolean;
   onClose: () => void;
   activeTab: string;
