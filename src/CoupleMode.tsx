@@ -363,11 +363,74 @@ export default function CoupleMode({ userId, userEmail, userName, expCats, accen
 
       {/* ── CONTA ── */}
       {tab==="conta"&&<>
-        <div style={{background:"linear-gradient(135deg,rgba(167,139,250,0.1),rgba(236,72,153,0.07))",border:"1px solid rgba(167,139,250,0.2)",borderRadius:14,padding:"18px",marginBottom:14,textAlign:"center" as const}}>
-          <div style={{fontSize:10,color:subtext,textTransform:"uppercase" as const,letterSpacing:"0.08em",marginBottom:4}}>Saldo da conta conjunta</div>
-          <div style={{fontSize:30,fontWeight:800,color:"#a78bfa",letterSpacing:"-0.5px",marginBottom:4}}>{fmt(account?.saldo||0)}</div>
-          <div style={{fontSize:11,color:subtext}}>contribuições: {fmt((account?.contribuicao_user1||0)+(account?.contribuicao_user2||0))}/mês</div>
-        </div>
+  {/* ── Saldo conjunto hero ── */}
+  <div style={{background:"linear-gradient(135deg,rgba(0,195,122,0.08),rgba(124,58,237,0.06))",border:"1px solid rgba(0,195,122,0.2)",borderRadius:20,padding:"24px 20px",marginBottom:16}}>
+    <div style={{fontSize:10,fontWeight:700,color:subtext,textTransform:"uppercase" as const,letterSpacing:"0.12em",marginBottom:8}}>Saldo Conjunto</div>
+    <div style={{display:"flex",justifyContent:"space-between",alignItems:"flex-start",marginBottom:8}}>
+      <div style={{fontSize:36,fontWeight:800,color:"#f1f5f9",letterSpacing:"-1px",lineHeight:1}}>{fmt(account?.saldo||0)}</div>
+      <div style={{width:44,height:44,borderRadius:"50%",background:"rgba(0,195,122,0.15)",border:"1px solid rgba(0,195,122,0.3)",display:"flex",alignItems:"center",justifyContent:"center",fontSize:22}}>💚</div>
+    </div>
+    <div style={{fontSize:12,color:"rgba(0,195,122,0.8)",fontWeight:600,marginBottom:16}}>
+      + {fmt((account?.contribuicao_user1||0)+(account?.contribuicao_user2||0))} este mês
+    </div>
+    <div style={{background:"rgba(255,255,255,0.04)",borderRadius:10,padding:"10px 14px",display:"flex",justifyContent:"space-between",alignItems:"center"}}>
+      <span style={{fontSize:12,color:subtext}}>Contribuições este mês</span>
+      <span style={{fontSize:13,fontWeight:700,color:"rgba(0,195,122,0.9)"}}>{fmt((account?.contribuicao_user1||0)+(account?.contribuicao_user2||0))}</span>
+    </div>
+  </div>
+
+  {/* ── Contribuições ── */}
+  {!editContrib?(
+    <>
+      <div style={{fontSize:14,fontWeight:700,color:"#f1f5f9",marginBottom:12}}>Contribuições do mês</div>
+      <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:10,marginBottom:14}}>
+        {[
+          {nome:userName,cor:MY_COLOR,contrib:isUser1?account?.contribuicao_user1:account?.contribuicao_user2,initials:userName.slice(0,2).toUpperCase()},
+          {nome:partnerName,cor:PARTNER_COLOR,contrib:isUser1?account?.contribuicao_user2:account?.contribuicao_user1,initials:partnerName.slice(0,2).toUpperCase()}
+        ].map((p,i)=>{
+          const total=(account?.contribuicao_user1||0)+(account?.contribuicao_user2||0);
+          const pct=total>0?Math.round(((p.contrib||0)/total)*100):50;
+          return(
+            <div key={i} style={{background:"rgba(255,255,255,0.04)",border:`1px solid rgba(255,255,255,0.08)`,borderRadius:16,padding:"16px 14px"}}>
+              <div style={{display:"flex",alignItems:"center",gap:8,marginBottom:12}}>
+                <div style={{width:36,height:36,borderRadius:"50%",background:`${p.cor}25`,border:`2px solid ${p.cor}`,display:"flex",alignItems:"center",justifyContent:"center",fontSize:13,fontWeight:700,color:p.cor,flexShrink:0}}>{p.initials}</div>
+                <span style={{fontSize:13,fontWeight:600,color:"#f1f5f9"}}>{p.nome}</span>
+              </div>
+              <div style={{fontSize:22,fontWeight:800,color:p.cor,marginBottom:4}}>{fmt(p.contrib||0)}</div>
+              <div style={{fontSize:11,color:subtext,marginBottom:10}}>{pct}% do total</div>
+              <div style={{height:3,borderRadius:99,background:"rgba(255,255,255,0.07)",overflow:"hidden"}}>
+                <div style={{width:`${pct}%`,height:"100%",background:p.cor,borderRadius:99}}/>
+              </div>
+            </div>
+          );
+        })}
+      </div>
+
+      {/* ── Status ── */}
+      {(()=>{
+        const c1=account?.contribuicao_user1||0;
+        const c2=account?.contribuicao_user2||0;
+        const balanced=Math.abs(c1-c2)<1;
+        return(
+          <div style={{background:balanced?"rgba(0,195,122,0.08)":"rgba(245,158,11,0.08)",border:`1px solid ${balanced?"rgba(0,195,122,0.2)":"rgba(245,158,11,0.2)"}`,borderRadius:14,padding:"14px 16px",marginBottom:14,display:"flex",alignItems:"center",gap:12}}>
+            <div style={{width:36,height:36,borderRadius:"50%",background:balanced?"rgba(0,195,122,0.15)":"rgba(245,158,11,0.15)",display:"flex",alignItems:"center",justifyContent:"center",fontSize:18,flexShrink:0}}>{balanced?"⚖️":"⚠️"}</div>
+            <div>
+              <div style={{fontSize:13,fontWeight:700,color:balanced?"#34d399":"#f59e0b",marginBottom:2}}>{balanced?"Tudo certo! 🎉":"Contribuições desequilibradas"}</div>
+              <div style={{fontSize:12,color:subtext}}>{balanced?"As contribuições estão equilibradas. Mantenham o bom trabalho!":"Considera ajustar as contribuições mensais."}</div>
+            </div>
+          </div>
+        );
+      })()}
+
+      <div style={{display:"flex",flexDirection:"column" as const,gap:10,marginBottom:14}}>
+        <button onClick={()=>{}} style={{width:"100%",padding:"14px 0",background:"linear-gradient(135deg,#00c37a,#00a86b)",border:"none",borderRadius:14,color:"#fff",fontWeight:700,fontSize:14,cursor:"pointer",fontFamily:"'Sora',sans-serif",display:"flex",alignItems:"center",justifyContent:"center",gap:8}}>
+          ⇄ Acertar contas
+        </button>
+        <button onClick={()=>setTab("acerto")} style={{width:"100%",padding:"14px 0",background:"linear-gradient(135deg,#00c37a,#00a86b)",border:"none",borderRadius:14,color:"#fff",fontWeight:700,fontSize:14,cursor:"pointer",fontFamily:"'Sora',sans-serif",display:"flex",alignItems:"center",justifyContent:"center",gap:8}}>
+          ✏️ Editar contribuições
+        </button>
+      </div>
+    </>
         {!editContrib?(
           <>
             <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:10,marginBottom:10}}>

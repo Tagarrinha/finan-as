@@ -654,7 +654,7 @@ function MainApp({user,userName,onLogout}:{user:SBUser;userName:string;onLogout:
   const maxInc=Math.max(...byIncCat.map(c=>c.total),1);
   const revArr:number[]=monthlyRev[world]?.[revYear]||new Array(12).fill(0);
   const maxBar=Math.max(...revArr,...MONTHS.map((_,i)=>expenses.filter(e=>e.world===world&&new Date(e.data).getMonth()===i&&String(new Date(e.data).getFullYear())===revYear).reduce((s,e)=>s+Number(e.valor),0)),1);
-  const overBudget=(Object.entries(budgetTargets) as [TypeKey,number][]).filter(([type,target])=>(byType[type]||0)>totalExp*(target/100)&&totalExp>0);
+  const overBudget=(Object.entries(budgetTargets) as [TypeKey,number][]).filter(([type,target])=>(byType[type]||0)>totalInc*(target/100)&&totalInc>0);
   const totalSaldo=accounts.reduce((s,a)=>s+Number(a.saldo),0);
   const dueRecurring=recurring.filter(r=>r.world===world&&r.ativa&&r.proxima_data<=today).length;
 
@@ -902,97 +902,242 @@ async function handleCoupleSettlement(valor: number) {
 
         {/* RESUMO */}
         {tab==="resumo"&&<>
-          <div style={S.sg}>
-            <StatCard label="Rendimento" value={totalInc} color={T.positive} sub={`${myIncomes.length} entradas`}/>
-            <StatCard label="Despesas"   value={totalExp} color={T.negative} sub={`${myExpenses.length} items`}/>
+  {/* ── HERO: Resultado do mês ── */}
+  <div style={{padding:"24px 0 20px",textAlign:"center"}}>
+    <div style={{fontSize:11,fontWeight:700,color:T.subtext,letterSpacing:"0.15em",textTransform:"uppercase",marginBottom:8}}>
+      {new Date().toLocaleString("pt-PT",{month:"short"}).toUpperCase()} · {new Date().getFullYear()}
+    </div>
+    <div style={{fontSize:11,fontWeight:600,color:T.subtext,marginBottom:12,letterSpacing:"0.08em",textTransform:"uppercase"}}>Resultado do mês</div>
+    <div style={{fontSize:56,fontWeight:800,color:balance>=0?T.positive:T.negative,letterSpacing:"-2px",lineHeight:1,marginBottom:16}}>
+      {balance>=0?"+":""}{fmt(balance)}
+    </div>
+    {(()=>{
+      const now=new Date();
+      const prevMonth=now.getMonth()===0?11:now.getMonth()-1;
+      const prevYear=now.getMonth()===0?now.getFullYear()-1:now.getFullYear();
+      const prevInc=incomes.filter(i=>i.world===world&&new Date(i.data).getMonth()===prevMonth&&new Date(i.data).getFullYear()===prevYear).reduce((s,i)=>s+Number(i.valor),0);
+      const prevExp=expenses.filter(e=>e.world===world&&new Date(e.data).getMonth()===prevMonth&&new Date(e.data).getFullYear()===prevYear).reduce((s,e)=>s+Number(e.valor),0);
+      const prevBal=prevInc-prevExp;
+      if(prevBal===0) return null;
+      const diff=Math.round(((balance-prevBal)/Math.abs(prevBal))*100);
+      const up=diff>=0;
+      return(
+        <div style={{display:"inline-flex",alignItems:"center",gap:6,background:up?"rgba(52,211,153,0.12)":"rgba(251,113,133,0.12)",border:`1px solid ${up?"rgba(52,211,153,0.3)":"rgba(251,113,133,0.3)"}`,borderRadius:99,padding:"6px 14px",fontSize:12,fontWeight:700,color:up?T.positive:T.negative}}>
+          <span>{up?"↗":"↘"}</span>
+          <span>{up?"+":""}{diff}% vs mês anterior</span>
+        </div>
+      );
+    })()}
+  </div>
+
+  {/* ── 01 FLUXO ── */}
+  <div style={{marginBottom:14}}>
+    <div style={{display:"flex",alignItems:"center",gap:8,marginBottom:10}}>
+      <span style={{fontSize:11,fontWeight:700,color:T.subtext,letterSpacing:"0.1em"}}>01</span>
+      <div style={{width:32,height:1,background:T.cardBorder}}/>
+      <span style={{fontSize:11,fontWeight:700,color:T.subtext,letterSpacing:"0.1em",textTransform:"uppercase"}}>Fluxo</span>
+    </div>
+    <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:10}}>
+      <div style={{background:T.cardBg,border:`1px solid ${T.cardBorder}`,borderRadius:16,padding:"18px 16px"}}>
+        <div style={{display:"flex",alignItems:"center",gap:8,marginBottom:12}}>
+          <div style={{width:28,height:28,borderRadius:8,background:"rgba(52,211,153,0.15)",display:"flex",alignItems:"center",justifyContent:"center"}}>
+            <span style={{fontSize:14,color:T.positive}}>↙</span>
           </div>
-          <div style={{...S.card,display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:14}}>
-            <span style={{fontSize:13,color:T.subtext,fontWeight:600}}>Resultado</span>
-            <span style={{fontSize:22,fontWeight:800,color:balance>=0?T.positive:T.negative,letterSpacing:"-0.5px"}}>{fmt(balance)}</span>
+          <span style={{fontSize:10,fontWeight:700,color:T.subtext,letterSpacing:"0.1em",textTransform:"uppercase"}}>Receitas</span>
+        </div>
+        <div style={{fontSize:22,fontWeight:800,color:"#f1f5f9",letterSpacing:"-0.5px"}}>{fmt(totalInc)}</div>
+        <div style={{fontSize:11,color:T.subtext,marginTop:4}}>{myIncomes.length} entrada{myIncomes.length!==1?"s":""}</div>
+      </div>
+      <div style={{background:T.cardBg,border:`1px solid ${T.cardBorder}`,borderRadius:16,padding:"18px 16px"}}>
+        <div style={{display:"flex",alignItems:"center",gap:8,marginBottom:12}}>
+          <div style={{width:28,height:28,borderRadius:8,background:"rgba(251,113,133,0.15)",display:"flex",alignItems:"center",justifyContent:"center"}}>
+            <span style={{fontSize:14,color:T.negative}}>↗</span>
           </div>
-          {dueRecurring>0&&(
-            <div onClick={()=>setTab("recorrentes")} style={{background:"rgba(245,158,11,0.08)",border:"1px solid rgba(245,158,11,0.3)",borderRadius:12,padding:"10px 14px",marginBottom:14,cursor:"pointer",display:"flex",alignItems:"center",gap:10}}>
-              <span style={{fontSize:20}}>🔔</span>
-              <div style={{flex:1}}><div style={{fontSize:13,fontWeight:700,color:"#f59e0b"}}>{dueRecurring} despesa{dueRecurring>1?"s":""} recorrente{dueRecurring>1?"s":""} a vencer</div><div style={{fontSize:11,color:"#78350f"}}>Toca para ver e registar</div></div>
-              <span style={{color:"#f59e0b"}}>→</span>
+          <span style={{fontSize:10,fontWeight:700,color:T.subtext,letterSpacing:"0.1em",textTransform:"uppercase"}}>Despesas</span>
+        </div>
+        <div style={{fontSize:22,fontWeight:800,color:"#f1f5f9",letterSpacing:"-0.5px"}}>{fmt(totalExp)}</div>
+        <div style={{fontSize:11,color:T.subtext,marginTop:4}}>{myExpenses.length} item{myExpenses.length!==1?"s":""}</div>
+      </div>
+    </div>
+  </div>
+
+  {/* ── ALERTA RECORRENTES ── */}
+  {dueRecurring>0&&(
+    <div onClick={()=>setTab("recorrentes")} style={{background:"rgba(245,158,11,0.08)",border:"1px solid rgba(245,158,11,0.3)",borderRadius:14,padding:"14px 16px",marginBottom:14,cursor:"pointer",display:"flex",alignItems:"center",gap:12}}>
+      <div style={{width:36,height:36,borderRadius:10,background:"rgba(245,158,11,0.15)",display:"flex",alignItems:"center",justifyContent:"center",fontSize:18,flexShrink:0}}>🔔</div>
+      <div style={{flex:1}}>
+        <div style={{fontSize:13,fontWeight:700,color:"#f59e0b"}}>{dueRecurring} despesa{dueRecurring>1?"s":""} recorrente{dueRecurring>1?"s":""} a vencer</div>
+        <div style={{fontSize:11,color:"#78350f",marginTop:2}}>Toca para ver e registar</div>
+      </div>
+      <span style={{color:"#f59e0b",fontSize:16}}>→</span>
+    </div>
+  )}
+
+  {/* ── CONTAS ── */}
+  {accounts.length>0&&(
+    <div style={{display:"flex",gap:8,overflowX:"auto",marginBottom:14,paddingBottom:4}}>
+      {accounts.map(a=>(
+        <div key={a.id} style={{background:T.cardBg,border:`1px solid ${T.accent}25`,borderRadius:12,padding:"10px 14px",flexShrink:0,minWidth:130}}>
+          <div style={{fontSize:12,fontWeight:600,color:T.subtext,marginBottom:2}}>{a.icon} {a.nome}</div>
+          <div style={{fontSize:16,fontWeight:800,color:Number(a.saldo)>=0?T.positive:T.negative}}>{fmt(Number(a.saldo))}</div>
+        </div>
+      ))}
+    </div>
+  )}
+
+  {/* ── ALERTA ORÇAMENTO ── */}
+  {(()=>{
+    const overItems=(Object.entries(TYPE_META) as [TypeKey,typeof TYPE_META[TypeKey]][]).filter(([type])=>{
+      const actual=byType[type]||0;
+      return actual>totalInc*(budgetTargets[type]/100)&&totalInc>0;
+    });
+    if(!overItems.length) return null;
+    const [type,meta]=overItems[0];
+    const actual=byType[type]||0;
+    const target=budgetTargets[type];
+    const actualPct=pct(actual,totalInc);
+    return(
+      <div style={{background:"rgba(245,158,11,0.08)",border:"1px solid rgba(245,158,11,0.3)",borderRadius:14,padding:"14px 16px",marginBottom:14,display:"flex",alignItems:"flex-start",gap:12}}>
+        <div style={{width:36,height:36,borderRadius:10,background:"rgba(245,158,11,0.15)",display:"flex",alignItems:"center",justifyContent:"center",fontSize:18,flexShrink:0}}>⚠️</div>
+        <div>
+          <div style={{fontSize:13,fontWeight:700,color:"#f59e0b",marginBottom:4}}>{meta.label} acima do orçamento</div>
+          <div style={{fontSize:12,color:T.subtext}}>Estás em {actualPct}% — alvo {target}%. Considera reduzir esta semana.</div>
+        </div>
+      </div>
+    );
+  })()}
+
+  {/* ── 02 COMPOSIÇÃO ── */}
+  <div style={{marginBottom:14}}>
+    <div style={{display:"flex",alignItems:"center",gap:8,marginBottom:10}}>
+      <span style={{fontSize:11,fontWeight:700,color:T.subtext,letterSpacing:"0.1em"}}>02</span>
+      <div style={{width:32,height:1,background:T.cardBorder}}/>
+      <span style={{fontSize:11,fontWeight:700,color:T.subtext,letterSpacing:"0.1em",textTransform:"uppercase"}}>Composição</span>
+    </div>
+    <div style={S.card}>
+      {(Object.entries(TYPE_META) as [TypeKey,typeof TYPE_META[TypeKey]][]).map(([type,meta])=>{
+        const actual=byType[type]||0,target=budgetTargets[type],targetAmt=totalInc*(target/100),actualPct=pct(actual,totalInc),over=actual>targetAmt&&totalInc>0;
+        return(
+          <div key={type} style={{marginBottom:18}}>
+            <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:8}}>
+              <span style={{fontSize:14,fontWeight:600,color:over?"#ef4444":"#f1f5f9"}}>{meta.label}</span>
+              <span style={{fontSize:13,fontWeight:700,color:over?"#ef4444":T.subtext}}>{actualPct}% / {target}%</span>
             </div>
-          )}
-          {accounts.length>0&&(<div style={{display:"flex",gap:8,overflowX:"auto",marginBottom:14,paddingBottom:4}}>{accounts.map(a=>(<div key={a.id} style={{background:T.cardBg,border:`1px solid ${T.accent}25`,borderRadius:12,padding:"10px 14px",flexShrink:0,minWidth:130}}><div style={{fontSize:12,fontWeight:600,color:T.subtext,marginBottom:2}}>{a.icon} {a.nome}</div><div style={{fontSize:16,fontWeight:800,color:Number(a.saldo)>=0?T.positive:T.negative}}>{fmt(Number(a.saldo))}</div></div>))}</div>)}
-          {accounts.length>0&&(()=>{
-            const totalCorrente   = accounts.filter(a=>a.tipo==="corrente").reduce((s,a)=>s+Number(a.saldo),0);
-            const totalPoupanca   = accounts.filter(a=>a.tipo==="poupanca").reduce((s,a)=>s+Number(a.saldo),0);
-            const totalInvest     = accounts.filter(a=>a.tipo==="investimento").reduce((s,a)=>s+Number(a.saldo),0);
-            const totalOutro      = accounts.filter(a=>a.tipo==="outro").reduce((s,a)=>s+Number(a.saldo),0);
-            const netWorth        = totalSaldo;
-            const rows = [
-              {label:"Conta Corrente",icon:"💳",val:totalCorrente, color:"#3b82f6",show:totalCorrente!==0},
-              {label:"Conta Poupança",icon:"🏦",val:totalPoupanca, color:"#10b981",show:totalPoupanca!==0},
-              {label:"Investimentos", icon:"📈",val:totalInvest,   color:"#a78bfa",show:totalInvest!==0},
-              {label:"Outros",        icon:"📂",val:totalOutro,    color:"#f59e0b",show:totalOutro!==0},
-            ].filter(r=>r.show);
-            return(
-              <div style={{...S.card,marginBottom:14}}>
-                <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:14}}>
-                  <SectionTitle>💎 Net Worth</SectionTitle>
-                  <span style={{fontSize:18,fontWeight:800,color:netWorth>=0?T.positive:T.negative,letterSpacing:"-0.5px"}}>{fmt(netWorth)}</span>
-                </div>
-                {rows.map(r=>(<div key={r.label} style={{marginBottom:10}}><div style={{display:"flex",justifyContent:"space-between",marginBottom:4}}><span style={{fontSize:13}}>{r.icon} {r.label}</span><span style={{fontSize:13,fontWeight:700,color:r.color}}>{fmt(r.val)}</span></div><div style={{height:5,borderRadius:99,background:"rgba(255,255,255,0.07)",overflow:"hidden"}}><div style={{width:`${Math.min(100,Math.abs(r.val)/Math.max(Math.abs(netWorth),1)*100)}%`,height:"100%",background:r.color,borderRadius:99,transition:"width .5s"}}/></div></div>))}
-                <div style={{marginTop:10,paddingTop:10,borderTop:`1px solid ${T.cardBorder}`,display:"flex",justifyContent:"space-between",alignItems:"center"}}>
-                  <span style={{fontSize:12,color:T.subtext,fontWeight:600}}>Total</span>
-                  <span style={{fontSize:16,fontWeight:800,color:netWorth>=0?T.positive:T.negative}}>{fmt(netWorth)}</span>
-                </div>
+            <div style={{position:"relative",height:6,borderRadius:99,background:"rgba(255,255,255,0.07)"}}>
+              <div style={{position:"absolute",left:0,top:0,bottom:0,width:`${Math.min(100,actualPct)}%`,background:over?"#ef4444":meta.color,borderRadius:99,transition:"width .5s ease"}}/>
+              <div style={{position:"absolute",top:-4,bottom:-4,left:`${target}%`,width:2,background:"rgba(255,255,255,0.25)",borderRadius:1}}/>
+            </div>
+            <div style={{display:"flex",justifyContent:"space-between",marginTop:5}}>
+              <span style={{fontSize:11,color:over?"#f87171":T.subtext}}>{fmt(actual)}</span>
+              <span style={{fontSize:11,color:T.subtext}}>limite {fmt(targetAmt)}</span>
+            </div>
+          </div>
+        );
+      })}
+      {totalInc===0&&<div style={{color:T.subtext,fontSize:12,textAlign:"center",padding:"8px 0"}}>Regista rendimentos para ver a composição.</div>}
+    </div>
+  </div>
+
+  {/* ── 03 NET WORTH ── */}
+  {accounts.length>0&&(()=>{
+    const totalCorrente=accounts.filter(a=>a.tipo==="corrente").reduce((s,a)=>s+Number(a.saldo),0);
+    const totalPoupanca=accounts.filter(a=>a.tipo==="poupanca").reduce((s,a)=>s+Number(a.saldo),0);
+    const totalInvest=accounts.filter(a=>a.tipo==="investimento").reduce((s,a)=>s+Number(a.saldo),0);
+    const totalOutro=accounts.filter(a=>a.tipo==="outro").reduce((s,a)=>s+Number(a.saldo),0);
+    const netWorth=totalSaldo;
+    const rows=[
+      {label:"Conta Corrente",icon:"💳",val:totalCorrente,color:"#3b82f6",show:totalCorrente!==0},
+      {label:"Conta Poupança",icon:"🏦",val:totalPoupanca,color:"#10b981",show:totalPoupanca!==0},
+      {label:"Investimentos",icon:"📈",val:totalInvest,color:"#a78bfa",show:totalInvest!==0},
+      {label:"Outros",icon:"📂",val:totalOutro,color:"#f59e0b",show:totalOutro!==0},
+    ].filter(r=>r.show);
+    if(!rows.length) return null;
+    return(
+      <div style={{marginBottom:14}}>
+        <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:10}}>
+          <div style={{display:"flex",alignItems:"center",gap:8}}>
+            <span style={{fontSize:11,fontWeight:700,color:T.subtext,letterSpacing:"0.1em"}}>03</span>
+            <div style={{width:32,height:1,background:T.cardBorder}}/>
+            <span style={{fontSize:11,fontWeight:700,color:T.subtext,letterSpacing:"0.1em",textTransform:"uppercase"}}>Net Worth</span>
+          </div>
+          <span style={{fontSize:18,fontWeight:800,color:netWorth>=0?T.positive:T.negative}}>{fmt(netWorth)}</span>
+        </div>
+        <div style={S.card}>
+          {rows.map(r=>(
+            <div key={r.label} style={{marginBottom:12}}>
+              <div style={{display:"flex",justifyContent:"space-between",marginBottom:5}}>
+                <span style={{fontSize:13,color:"#e2e8f0"}}>{r.icon} {r.label}</span>
+                <span style={{fontSize:13,fontWeight:700,color:r.color}}>{fmt(r.val)}</span>
               </div>
-            );
-          })()}
-          <div style={S.card}>
-            <SectionTitle>Distribuição por tipo — metas</SectionTitle>
-            {(Object.entries(TYPE_META) as [TypeKey,typeof TYPE_META[TypeKey]][]).map(([type,meta])=>{
-              const actual=byType[type]||0,target=budgetTargets[type],targetAmt=totalInc*(target/100),actualPct=pct(actual,totalInc),over=actual>targetAmt&&totalInc>0;
-              return(<div key={type} style={{marginBottom:14}}>
-                <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:5}}>
-                  <div style={{display:"flex",alignItems:"center",gap:7}}><span style={{fontSize:15}}>{meta.icon}</span><span style={{fontSize:13,fontWeight:600,color:over?"#ef4444":meta.color}}>{meta.label}</span><span style={{fontSize:10,color:T.subtext,background:"rgba(255,255,255,0.05)",padding:"2px 7px",borderRadius:99}}>meta {target}%</span></div>
-                  <div><span style={{fontSize:14,fontWeight:800,color:over?"#ef4444":meta.color}}>{fmt(actual)}</span><span style={{fontSize:11,color:over?"#ef4444":T.subtext,marginLeft:4}}>({actualPct}%)</span></div>
-                </div>
-                <div style={{position:"relative",height:8,borderRadius:99,background:"rgba(255,255,255,0.07)",overflow:"visible"}}>
-                  <div style={{position:"absolute",left:0,top:0,bottom:0,width:`${Math.min(100,actualPct)}%`,background:over?"#ef4444":meta.color,borderRadius:99,transition:"width .5s ease"}}/>
-                  <div style={{position:"absolute",top:-3,bottom:-3,left:`${target}%`,width:2,background:"rgba(255,255,255,0.3)",borderRadius:1,zIndex:2}}/>
-                </div>
-                {over&&<div style={{display:"flex",alignItems:"center",gap:7,background:"#450a0a",border:"1px solid #ef444460",borderRadius:8,padding:"7px 10px",marginTop:7}}><span>⚠️</span><span style={{fontSize:11,color:"#f87171"}}>+{fmt(actual-targetAmt)} acima do limite</span></div>}
-              </div>);
-            })}
-            {totalExp===0&&<div style={{color:T.subtext,fontSize:12,textAlign:"center",padding:"8px 0"}}>Regista despesas para ver a distribuição.</div>}
-          </div>
-          <div style={S.card}>
-            <SectionTitle>Top categorias</SectionTitle>
-            {byCat.filter(c=>c.total>0).slice(0,6).map(c=>(<div key={c.id} style={{marginBottom:10}}><div style={{display:"flex",justifyContent:"space-between",marginBottom:4}}><span style={{fontSize:13}}>{c.icon} {c.label}</span><span style={{fontSize:13,fontWeight:700}}>{fmt(c.total)}</span></div><ProgressBar value={c.total} max={maxCat} color={TYPE_META[c.type]?.color||"#6b7280"} height={4}/></div>))}
-            {byCat.filter(c=>c.total>0).length===0&&<div style={{color:T.subtext,fontSize:13,textAlign:"center",padding:"16px 0"}}>Sem despesas.</div>}
-          </div>
-          <div style={S.card}>
-            <SectionTitle>📈 Receitas vs Despesas — {new Date().getFullYear()}</SectionTitle>
-            <div style={{display:"flex",alignItems:"flex-end",gap:4,height:90,marginBottom:8}}>
-              {MONTHS.map((m,i)=>{
-                const rev=monthlyRev[world]?.[String(new Date().getFullYear())]?.[i]||0;
-                const exp=expenses.filter(e=>e.world===world&&new Date(e.data).getMonth()===i&&new Date(e.data).getFullYear()===new Date().getFullYear()).reduce((s,e)=>s+Number(e.valor),0);
-                const maxVal=Math.max(...MONTHS.map((_,j)=>{const r=monthlyRev[world]?.[String(new Date().getFullYear())]?.[j]||0;const ex=expenses.filter(e=>e.world===world&&new Date(e.data).getMonth()===j&&new Date(e.data).getFullYear()===new Date().getFullYear()).reduce((s,e)=>s+Number(e.valor),0);return Math.max(r,ex);}),1);
-                const rH=Math.round((rev/maxVal)*78)||2;
-                const eH=Math.round((exp/maxVal)*78)||2;
-                return(
-                  <div key={i} style={{flex:1,display:"flex",flexDirection:"column",alignItems:"center",gap:2}}>
-                    <div style={{display:"flex",alignItems:"flex-end",gap:1,height:78}}>
-                      <div style={{width:"45%",height:rH,background:T.positive,borderRadius:"3px 3px 0 0",transition:"height .4s"}}/>
-                      <div style={{width:"45%",height:eH,background:T.negative,borderRadius:"3px 3px 0 0",transition:"height .4s"}}/>
-                    </div>
-                    <span style={{fontSize:8,color:T.subtext}}>{m}</span>
-                  </div>
-                );
-              })}
+              <div style={{height:4,borderRadius:99,background:"rgba(255,255,255,0.07)",overflow:"hidden"}}>
+                <div style={{width:`${Math.min(100,Math.abs(r.val)/Math.max(Math.abs(netWorth),1)*100)}%`,height:"100%",background:r.color,borderRadius:99,transition:"width .5s"}}/>
+              </div>
             </div>
-            <div style={{display:"flex",gap:14}}>
-              <div style={{display:"flex",alignItems:"center",gap:5,fontSize:11,color:"#94a3b8"}}><div style={{width:10,height:10,borderRadius:2,background:T.positive}}/>Receitas</div>
-              <div style={{display:"flex",alignItems:"center",gap:5,fontSize:11,color:"#94a3b8"}}><div style={{width:10,height:10,borderRadius:2,background:T.negative}}/>Despesas</div>
+          ))}
+        </div>
+      </div>
+    );
+  })()}
+
+  {/* ── 04 EVOLUÇÃO ── */}
+  <div style={{marginBottom:14}}>
+    <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:10}}>
+      <div style={{display:"flex",alignItems:"center",gap:8}}>
+        <span style={{fontSize:11,fontWeight:700,color:T.subtext,letterSpacing:"0.1em"}}>04</span>
+        <div style={{width:32,height:1,background:T.cardBorder}}/>
+        <span style={{fontSize:11,fontWeight:700,color:T.subtext,letterSpacing:"0.1em",textTransform:"uppercase"}}>Evolução</span>
+      </div>
+      <span style={{fontSize:11,color:T.subtext}}>{new Date().getFullYear()}</span>
+    </div>
+    <div style={S.card}>
+      <div style={{display:"flex",alignItems:"flex-end",gap:4,height:100,marginBottom:10}}>
+        {MONTHS.map((m,i)=>{
+          const rev=monthlyRev[world]?.[String(new Date().getFullYear())]?.[i]||0;
+          const exp=expenses.filter(e=>e.world===world&&new Date(e.data).getMonth()===i&&new Date(e.data).getFullYear()===new Date().getFullYear()).reduce((s,e)=>s+Number(e.valor),0);
+          const maxVal=Math.max(...MONTHS.map((_,j)=>{const r=monthlyRev[world]?.[String(new Date().getFullYear())]?.[j]||0;const ex=expenses.filter(e=>e.world===world&&new Date(e.data).getMonth()===j&&new Date(e.data).getFullYear()===new Date().getFullYear()).reduce((s,e)=>s+Number(e.valor),0);return Math.max(r,ex);}),1);
+          const rH=Math.round((rev/maxVal)*88)||2;
+          const eH=Math.round((exp/maxVal)*88)||2;
+          const isCurrent=i===new Date().getMonth();
+          return(
+            <div key={i} style={{flex:1,display:"flex",flexDirection:"column",alignItems:"center",gap:3}}>
+              <div style={{display:"flex",alignItems:"flex-end",gap:1,height:88}}>
+                <div style={{width:"45%",height:rH,background:isCurrent?T.positive:`${T.positive}55`,borderRadius:"3px 3px 0 0",transition:"height .4s"}}/>
+                <div style={{width:"45%",height:eH,background:isCurrent?T.negative:`${T.negative}55`,borderRadius:"3px 3px 0 0",transition:"height .4s"}}/>
+              </div>
+              <span style={{fontSize:7,color:isCurrent?T.accent:T.subtext,fontWeight:isCurrent?700:400}}>{m}</span>
             </div>
+          );
+        })}
+      </div>
+      <div style={{display:"flex",gap:16,paddingTop:8,borderTop:`1px solid ${T.cardBorder}`}}>
+        <div style={{display:"flex",alignItems:"center",gap:6,fontSize:11,color:"#94a3b8"}}><div style={{width:10,height:10,borderRadius:2,background:T.positive}}/>Receitas</div>
+        <div style={{display:"flex",alignItems:"center",gap:6,fontSize:11,color:"#94a3b8"}}><div style={{width:10,height:10,borderRadius:2,background:T.negative}}/>Despesas</div>
+        <div style={{marginLeft:"auto",fontSize:11,color:T.subtext}}>mês actual destacado</div>
+      </div>
+    </div>
+  </div>
+
+  {/* ── 05 TOP CATEGORIAS ── */}
+  <div style={{marginBottom:14}}>
+    <div style={{display:"flex",alignItems:"center",gap:8,marginBottom:10}}>
+      <span style={{fontSize:11,fontWeight:700,color:T.subtext,letterSpacing:"0.1em"}}>05</span>
+      <div style={{width:32,height:1,background:T.cardBorder}}/>
+      <span style={{fontSize:11,fontWeight:700,color:T.subtext,letterSpacing:"0.1em",textTransform:"uppercase"}}>Top categorias</span>
+    </div>
+    <div style={S.card}>
+      {byCat.filter(c=>c.total>0).slice(0,6).map(c=>(
+        <div key={c.id} style={{marginBottom:12}}>
+          <div style={{display:"flex",justifyContent:"space-between",marginBottom:5}}>
+            <span style={{fontSize:13,color:"#e2e8f0"}}>{c.icon} {c.label}</span>
+            <span style={{fontSize:13,fontWeight:700,color:"#f1f5f9"}}>{fmt(c.total)}</span>
           </div>
-        </>}
+          <ProgressBar value={c.total} max={maxCat} color={TYPE_META[c.type]?.color||"#6b7280"} height={4}/>
+        </div>
+      ))}
+      {byCat.filter(c=>c.total>0).length===0&&<div style={{color:T.subtext,fontSize:13,textAlign:"center",padding:"16px 0"}}>Sem despesas registadas.</div>}
+    </div>
+  </div>
+</>}
 
         {/* DESPESAS */}
         {tab==="despesas"&&<>
