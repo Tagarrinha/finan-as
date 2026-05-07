@@ -475,6 +475,7 @@ export default function CoupleMode({ userId, userEmail, userName, expCats, accen
   <button onClick={()=>marcarLiquidado(e)} style={{flex:1,padding:"8px 0",background:"rgba(52,211,153,0.15)",border:"1px solid rgba(52,211,153,0.3)",borderRadius:9,color:"#34d399",fontSize:12,fontWeight:700,cursor:"pointer",fontFamily:"'Sora',sans-serif"}}>✓ Marcar como liquidado</button>
   <button onClick={()=>deleteExpense(e)} style={{padding:"8px 12px",background:"rgba(239,68,68,0.08)",border:"1px solid rgba(239,68,68,0.2)",borderRadius:9,color:"#f87171",fontSize:12,cursor:"pointer"}}>🗑️</button>
 </div>
+                </div>
               );
             })}
           </>
