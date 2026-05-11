@@ -119,47 +119,6 @@ async function syncToPersonal(e: CoupleExpense) {
   setTimeout(() => setSyncMsg(""), 3500);
 }
 
-    const rows = [
-      {
-        user_id: couple!.user1_id,
-        descricao: e.descricao,
-        valor: e.split_user1,
-        cat: e.cat,
-        subcat: "👫 Casal",
-        data: e.data,
-        tipo: "necessidade" as TypeKey,
-        world: "pessoal",
-        from_couple: true,
-        couple_expense_id: e.id,
-      },
-      ...(couple!.user2_id ? [{
-        user_id: couple!.user2_id,
-        descricao: e.descricao,
-        valor: e.split_user2,
-        cat: e.cat,
-        subcat: "👫 Casal",
-        data: e.data,
-        tipo: "necessidade" as TypeKey,
-        world: "pessoal",
-        from_couple: true,
-        couple_expense_id: e.id,
-      }] : []),
-    ];
-
-    const { error, data } = await supabase.from("expenses").insert(rows).select();
-    if (error) {
-      console.error("Sync error:", error);
-      setSyncMsg(`⚠️ Erro: ${error.message}`);
-    } else {
-      setSyncMsg("✓ Registado nas contas pessoais de ambos!");
-    }
-  } catch(err) {
-    console.error("Sync exception:", err);
-    setSyncMsg("⚠️ Sincronização falhou.");
-  }
-  setTimeout(() => setSyncMsg(""), 3500);
-}
-
   async function addExpense() {
     if(!couple||!form.descricao.trim()||!form.valor||!form.cat) return;
     setSaving(true);
