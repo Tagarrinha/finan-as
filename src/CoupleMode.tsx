@@ -205,20 +205,17 @@ async function syncToPersonal(e: CoupleExpense) {
     tipo: form.tipo, data: form.data,
     split_user1: s1, split_user2: s2,
   }).eq("id", editingExpenseId);
-  await supabase.from("expenses").delete().eq("couple_expense_id", editingExpenseId);
+  // Edge Function trata do delete + re-insert com service role
   if(form.liquidado) {
-    const updated = expenses.find(x => x.id === editingExpenseId);
-    if(updated) await syncToPersonal({...updated, valor:total, split_user1:s1, split_user2:s2, cat:form.cat, subcat:form.subcat, data:form.data});
+    await supabase.functions.invoke("couple-expense-sync", {
+      body: { couple_expense_id: editingExpenseId, force_resync: true }
+    });
+  } else {
+    // Se não liquidado, apaga as despesas pessoais sincronizadas
+    await supabase.functions.invoke("couple-expense-sync", {
+      body: { couple_expense_id: editingExpenseId, delete_only: true }
+    });
   }
-  setExpenses(p => p.map(x => x.id === editingExpenseId
-    ? {...x, descricao:form.descricao.trim(), valor:total, cat:form.cat, subcat:form.subcat, tipo:form.tipo, data:form.data, split_user1:s1, split_user2:s2}
-    : x
-  ));
-  setEditingExpenseId(null);
-  setForm(f => ({...f, descricao:"", valor:"", subcat:""}));
-  setShowForm(false);
-  setSaving(false);
-}
   async function dissolveCouple() {
     if(!couple||!window.confirm("Tens a certeza? Todos os dados conjuntos serão apagados.")) return;
     await supabase.from("couples").delete().eq("id",couple.id);

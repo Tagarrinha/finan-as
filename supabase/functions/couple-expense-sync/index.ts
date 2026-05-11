@@ -15,7 +15,7 @@ serve(async (req) => {
   }
 
   try {
-    const { couple_expense_id } = await req.json();
+    const { couple_expense_id, force_resync, delete_only } = await req.json();
 
     if (!couple_expense_id) {
       return new Response(JSON.stringify({ error: "Missing couple_expense_id" }), {
@@ -24,6 +24,17 @@ serve(async (req) => {
     }
 
     const supabase = createClient(SUPABASE_URL, SERVICE_ROLE_KEY);
+
+    if (delete_only) {
+      await supabase.from("expenses").delete().eq("couple_expense_id", couple_expense_id);
+      return new Response(JSON.stringify({ success: true, deleted: true }), {
+        status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
+    if (force_resync) {
+      await supabase.from("expenses").delete().eq("couple_expense_id", couple_expense_id);
+    }
 
     const { data: expense, error: expError } = await supabase
       .from("couple_expenses")
@@ -49,15 +60,17 @@ serve(async (req) => {
       });
     }
 
-    const { data: existing } = await supabase
-      .from("expenses")
-      .select("id")
-      .eq("couple_expense_id", couple_expense_id);
+    if (!force_resync) {
+      const { data: existing } = await supabase
+        .from("expenses")
+        .select("id")
+        .eq("couple_expense_id", couple_expense_id);
 
-    if (existing && existing.length > 0) {
-      return new Response(JSON.stringify({ success: true, skipped: true }), {
-        status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" },
-      });
+      if (existing && existing.length > 0) {
+        return new Response(JSON.stringify({ success: true, skipped: true }), {
+          status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
     }
 
     const rows = [
