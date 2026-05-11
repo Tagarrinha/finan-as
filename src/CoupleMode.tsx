@@ -107,13 +107,16 @@ export default function CoupleMode({ userId, userEmail, userName, expCats, accen
 
 async function syncToPersonal(e: CoupleExpense) {
   setSyncMsg("A sincronizar com contas pessoais...");
+  console.log("syncToPersonal called with:", e.id);
   try {
     const res = await supabase.functions.invoke("couple-expense-sync", {
       body: { couple_expense_id: e.id }
     });
+    console.log("Edge function response:", res);
     if (res.error) setSyncMsg(`⚠️ Erro: ${res.error.message}`);
     else setSyncMsg("✓ Registado nas contas pessoais de ambos!");
   } catch(err) {
+    console.log("Exception:", err);
     setSyncMsg("⚠️ Sincronização falhou.");
   }
   setTimeout(() => setSyncMsg(""), 3500);
