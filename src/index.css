@@ -107,3 +107,11 @@ code {
   padding: 4px 8px;
   background: var(--code-bg);
 }
+/* Premium theme enhancements */
+* {
+  -webkit-tap-highlight-color: transparent;
+}
+
+body {
+  overscroll-behavior: none;
+}
