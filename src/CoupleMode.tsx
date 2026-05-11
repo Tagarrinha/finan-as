@@ -108,17 +108,16 @@ export default function CoupleMode({ userId, userEmail, userName, expCats, accen
 async function syncToPersonal(e: CoupleExpense) {
   setSyncMsg("A sincronizar com contas pessoais...");
   try {
-    // Verifica se já foi sincronizado para evitar duplicados
-    const { data: existing } = await supabase
-      .from("expenses")
-      .select("id")
-      .eq("couple_expense_id", e.id);
-
-    if (existing && existing.length > 0) {
-      setSyncMsg("✓ Já sincronizado anteriormente.");
-      setTimeout(() => setSyncMsg(""), 3500);
-      return;
-    }
+    const res = await supabase.functions.invoke("couple-expense-sync", {
+      body: { couple_expense_id: e.id }
+    });
+    if (res.error) setSyncMsg(`⚠️ Erro: ${res.error.message}`);
+    else setSyncMsg("✓ Registado nas contas pessoais de ambos!");
+  } catch(err) {
+    setSyncMsg("⚠️ Sincronização falhou.");
+  }
+  setTimeout(() => setSyncMsg(""), 3500);
+}
 
     const rows = [
       {
