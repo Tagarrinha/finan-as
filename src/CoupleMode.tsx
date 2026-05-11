@@ -216,6 +216,15 @@ async function syncToPersonal(e: CoupleExpense) {
       body: { couple_expense_id: editingExpenseId, delete_only: true }
     });
   }
+  setExpenses(p => p.map(x => x.id === editingExpenseId
+    ? {...x, descricao:form.descricao.trim(), valor:total, cat:form.cat, subcat:form.subcat, tipo:form.tipo, data:form.data, split_user1:s1, split_user2:s2}
+    : x
+  ));
+  setEditingExpenseId(null);
+  setForm(f => ({...f, descricao:"", valor:"", subcat:""}));
+  setShowForm(false);
+  setSaving(false);
+}
   async function dissolveCouple() {
     if(!couple||!window.confirm("Tens a certeza? Todos os dados conjuntos serão apagados.")) return;
     await supabase.from("couples").delete().eq("id",couple.id);
