@@ -108,7 +108,6 @@ export default function CoupleMode({ userId, userEmail, userName, expCats, accen
 async function syncToPersonal(e: CoupleExpense) {
   setSyncMsg("A sincronizar com contas pessoais...");
   try {
-    // Verifica duplicados
     const { data: existing } = await supabase
       .from("expenses")
       .select("id")
@@ -120,34 +119,18 @@ async function syncToPersonal(e: CoupleExpense) {
       return;
     }
 
-    const rows = [
-      {
-        user_id: couple!.user1_id,
-        descricao: e.descricao,
-        valor: e.split_user1,
-        cat: e.cat,
-        subcat: "👫 Casal",
-        data: e.data,
-        tipo: "necessidade" as TypeKey,
-        world: "pessoal",
-        from_couple: true,
-        couple_expense_id: e.id,
-      },
-      ...(couple!.user2_id ? [{
-        user_id: couple!.user2_id,
-        descricao: e.descricao,
-        valor: e.split_user2,
-        cat: e.cat,
-        subcat: "👫 Casal",
-        data: e.data,
-        tipo: "necessidade" as TypeKey,
-        world: "pessoal",
-        from_couple: true,
-        couple_expense_id: e.id,
-      }] : []),
-    ];
+    const { error } = await supabase.rpc("insert_couple_expense", {
+      p_user1_id: couple!.user1_id,
+      p_user2_id: couple!.user2_id || null,
+      p_descricao: e.descricao,
+      p_valor1: e.split_user1,
+      p_valor2: e.split_user2,
+      p_cat: e.cat,
+      p_data: e.data,
+      p_tipo: e.tipo || "necessidade",
+      p_couple_expense_id: e.id,
+    });
 
-    const { error } = await supabase.from("expenses").insert(rows);
     if (error) setSyncMsg(`⚠️ Erro: ${error.message}`);
     else setSyncMsg("✓ Registado nas contas pessoais de ambos!");
   } catch {
