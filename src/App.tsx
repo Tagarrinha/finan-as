@@ -5,10 +5,7 @@ import SavingsGoals, { SavingsGoal } from "./SavingsGoals";
 import MonthComparison from "./MonthComparison";
 import WorldEditor from "./WorldEditor";
 import CoupleMode from "./CoupleMode";
-
-const SUPA_URL = "https://aiifzqmwnnfnrwmacyxq.supabase.co";
-const SUPA_KEY = "sb_publishable_GaZqBKcZGXJagV9mLnM1Zw_3Dq3wm6g";
-const supabase = createClient(SUPA_URL, SUPA_KEY);
+import { supabase } from "./supabase";
 
 type TypeKey = "necessidade"|"desejo"|"investimento";
 type ThemeKey = "original"|"aurora"|"ocean"|"nebula"|"verde"|"premium";
@@ -711,9 +708,12 @@ async function handleCoupleSettlement(valor: number) {
   const novoSaldo = Number(conta.saldo) - valor;
   await supabase.from("accounts").update({ saldo: novoSaldo }).eq("id", conta.id);
   setAccounts(p => p.map(a => a.id === conta.id ? { ...a, saldo: novoSaldo } : a));
+  // Recarrega despesas para mostrar as do casal
+  const {data} = await supabase.from("expenses").select("*").eq("user_id", user.id).order("data", {ascending: false});
+  if(data) setExpenses(data as Expense[]);
 }
   const S:Record<string,CSSProperties>={
-  root:{minHeight:"100vh",background:T.root,color:"#e2e8f0",fontFamily:"'Sora',sans-serif",paddingBottom:100},
+  root:{minHeight:"100dvh",background:T.root,color:"#e2e8f0",fontFamily:"'Sora',sans-serif",paddingBottom:"calc(100px + env(safe-area-inset-bottom, 0px))"},
   header:{background:T.header,padding:"20px clamp(20px, 5vw, 48px) 16px",borderBottom:`1px solid ${T.cardBorder}`},
   body:{padding:"16px clamp(20px, 5vw, 48px)",maxWidth:900,margin:"0 auto"},
   card:{background:T.cardBg,border:`1px solid ${T.cardBorder}`,borderRadius:14,padding:"16px 18px",marginBottom:14,boxShadow:"0 1px 3px rgba(0,0,0,0.3),0 4px 16px rgba(0,0,0,0.2)"},
@@ -767,7 +767,7 @@ async function handleCoupleSettlement(valor: number) {
             ))}
           </div>
         </div>
-        <div style={{flex:1,overflowY:"auto" as const,padding:"16px 20px"}}>
+        <div style={{flex:1,overflowY:"auto" as const,padding:"16px 20px",paddingBottom:"calc(32px + env(safe-area-inset-bottom, 0px))"}}>
           {sidebarTab==="contas"&&<>
             <div style={{background:T.cardBg,border:`1px solid ${T.accent}30`,borderRadius:14,padding:"16px",marginBottom:14,textAlign:"center" as const}}>
               <div style={{fontSize:10,color:T.subtext,textTransform:"uppercase" as const,letterSpacing:"0.08em",marginBottom:4}}>Saldo Total</div>
@@ -862,68 +862,56 @@ async function handleCoupleSettlement(valor: number) {
         </div>
       </div>
 
-      {/* HEADER */}
-<div style={{...S.header,position:"relative",zIndex:1}}>
-  <div style={{display:"flex",justifyContent:"space-between",alignItems:"center"}}>
-    {/* LEFT: hamburger + title */}
-    <div style={{display:"flex",alignItems:"center",gap:10}}>
-      <button
-        className="lnav-hamburger"
-        onClick={() => setLeftNavOpen(true)}
-        aria-label="Abrir menu"
-        style={{"--lnav-accent":T.accent,"--lnav-accent-dark":T.accentDark} as React.CSSProperties}
-      >
-        ☰
-      </button>
-      <div>
-        <div style={{fontSize:16,fontWeight:800,color:"#f1f5f9",letterSpacing:"-0.3px"}}>💰 As Minhas Finanças</div>
-        <div style={{fontSize:11,color:T.subtext,marginTop:1}}>Olá, <span style={{color:T.accent,fontWeight:700}}>{userName}</span> · <span style={{color:T.positive}}>sincronizado ✓</span></div>
-      </div>
-    </div>
-    {/* RIGHT: settings */}
+{/* HEADER */}
+<div style={{padding:"12px 16px 0",position:"relative",zIndex:1,display:"flex",alignItems:"center",justifyContent:"space-between"}}>
+  <button
+    className="lnav-hamburger"
+    onClick={() => setLeftNavOpen(true)}
+    aria-label="Abrir menu"
+    style={{"--lnav-accent":T.accent,"--lnav-accent-dark":T.accentDark} as React.CSSProperties}
+  >
+    ☰
+  </button>
+  {/* FILTRO inline */}
+  <div style={{position:"relative"}}>
+    <button
+      onClick={()=>setShowFilterMenu(v=>!v)}
+      style={{display:"flex",alignItems:"center",gap:6,padding:"7px 12px",background:showFilterMenu||fYear!=="todos"||fMonth!=="todos"?`${T.accent}20`:"rgba(255,255,255,0.05)",border:`1px solid ${showFilterMenu||fYear!=="todos"||fMonth!=="todos"?T.accent:"rgba(255,255,255,0.1)"}`,borderRadius:99,cursor:"pointer",fontFamily:"'Sora',sans-serif"}}
+    >
+      <svg width="14" height="14" viewBox="0 0 24 24" fill={fYear!=="todos"||fMonth!=="todos"?T.accent:"rgba(255,255,255,0.5)"}><path d="M4.25 5.61C6.27 8.2 10 13 10 13v6c0 .55.45 1 1 1h2c.55 0 1-.45 1-1v-6s3.72-4.8 5.74-7.39A.998.998 0 0019 4H5a1 1 0 00-.75 1.61z"/></svg>
+      <span style={{fontSize:11,fontWeight:700,color:fYear!=="todos"||fMonth!=="todos"?T.accent:"rgba(255,255,255,0.5)"}}>
+        {fYear==="todos"&&fMonth==="todos"?"Filtro":`${fMonth!=="todos"?MONTHS[Number(fMonth)]:"Todo o ano"} ${fYear!=="todos"?fYear:""}`}
+      </span>
+      {(fYear!=="todos"||fMonth!=="todos")&&(
+        <span onClick={e=>{e.stopPropagation();setFYear("todos");setFMonth("todos");}} style={{fontSize:11,color:T.accent,marginLeft:2,fontWeight:700}}>✕</span>
+      )}
+    </button>
+    {showFilterMenu&&(
+      <>
+        <div onClick={()=>setShowFilterMenu(false)} style={{position:"fixed",inset:0,zIndex:9}}/>
+        <div style={{position:"absolute",top:"calc(100% + 8px)",right:0,zIndex:20,background:"#0f1117",border:`1px solid ${T.cardBorder}`,borderRadius:16,padding:"16px",minWidth:240,boxShadow:"0 8px 32px rgba(0,0,0,0.5)"}}>
+          <div style={{fontSize:10,fontWeight:700,color:T.subtext,textTransform:"uppercase" as const,letterSpacing:"0.1em",marginBottom:10}}>Ano</div>
+          <div style={{display:"flex",gap:6,flexWrap:"wrap" as const,marginBottom:14}}>
+            {["todos","2024","2025","2026"].map(y=>(
+              <button key={y} onClick={()=>setFYear(y)} style={{padding:"6px 12px",borderRadius:99,border:`1px solid ${fYear===y?T.accent:"rgba(255,255,255,0.1)"}`,background:fYear===y?`${T.accent}20`:"transparent",color:fYear===y?T.accent:"#94a3b8",fontSize:12,fontWeight:700,cursor:"pointer",fontFamily:"'Sora',sans-serif"}}>
+                {y==="todos"?"Todos":y}
+              </button>
+            ))}
+          </div>
+          <div style={{fontSize:10,fontWeight:700,color:T.subtext,textTransform:"uppercase" as const,letterSpacing:"0.1em",marginBottom:10}}>Mês</div>
+          <div style={{display:"grid",gridTemplateColumns:"1fr 1fr 1fr",gap:6}}>
+            <button onClick={()=>setFMonth("todos")} style={{padding:"6px 8px",borderRadius:99,border:`1px solid ${fMonth==="todos"?T.accent:"rgba(255,255,255,0.1)"}`,background:fMonth==="todos"?`${T.accent}20`:"transparent",color:fMonth==="todos"?T.accent:"#94a3b8",fontSize:11,fontWeight:700,cursor:"pointer",fontFamily:"'Sora',sans-serif"}}>Todos</button>
+            {MONTHS.map((m,i)=>(
+              <button key={i} onClick={()=>setFMonth(String(i))} style={{padding:"6px 8px",borderRadius:99,border:`1px solid ${fMonth===String(i)?T.accent:"rgba(255,255,255,0.1)"}`,background:fMonth===String(i)?`${T.accent}20`:"transparent",color:fMonth===String(i)?T.accent:"#94a3b8",fontSize:11,fontWeight:700,cursor:"pointer",fontFamily:"'Sora',sans-serif"}}>{m}</button>
+            ))}
+          </div>
+          <button onClick={()=>setShowFilterMenu(false)} style={{width:"100%",marginTop:14,padding:"9px 0",background:`linear-gradient(135deg,${T.accent},${T.accentDark})`,border:"none",borderRadius:10,color:"#fff",fontSize:12,fontWeight:700,cursor:"pointer",fontFamily:"'Sora',sans-serif"}}>Aplicar</button>
+        </div>
+      </>
+    )}
   </div>
 </div>
-
-      {/* FILTERS */}
-<div style={{padding:"10px 20px 0",display:"flex",justifyContent:"flex-end",position:"relative",zIndex:10}}>
-  <button
-    onClick={()=>setShowFilterMenu(v=>!v)}
-    style={{display:"flex",alignItems:"center",gap:6,padding:"7px 12px",background:showFilterMenu||fYear!=="todos"||fMonth!=="todos"?`${T.accent}20`:"rgba(255,255,255,0.05)",border:`1px solid ${showFilterMenu||fYear!=="todos"||fMonth!=="todos"?T.accent:"rgba(255,255,255,0.1)"}`,borderRadius:99,cursor:"pointer",fontFamily:"'Sora',sans-serif"}}
-  >
-    <svg width="14" height="14" viewBox="0 0 24 24" fill={fYear!=="todos"||fMonth!=="todos"?T.accent:"rgba(255,255,255,0.5)"}><path d="M4.25 5.61C6.27 8.2 10 13 10 13v6c0 .55.45 1 1 1h2c.55 0 1-.45 1-1v-6s3.72-4.8 5.74-7.39A.998.998 0 0019 4H5a1 1 0 00-.75 1.61z"/></svg>
-    <span style={{fontSize:11,fontWeight:700,color:fYear!=="todos"||fMonth!=="todos"?T.accent:"rgba(255,255,255,0.5)"}}>
-      {fYear==="todos"&&fMonth==="todos"?"Filtro":`${fMonth!=="todos"?MONTHS[Number(fMonth)]:"Todo o ano"} ${fYear!=="todos"?fYear:""}`}
-    </span>
-    {(fYear!=="todos"||fMonth!=="todos")&&(
-      <span onClick={e=>{e.stopPropagation();setFYear("todos");setFMonth("todos");}} style={{fontSize:11,color:T.accent,marginLeft:2,fontWeight:700}}>✕</span>
-    )}
-  </button>
-  {showFilterMenu&&(
-    <>
-      <div onClick={()=>setShowFilterMenu(false)} style={{position:"fixed",inset:0,zIndex:9}}/>
-      <div style={{position:"absolute",top:"calc(100% + 8px)",right:20,zIndex:20,background:"#0f1117",border:`1px solid ${T.cardBorder}`,borderRadius:16,padding:"16px",minWidth:240,boxShadow:"0 8px 32px rgba(0,0,0,0.5)"}}>
-        <div style={{fontSize:10,fontWeight:700,color:T.subtext,textTransform:"uppercase" as const,letterSpacing:"0.1em",marginBottom:10}}>Ano</div>
-        <div style={{display:"flex",gap:6,flexWrap:"wrap" as const,marginBottom:14}}>
-          {["todos","2024","2025","2026"].map(y=>(
-            <button key={y} onClick={()=>setFYear(y)} style={{padding:"6px 12px",borderRadius:99,border:`1px solid ${fYear===y?T.accent:"rgba(255,255,255,0.1)"}`,background:fYear===y?`${T.accent}20`:"transparent",color:fYear===y?T.accent:"#94a3b8",fontSize:12,fontWeight:700,cursor:"pointer",fontFamily:"'Sora',sans-serif"}}>
-              {y==="todos"?"Todos":y}
-            </button>
-          ))}
-        </div>
-        <div style={{fontSize:10,fontWeight:700,color:T.subtext,textTransform:"uppercase" as const,letterSpacing:"0.1em",marginBottom:10}}>Mês</div>
-        <div style={{display:"grid",gridTemplateColumns:"1fr 1fr 1fr",gap:6}}>
-          <button onClick={()=>setFMonth("todos")} style={{padding:"6px 8px",borderRadius:99,border:`1px solid ${fMonth==="todos"?T.accent:"rgba(255,255,255,0.1)"}`,background:fMonth==="todos"?`${T.accent}20`:"transparent",color:fMonth==="todos"?T.accent:"#94a3b8",fontSize:11,fontWeight:700,cursor:"pointer",fontFamily:"'Sora',sans-serif"}}>Todos</button>
-          {MONTHS.map((m,i)=>(
-            <button key={i} onClick={()=>setFMonth(String(i))} style={{padding:"6px 8px",borderRadius:99,border:`1px solid ${fMonth===String(i)?T.accent:"rgba(255,255,255,0.1)"}`,background:fMonth===String(i)?`${T.accent}20`:"transparent",color:fMonth===String(i)?T.accent:"#94a3b8",fontSize:11,fontWeight:700,cursor:"pointer",fontFamily:"'Sora',sans-serif"}}>{m}</button>
-          ))}
-        </div>
-        <button onClick={()=>setShowFilterMenu(false)} style={{width:"100%",marginTop:14,padding:"9px 0",background:`linear-gradient(135deg,${T.accent},${T.accentDark})`,border:"none",borderRadius:10,color:"#fff",fontSize:12,fontWeight:700,cursor:"pointer",fontFamily:"'Sora',sans-serif"}}>Aplicar</button>
-      </div>
-    </>
-  )}
-</div>
 <div style={{...S.body,position:"relative",zIndex:1}}>
-
         {/* RESUMO */}
         {tab==="resumo"&&<>
   {/* ── HERO ── */}
@@ -1272,12 +1260,12 @@ async function handleCoupleSettlement(valor: number) {
             </div>
           </div>
         </>}
-
-      </div>
+    </div>
+    </div>
 
       {/* ── BOTTOM NAV ── */}
       <div style={{position:"fixed",bottom:16,left:"50%",transform:"translateX(-50%)",zIndex:60,width:"calc(100% - 32px)",maxWidth:420}}>
-        <div style={{background:"rgba(15,18,30,0.85)",backdropFilter:"blur(20px)",WebkitBackdropFilter:"blur(20px)",border:"1px solid rgba(255,255,255,0.08)",borderRadius:24,padding:"10px 8px",display:"flex",alignItems:"center",justifyContent:"space-around",boxShadow:"0 8px 32px rgba(0,0,0,0.5)"}}>
+        <div style={{background:"rgba(15,18,30,0.85)",backdropFilter:"blur(20px)",WebkitBackdropFilter:"blur(20px)",border:"1px solid rgba(255,255,255,0.08)",borderRadius:24,padding:"10px 8px",display:"flex",alignItems:"center",justifyContent:"space-around",boxShadow:"0 8px 32px rgba(0,0,0,0.5)",paddingBottom:"env(safe-area-inset-bottom, 10px)"}}>
 
           {/* Dashboard */}
           <button onClick={()=>setTab("resumo")} style={{display:"flex",flexDirection:"column" as const,alignItems:"center",gap:4,padding:"8px 16px",borderRadius:16,border:"none",background:tab==="resumo"?`${T.accent}20`:"transparent",cursor:"pointer",transition:"all .2s",minWidth:60}}>

@@ -1,9 +1,5 @@
 import { useState, CSSProperties } from "react";
-import { createClient } from "@supabase/supabase-js";
-
-const SUPA_URL = "https://aiifzqmwnnfnrwmacyxq.supabase.co";
-const SUPA_KEY = "sb_publishable_GaZqBKcZGXJagV9mLnM1Zw_3Dq3wm6g";
-const supabase = createClient(SUPA_URL, SUPA_KEY);
+import { supabase } from "./supabase";
 
 type TypeKey = "necessidade"|"desejo"|"investimento";
 type FreqKey = "mensal"|"semanal"|"anual";

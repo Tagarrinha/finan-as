@@ -1,9 +1,6 @@
 import { useState, useEffect, CSSProperties } from "react";
-import { createClient } from "@supabase/supabase-js";
-
-const SUPA_URL = "https://aiifzqmwnnfnrwmacyxq.supabase.co";
-const SUPA_KEY = "sb_publishable_GaZqBKcZGXJagV9mLnM1Zw_3Dq3wm6g";
-const supabase = createClient(SUPA_URL, SUPA_KEY);
+import { supabase } from "./supabase";
+import CoupleRecurring, { CoupleRecurringExpense } from "./CoupleRecurring";
 
 type TypeKey = "necessidade"|"desejo"|"investimento";
 interface ExpCat { id:string; label:string; icon:string; type:TypeKey; }
@@ -34,7 +31,7 @@ export default function CoupleMode({ userId, userEmail, userName, expCats, accen
   const [expenses,    setExpenses]    = useState<CoupleExpense[]>([]);
   const [settlements, setSettlements] = useState<Settlement[]>([]);
   const [loading,     setLoading]     = useState(true);
-  const [tab,         setTab]         = useState<"conta"|"despesas"|"acerto">("conta");
+  const [tab,         setTab]         = useState<"conta"|"despesas"|"recorrentes"|"acerto">("conta");
   const [inviteEmail, setInviteEmail] = useState("");
   const [inviting,    setInviting]    = useState(false);
   const [inviteErr,   setInviteErr]   = useState("");
@@ -50,6 +47,7 @@ export default function CoupleMode({ userId, userEmail, userName, expCats, accen
   const [editContrib,setEditContrib]= useState(false);
   const [myContrib,  setMyContrib]  = useState("");
   const [partnerContrib,setPartnerContrib]=useState("");
+  const [recurringItems, setRecurringItems] = useState<CoupleRecurringExpense[]>([]);
 
   useEffect(()=>{ loadCouple(); },[userId,userEmail]);
 
@@ -65,14 +63,16 @@ export default function CoupleMode({ userId, userEmail, userName, expCats, accen
       }
       setCouple(c as Couple);
       if(c.status==="active"){
-        const [expR,accR,setR]=await Promise.all([
+        const [expR,accR,setR,recR]=await Promise.all([
           supabase.from("couple_expenses").select("*").eq("couple_id",c.id).order("data",{ascending:false}),
           supabase.from("couple_account").select("*").eq("couple_id",c.id).maybeSingle(),
           supabase.from("couple_settlements").select("*").eq("couple_id",c.id).order("created_at",{ascending:false}),
+          supabase.from("couple_recurring_expenses").select("*").eq("couple_id",c.id).order("proxima_data"),
         ]);
         if(expR.data) setExpenses(expR.data as CoupleExpense[]);
         if(accR.data) setAccount(accR.data as CoupleAccount);
         if(setR.data) setSettlements(setR.data as Settlement[]);
+        if(recR.data) setRecurringItems(recR.data as CoupleRecurringExpense[]);
       }
     }
     setLoading(false);
@@ -264,6 +264,10 @@ async function syncToPersonal(e: CoupleExpense) {
   // Quanto cada um deve no total das por liquidar
   const myDebt=porLiquidar.reduce((s,e)=>s+(isUser1?e.split_user1:e.split_user2),0);
   const partnerDebt=porLiquidar.reduce((s,e)=>s+(isUser1?e.split_user2:e.split_user1),0);
+  const totalContributions = (account?.contribuicao_user1||0) + (account?.contribuicao_user2||0);
+const totalSettledExpenses = liquidadas.reduce((s,e) => s + Number(e.valor), 0);
+const jointBalance = totalContributions - totalSettledExpenses;
+  
 
   // ── NO COUPLE ──────────────────────────────────────────────────────────────
   if(!couple) return (
@@ -351,11 +355,11 @@ async function syncToPersonal(e: CoupleExpense) {
 
       {/* Tabs */}
       <div style={{display:"flex",gap:2,marginBottom:16,borderBottom:`1px solid ${cardBorder}`}}>
-        {(["conta","despesas","acerto"] as const).map(t=>{
+        {(["conta","despesas","recorrentes","acerto"] as const).map(t=>{
           const badge=t==="acerto"&&porLiquidar.length>0;
           return(
             <button key={t} style={{...tBtn(tab===t,t==="conta"?"#a78bfa":t==="despesas"?accent:PARTNER_COLOR),position:"relative"}} onClick={()=>setTab(t)}>
-              {t==="conta"?"🏦 Conta":t==="despesas"?"💳 Despesas":"⚖️ Acerto"}
+              {t==="conta"?"🏦 Conta":t==="despesas"?"💳 Despesas":t==="recorrentes"?"🔄 Recorrentes":"⚖️ Acerto"}
               {badge&&<span style={{position:"absolute",top:4,right:4,width:8,height:8,borderRadius:"50%",background:"#f59e0b"}}/>}
             </button>
           );
@@ -364,21 +368,21 @@ async function syncToPersonal(e: CoupleExpense) {
 
       {/* ── CONTA ── */}
       {tab==="conta"&&<>
-  {/* ── Saldo conjunto hero ── */}
-  <div style={{background:"linear-gradient(135deg,rgba(0,195,122,0.08),rgba(124,58,237,0.06))",border:"1px solid rgba(0,195,122,0.2)",borderRadius:20,padding:"24px 20px",marginBottom:16}}>
-    <div style={{fontSize:10,fontWeight:700,color:subtext,textTransform:"uppercase" as const,letterSpacing:"0.12em",marginBottom:8}}>Saldo Conjunto</div>
-    <div style={{display:"flex",justifyContent:"space-between",alignItems:"flex-start",marginBottom:8}}>
-      <div style={{fontSize:36,fontWeight:800,color:"#f1f5f9",letterSpacing:"-1px",lineHeight:1}}>{fmt(account?.saldo||0)}</div>
-      <div style={{width:44,height:44,borderRadius:"50%",background:"rgba(0,195,122,0.15)",border:"1px solid rgba(0,195,122,0.3)",display:"flex",alignItems:"center",justifyContent:"center",fontSize:22}}>💚</div>
-    </div>
-    <div style={{fontSize:12,color:"rgba(0,195,122,0.8)",fontWeight:600,marginBottom:16}}>
-      + {fmt((account?.contribuicao_user1||0)+(account?.contribuicao_user2||0))} este mês
-    </div>
-    <div style={{background:"rgba(255,255,255,0.04)",borderRadius:10,padding:"10px 14px",display:"flex",justifyContent:"space-between",alignItems:"center"}}>
-      <span style={{fontSize:12,color:subtext}}>Contribuições este mês</span>
-      <span style={{fontSize:13,fontWeight:700,color:"rgba(0,195,122,0.9)"}}>{fmt((account?.contribuicao_user1||0)+(account?.contribuicao_user2||0))}</span>
-    </div>
+{/* ── Saldo conjunto hero ── */}
+<div style={{background:"linear-gradient(135deg,rgba(0,195,122,0.08),rgba(124,58,237,0.06))",border:"1px solid rgba(0,195,122,0.2)",borderRadius:20,padding:"24px 20px",marginBottom:16}}>
+  <div style={{fontSize:10,fontWeight:700,color:subtext,textTransform:"uppercase" as const,letterSpacing:"0.12em",marginBottom:8}}>Saldo Conjunto</div>
+  <div style={{display:"flex",justifyContent:"space-between",alignItems:"flex-start",marginBottom:8}}>
+    <div style={{fontSize:36,fontWeight:800,color:jointBalance>=0?"#f1f5f9":"#ff7d7d",letterSpacing:"-1px",lineHeight:1}}>{fmt(jointBalance)}</div>
+    <div style={{width:44,height:44,borderRadius:"50%",background:"rgba(0,195,122,0.15)",border:"1px solid rgba(0,195,122,0.3)",display:"flex",alignItems:"center",justifyContent:"center",fontSize:22}}>💚</div>
   </div>
+  <div style={{fontSize:12,color:jointBalance>=0?"rgba(0,195,122,0.8)":"rgba(255,125,125,0.8)",fontWeight:600,marginBottom:16}}>
+    {totalSettledExpenses>0?`${fmt(totalContributions)} contribuições − ${fmt(totalSettledExpenses)} despesas`:`${fmt(totalContributions)} em contribuições`}
+  </div>
+  <div style={{background:"rgba(255,255,255,0.04)",borderRadius:10,padding:"10px 14px",display:"flex",justifyContent:"space-between",alignItems:"center"}}>
+    <span style={{fontSize:12,color:subtext}}>Contribuições este mês</span>
+    <span style={{fontSize:13,fontWeight:700,color:"rgba(0,195,122,0.9)"}}>{fmt(totalContributions)}</span>
+  </div>
+</div>
 
   {/* ── Contribuições ── */}
   {!editContrib?(
@@ -616,7 +620,47 @@ async function syncToPersonal(e: CoupleExpense) {
           </>
         )}
       </>}
-
+{/* ── RECORRENTES ── */}
+{tab==="recorrentes"&&couple&&(
+  <CoupleRecurring
+    coupleId={couple.id}
+    isUser1={isUser1}
+    userName={userName}
+    partnerName={partnerName}
+    expCats={expCats}
+    accent={accent}
+    accentDark={accentDark}
+    cardBg={cardBg}
+    cardBorder={cardBorder}
+    subtext={subtext}
+    negative={negative}
+    items={recurringItems}
+    setItems={setRecurringItems}
+    onApplyDue={async (r) => {
+      const total = Number(r.valor);
+      const s1 = total / 2;
+      const s2 = total / 2;
+      const {data, error} = await supabase.from("couple_expenses").insert({
+        couple_id: couple.id,
+        created_by: userId,
+        descricao: r.descricao,
+        valor: total,
+        cat: r.cat,
+        subcat: "",
+        tipo: r.tipo,
+        data: new Date().toISOString().slice(0,10),
+        split_user1: s1,
+        split_user2: s2,
+        pago_por: userId,
+        liquidado: r.liquidado_auto,
+      }).select().single();
+      if(!error && data) {
+        setExpenses(p => [data as CoupleExpense, ...p]);
+        if(r.liquidado_auto) await syncToPersonal(data as CoupleExpense);
+      }
+    }}
+  />
+)}
       {/* ── ACERTO ── */}
       {tab==="acerto"&&<>
         {/* Por liquidar — lista individual */}
