@@ -1261,7 +1261,6 @@ async function handleCoupleSettlement(valor: number) {
           </div>
         </>}
     </div>
-    </div>
 
       {/* ── BOTTOM NAV ── */}
       <div style={{position:"fixed",bottom:16,left:"50%",transform:"translateX(-50%)",zIndex:60,width:"calc(100% - 32px)",maxWidth:420}}>
