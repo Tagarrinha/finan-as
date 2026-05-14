@@ -769,7 +769,7 @@ async function handleCoupleSettlement(valor: number) {
             ))}
           </div>
         </div>
-        <div style={{flex:1,overflowY:"auto" as const,padding:"16px 20px",paddingBottom:"calc(32px + env(safe-area-inset-bottom, 0px))",WebkitOverflowScrolling:"touch" as const}}>
+        <div style={{flex:1,overflowY:"auto" as const,padding:"16px 20px",paddingBottom:"calc(120px + env(safe-area-inset-bottom, 0px))",WebkitOverflowScrolling:"touch" as const}}>
           {sidebarTab==="contas"&&<>
             <div style={{background:T.cardBg,border:`1px solid ${T.accent}30`,borderRadius:14,padding:"16px",marginBottom:14,textAlign:"center" as const}}>
               <div style={{fontSize:10,color:T.subtext,textTransform:"uppercase" as const,letterSpacing:"0.08em",marginBottom:4}}>Saldo Total</div>
