@@ -199,6 +199,7 @@ async function syncToPersonal(e: CoupleExpense) {
     subcat: e.subcat,
     tipo: e.tipo,
     data: e.data,
+    split: "custom",
     pagoPor: e.pago_por === userId ? "me" : "partner",
     splitMy: String(isUser1local ? e.split_user1 : e.split_user2),
     splitPartner: String(isUser1local ? e.split_user2 : e.split_user1),
