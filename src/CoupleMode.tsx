@@ -36,11 +36,11 @@ export default function CoupleMode({ userId, userEmail, userName, expCats, accen
   const [inviting,    setInviting]    = useState(false);
   const [inviteErr,   setInviteErr]   = useState("");
   const [showForm,    setShowForm]    = useState(false);
-  const [form,        setForm]        = useState({
-    descricao:"", valor:"", cat:"", subcat:"", tipo:"necessidade" as TypeKey,
-    data:new Date().toISOString().slice(0,10), split:"50/50",
-    splitMy:"", splitPartner:"", liquidado:true,
-  });
+ const [form, setForm] = useState({
+  descricao:"", valor:"", cat:"", subcat:"", tipo:"necessidade" as TypeKey,
+  data:new Date().toISOString().slice(0,10), split:"50/50",
+  splitMy:"", splitPartner:"", liquidado:true, pagoPor:"me",
+});
   const [saving,     setSaving]     = useState(false);
   const [editingExpenseId, setEditingExpenseId] = useState<number|null>(null);
   const [syncMsg,    setSyncMsg]    = useState("");
@@ -150,7 +150,7 @@ async function syncToPersonal(e: CoupleExpense) {
     const {data,error}=await supabase.from("couple_expenses").insert({
       couple_id:couple.id,created_by:userId,descricao:form.descricao.trim(),
       valor:total,cat:form.cat,subcat:form.subcat,tipo:form.tipo,
-      data:form.data,split_user1:s1,split_user2:s2,pago_por:userId,liquidado:form.liquidado,
+      data:form.data,split_user1:s1,split_user2:s2,pago_por: form.pagoPor==="me" ? userId : (isUser1 ? couple.user2_id : couple.user1_id),liquidado:form.liquidado,
     }).select().single();
     if(!error&&data){
       setExpenses(p=>[data as CoupleExpense,...p]);
@@ -199,7 +199,7 @@ async function syncToPersonal(e: CoupleExpense) {
     subcat: e.subcat,
     tipo: e.tipo,
     data: e.data,
-    split: "custom",
+    pagoPor: e.pago_por === userId ? "me" : "partner",
     splitMy: String(isUser1local ? e.split_user1 : e.split_user2),
     splitPartner: String(isUser1local ? e.split_user2 : e.split_user1),
     liquidado: e.liquidado,
@@ -524,6 +524,20 @@ const jointBalance = totalContributions - totalSettledExpenses;
                 ))}
               </div>
             </div>
+            {/* Quem pagou */}
+            <div style={{marginBottom:12}}>
+              <div style={{fontSize:10,color:subtext,marginBottom:8}}>Quem pagou?</div>
+              <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:8}}>
+                <button onClick={()=>setForm(f=>({...f,pagoPor:"me"}))} style={{padding:"10px 8px",border:`1.5px solid ${form.pagoPor==="me"?MY_COLOR:"rgba(255,255,255,0.08)"}`,borderRadius:12,background:form.pagoPor==="me"?`${MY_COLOR}18`:"rgba(255,255,255,0.04)",color:form.pagoPor==="me"?MY_COLOR:"#64748b",fontWeight:700,fontSize:12,cursor:"pointer",fontFamily:"'Sora',sans-serif",textAlign:"center" as const}}>
+                  <div style={{fontSize:18,marginBottom:4}}>👤</div>
+                  <div>{userName}</div>
+                </button>
+                <button onClick={()=>setForm(f=>({...f,pagoPor:"partner"}))} style={{padding:"10px 8px",border:`1.5px solid ${form.pagoPor==="partner"?PARTNER_COLOR:"rgba(255,255,255,0.08)"}`,borderRadius:12,background:form.pagoPor==="partner"?`${PARTNER_COLOR}18`:"rgba(255,255,255,0.04)",color:form.pagoPor==="partner"?PARTNER_COLOR:"#64748b",fontWeight:700,fontSize:12,cursor:"pointer",fontFamily:"'Sora',sans-serif",textAlign:"center" as const}}>
+                  <div style={{fontSize:18,marginBottom:4}}>👤</div>
+                  <div>{partnerName}</div>
+                </button>
+              </div>
+            </div>
             {/* Estado — Liquidado / Por liquidar */}
             <div style={{marginBottom:14}}>
               <div style={{fontSize:10,color:subtext,marginBottom:8}}>Estado do pagamento</div>
@@ -681,13 +695,32 @@ const jointBalance = totalContributions - totalSettledExpenses;
                         <div style={{fontSize:10,color:subtext}}>{new Date(e.data+"T12:00:00").toLocaleDateString("pt-PT")} · total {fmt(e.valor)}</div>
                       </div>
                     </div>
+                    {/* Quem pagou */}
+                    {(()=>{
+                      const iPaid = e.pago_por === userId;
+                      const paidByName = iPaid ? userName : partnerName;
+                      const owedAmount = iPaid ? ptShare : myShare;
+                      const owedByName = iPaid ? partnerName : userName;
+                      const owedColor = iPaid ? PARTNER_COLOR : MY_COLOR;
+                      return(
+                        <div style={{background:"rgba(255,255,255,0.04)",border:"1px solid rgba(255,255,255,0.08)",borderRadius:10,padding:"10px 12px",marginBottom:8}}>
+                          <div style={{fontSize:11,color:subtext,marginBottom:6}}>💳 Pago por <strong style={{color:iPaid?MY_COLOR:PARTNER_COLOR}}>{paidByName}</strong></div>
+                          <div style={{display:"flex",alignItems:"center",gap:8}}>
+                            <div style={{flex:1,background:`${owedColor}15`,borderRadius:8,padding:"8px 10px",textAlign:"center" as const}}>
+                              <div style={{fontSize:10,color:owedColor,fontWeight:600,marginBottom:2}}>{owedByName} deve a {paidByName}</div>
+                              <div style={{fontSize:18,fontWeight:800,color:owedColor}}>{fmt(owedAmount)}</div>
+                            </div>
+                          </div>
+                        </div>
+                      );
+                    })()}
                     <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:6,marginBottom:8}}>
                       <div style={{background:`${MY_COLOR}12`,borderRadius:8,padding:"6px 10px"}}>
-                        <div style={{fontSize:10,color:MY_COLOR,fontWeight:600,marginBottom:2}}>{userName} deve</div>
+                        <div style={{fontSize:10,color:MY_COLOR,fontWeight:600,marginBottom:2}}>{userName} · parte</div>
                         <div style={{fontSize:14,fontWeight:800,color:MY_COLOR}}>{fmt(myShare)}</div>
                       </div>
                       <div style={{background:`${PARTNER_COLOR}12`,borderRadius:8,padding:"6px 10px"}}>
-                        <div style={{fontSize:10,color:PARTNER_COLOR,fontWeight:600,marginBottom:2}}>{partnerName} deve</div>
+                        <div style={{fontSize:10,color:PARTNER_COLOR,fontWeight:600,marginBottom:2}}>{partnerName} · parte</div>
                         <div style={{fontSize:14,fontWeight:800,color:PARTNER_COLOR}}>{fmt(ptShare)}</div>
                       </div>
                     </div>

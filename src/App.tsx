@@ -102,11 +102,11 @@ interface NavItem { id: NavTab; label: string; icon: string; }
 
 const LEFT_NAV_ITEMS: NavItem[] = [
   { id:"resumo",      label:"Dashboard",   icon:"📊" },
-  { id:"casal",       label:"Modo Casal",  icon:"�" },
+  { id:"casal",       label:"Modo Casal",  icon:"👫" },
   { id:"objetivos",   label:"Metas",       icon:"🎯" },
   { id:"despesas",    label:"Despesas",    icon:"📥" },
-  { id:"rendimentos", label:"Rendimentos", icon:"�" },
-  { id:"comparacao",  label:"Comparação",  icon:"�" },
+  { id:"rendimentos", label:"Rendimentos", icon:"💶" },
+  { id:"comparacao",  label:"Comparação",  icon:"📈" },
   { id:"definicoes",  label:"Definições",  icon:"⚙️" },
 ];
 
@@ -560,7 +560,7 @@ function MainApp({user,userName,onLogout}:{user:SBUser;userName:string;onLogout:
   const [leftNavOpen,setLeftNavOpen]=useState(false);       // ← NEW left nav drawer
   const [showFilterMenu,setShowFilterMenu]=useState(false);
   const [showAddModal,setShowAddModal]=useState(false);
-  const [themeKey,setThemeKey]=useState<ThemeKey>("original");
+  const [themeKey,setThemeKey]=useState<ThemeKey>("premium");
   const T=THEMES[themeKey];
   const [showTour,setShowTour]=useState(false);
   const [expenses,setExpenses]=useState<Expense[]>([]);
@@ -603,6 +603,7 @@ function MainApp({user,userName,onLogout}:{user:SBUser;userName:string;onLogout:
   const [fMonth,setFMonth]=useState("todos");const [fYear,setFYear]=useState("todos");
   const [editingExp,setEditingExp]=useState<number|null>(null);
   const [editingInc,setEditingInc]=useState<number|null>(null);
+  const [hideValues, setHideValues] = useState(false);
 
   useEffect(()=>{loadAll();},[user.id]);
 
@@ -647,6 +648,7 @@ function MainApp({user,userName,onLogout}:{user:SBUser;userName:string;onLogout:
   const totalExp=myExpenses.reduce((s,e)=>s+Number(e.valor),0);
   const totalInc=myIncomes.reduce((s,i)=>s+Number(i.valor),0);
   const balance=totalInc-totalExp;
+  const hv = (val: string) => hideValues ? "••••" : val;
   const byType=useMemo(()=>{const map:Record<TypeKey,number>={necessidade:0,desejo:0,investimento:0};myExpenses.forEach(e=>{if(e.tipo in map)map[e.tipo]+=Number(e.valor);});return map;},[myExpenses]);
   const byCat=useMemo(()=>expCats.map(c=>({...c,total:myExpenses.filter(e=>e.cat===c.id).reduce((s,e)=>s+Number(e.valor),0)})).sort((a,b)=>b.total-a.total),[myExpenses,expCats]);
   const byIncCat=useMemo(()=>incCats.map(c=>({...c,total:myIncomes.filter(i=>i.cat===c.id).reduce((s,i)=>s+Number(i.valor),0)})).sort((a,b)=>b.total-a.total),[myIncomes,incCats]);
@@ -767,11 +769,11 @@ async function handleCoupleSettlement(valor: number) {
             ))}
           </div>
         </div>
-        <div style={{flex:1,overflowY:"auto" as const,padding:"16px 20px",paddingBottom:"calc(32px + env(safe-area-inset-bottom, 0px))"}}>
+        <div style={{flex:1,overflowY:"auto" as const,padding:"16px 20px",paddingBottom:"calc(32px + env(safe-area-inset-bottom, 0px))",WebkitOverflowScrolling:"touch" as const}}>
           {sidebarTab==="contas"&&<>
             <div style={{background:T.cardBg,border:`1px solid ${T.accent}30`,borderRadius:14,padding:"16px",marginBottom:14,textAlign:"center" as const}}>
               <div style={{fontSize:10,color:T.subtext,textTransform:"uppercase" as const,letterSpacing:"0.08em",marginBottom:4}}>Saldo Total</div>
-              <div style={{fontSize:24,fontWeight:800,color:totalSaldo>=0?T.positive:T.negative}}>{fmt(totalSaldo)}</div>
+              <div style={{fontSize:24,fontWeight:800,color:totalSaldo>=0?T.positive:T.negative}}>{hv(fmt(totalSaldo))}</div>
               <div style={{fontSize:11,color:T.subtext,marginTop:2}}>{accounts.length} conta{accounts.length!==1?"s":""}</div>
             </div>
             <button onClick={()=>setShowTransfer(!showTransfer)} style={{width:"100%",marginBottom:14,padding:"10px 0",background:showTransfer?`${T.accent2}22`:"rgba(255,255,255,0.05)",border:`1px solid ${showTransfer?T.accent2:"rgba(255,255,255,0.1)"}`,borderRadius:10,color:showTransfer?T.accent2:"#94a3b8",fontSize:13,fontWeight:700,cursor:"pointer",fontFamily:"'Sora',sans-serif"}}>🔄 {showTransfer?"Cancelar":"Nova transferência"}</button>
@@ -872,6 +874,20 @@ async function handleCoupleSettlement(valor: number) {
   >
     ☰
   </button>
+ <button onClick={()=>setHideValues(v=>!v)} style={{background:"rgba(255,255,255,0.05)",border:"1px solid rgba(255,255,255,0.1)",borderRadius:99,padding:"7px 10px",cursor:"pointer",display:"flex",alignItems:"center",justifyContent:"center"}}>
+  {hideValues?(
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.5)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94"/>
+      <path d="M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19"/>
+      <line x1="1" y1="1" x2="23" y2="23"/>
+    </svg>
+  ):(
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.5)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+      <circle cx="12" cy="12" r="3"/>
+    </svg>
+  )}
+</button>
   {/* FILTRO inline */}
   <div style={{position:"relative"}}>
     <button
@@ -921,7 +937,7 @@ async function handleCoupleSettlement(valor: number) {
     </div>
     <div style={{fontSize:11,fontWeight:600,color:T.subtext,marginBottom:12,letterSpacing:"0.08em",textTransform:"uppercase"}}>Resultado do mês</div>
     <div style={{fontSize:56,fontWeight:800,color:balance>=0?T.positive:T.negative,letterSpacing:"-2px",lineHeight:1,marginBottom:16}}>
-      {balance>=0?"+":""}{fmt(balance)}
+      {balance>=0?"+":""}{hv(fmt(balance))}
     </div>
     {(()=>{
       const now=new Date();
@@ -952,7 +968,7 @@ async function handleCoupleSettlement(valor: number) {
         </div>
         <div>
           <div style={{fontSize:10,fontWeight:700,color:T.subtext,letterSpacing:"0.08em",textTransform:"uppercase",marginBottom:2}}>Receitas</div>
-          <div style={{fontSize:16,fontWeight:800,color:"#f1f5f9"}}>{fmt(totalInc)}</div>
+          <div style={{fontSize:16,fontWeight:800,color:"#f1f5f9"}}>{hv(fmt(totalInc))}</div>
           <div style={{fontSize:10,color:T.subtext}}>{myIncomes.length} entrada{myIncomes.length!==1?"s":""}</div>
         </div>
       </div>
@@ -962,7 +978,7 @@ async function handleCoupleSettlement(valor: number) {
         </div>
         <div>
           <div style={{fontSize:10,fontWeight:700,color:T.subtext,letterSpacing:"0.08em",textTransform:"uppercase",marginBottom:2}}>Despesas</div>
-          <div style={{fontSize:16,fontWeight:800,color:"#f1f5f9"}}>{fmt(totalExp)}</div>
+          <div style={{fontSize:16,fontWeight:800,color:"#f1f5f9"}}>{hv(fmt(totalExp))}</div>
           <div style={{fontSize:10,color:T.subtext}}>{myExpenses.length} item{myExpenses.length!==1?"s":""}</div>
         </div>
       </div>
@@ -1062,7 +1078,7 @@ async function handleCoupleSettlement(valor: number) {
           <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:14,paddingBottom:12,borderBottom:`1px solid ${T.cardBorder}`}}>
             <div>
               <div style={{fontSize:10,fontWeight:700,color:T.subtext,letterSpacing:"0.08em",textTransform:"uppercase",marginBottom:2}}>💎 Net Worth</div>
-              <div style={{fontSize:22,fontWeight:800,color:nw>=0?T.positive:T.negative,letterSpacing:"-0.5px"}}>{fmt(nw)}</div>
+              <div style={{fontSize:22,fontWeight:800,color:nw>=0?T.positive:T.negative,letterSpacing:"-0.5px"}}>{hv(fmt(nw))}</div>
             </div>
             <div style={{display:"flex",gap:6}}>
               {accounts.map(a=>(
@@ -1109,7 +1125,7 @@ async function handleCoupleSettlement(valor: number) {
       {accounts.map(a=>(
         <div key={a.id} style={{background:T.cardBg,border:`1px solid ${T.accent}25`,borderRadius:12,padding:"10px 14px",flexShrink:0,minWidth:130}}>
           <div style={{fontSize:12,fontWeight:600,color:T.subtext,marginBottom:2}}>{a.icon} {a.nome}</div>
-          <div style={{fontSize:16,fontWeight:800,color:Number(a.saldo)>=0?T.positive:T.negative}}>{fmt(Number(a.saldo))}</div>
+          <div style={{fontSize:16,fontWeight:800,color:Number(a.saldo)>=0?T.positive:T.negative}}>{hv(fmt(Number(a.saldo)))}</div>
         </div>
       ))}
     </div>
