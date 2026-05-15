@@ -587,10 +587,22 @@ const jointBalance = totalContributions - totalSettledExpenses;
                       <div style={{fontSize:15,fontWeight:800,color:negative}}>{fmt(e.valor)}</div>
                     </div>
                   </div>
-                  <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:6,marginBottom:10}}>
-                    <div style={{background:`${MY_COLOR}12`,borderRadius:8,padding:"6px 10px",display:"flex",justifyContent:"space-between"}}><span style={{fontSize:11,color:MY_COLOR,fontWeight:600}}>{userName}</span><span style={{fontSize:12,fontWeight:700,color:MY_COLOR}}>{fmt(myShare)}</span></div>
-                    <div style={{background:`${PARTNER_COLOR}12`,borderRadius:8,padding:"6px 10px",display:"flex",justifyContent:"space-between"}}><span style={{fontSize:11,color:PARTNER_COLOR,fontWeight:600}}>{partnerName}</span><span style={{fontSize:12,fontWeight:700,color:PARTNER_COLOR}}>{fmt(ptShare)}</span></div>
-                  </div>
+                  {(()=>{
+                    const iPaid = e.pago_por === userId;
+                    const paidByName = iPaid ? userName : partnerName;
+                    const owedAmount = iPaid ? ptShare : myShare;
+                    const owedByName = iPaid ? partnerName : userName;
+                    const owedColor = iPaid ? PARTNER_COLOR : MY_COLOR;
+                    return(
+                      <div style={{background:"rgba(255,255,255,0.04)",border:"1px solid rgba(255,255,255,0.08)",borderRadius:10,padding:"10px 12px",marginBottom:10}}>
+                        <div style={{fontSize:11,color:subtext,marginBottom:6}}>💳 Pago por <strong style={{color:iPaid?MY_COLOR:PARTNER_COLOR}}>{paidByName}</strong></div>
+                        <div style={{background:`${owedColor}15`,borderRadius:8,padding:"8px 10px",textAlign:"center" as const}}>
+                          <div style={{fontSize:10,color:owedColor,fontWeight:600,marginBottom:2}}>{owedByName} deve a {paidByName}</div>
+                          <div style={{fontSize:18,fontWeight:800,color:owedColor}}>{fmt(owedAmount)}</div>
+                        </div>
+                      </div>
+                    );
+                  })()}
                   <div style={{display:"flex",gap:8}}>
   <button onClick={()=>marcarLiquidado(e)} style={{flex:1,padding:"8px 0",background:"rgba(52,211,153,0.15)",border:"1px solid rgba(52,211,153,0.3)",borderRadius:9,color:"#34d399",fontSize:12,fontWeight:700,cursor:"pointer",fontFamily:"'Sora',sans-serif"}}>✓ Marcar como liquidado</button>
   <button onClick={()=>openEditExpense(e)} style={{padding:"8px 12px",background:"rgba(245,158,11,0.08)",border:"1px solid rgba(245,158,11,0.2)",borderRadius:9,color:"#f59e0b",fontSize:12,cursor:"pointer"}}>✏️</button>
@@ -678,9 +690,29 @@ const jointBalance = totalContributions - totalSettledExpenses;
 )}
       {/* ── ACERTO ── */}
       {tab==="acerto"&&<>
-        {/* Por liquidar — lista individual */}
         {porLiquidar.length>0?(
           <>
+            {/* Resumo do acerto */}
+            {(()=>{
+              const totalOwedByPartner = porLiquidar.filter(e=>e.pago_por===userId).reduce((s,e)=>s+(isUser1?e.split_user2:e.split_user1),0);
+              const totalOwedByMe = porLiquidar.filter(e=>e.pago_por!==userId).reduce((s,e)=>s+(isUser1?e.split_user1:e.split_user2),0);
+              const net = totalOwedByPartner - totalOwedByMe;
+              return(
+                <div style={{background:"rgba(255,255,255,0.04)",border:"1px solid rgba(255,255,255,0.08)",borderRadius:14,padding:"16px",marginBottom:14,textAlign:"center" as const}}>
+                  <div style={{fontSize:10,fontWeight:700,color:subtext,textTransform:"uppercase" as const,letterSpacing:"0.08em",marginBottom:12}}>Resumo do acerto</div>
+                  {net>0?(
+                    <><div style={{fontSize:12,color:PARTNER_COLOR,marginBottom:6}}>{partnerName} deve-te no total</div>
+                    <div style={{fontSize:28,fontWeight:800,color:PARTNER_COLOR}}>{fmt(net)}</div></>
+                  ):net<0?(
+                    <><div style={{fontSize:12,color:MY_COLOR,marginBottom:6}}>Deves a {partnerName} no total</div>
+                    <div style={{fontSize:28,fontWeight:800,color:MY_COLOR}}>{fmt(Math.abs(net))}</div></>
+                  ):(
+                    <div style={{fontSize:14,fontWeight:700,color:"#34d399"}}>✓ Estão empatados!</div>
+                  )}
+                </div>
+              );
+            })()}
+            {/* Despesas por liquidar */}
             <div style={{background:"rgba(245,158,11,0.08)",border:"1px solid rgba(245,158,11,0.25)",borderRadius:14,padding:"14px 16px",marginBottom:14}}>
               <div style={{fontSize:11,fontWeight:700,color:"#f59e0b",textTransform:"uppercase" as const,letterSpacing:"0.08em",marginBottom:12}}>⏳ Despesas por liquidar</div>
               {porLiquidar.map(e=>{
@@ -696,7 +728,6 @@ const jointBalance = totalContributions - totalSettledExpenses;
                         <div style={{fontSize:10,color:subtext}}>{new Date(e.data+"T12:00:00").toLocaleDateString("pt-PT")} · total {fmt(e.valor)}</div>
                       </div>
                     </div>
-                    {/* Quem pagou */}
                     {(()=>{
                       const iPaid = e.pago_por === userId;
                       const paidByName = iPaid ? userName : partnerName;
@@ -706,40 +737,17 @@ const jointBalance = totalContributions - totalSettledExpenses;
                       return(
                         <div style={{background:"rgba(255,255,255,0.04)",border:"1px solid rgba(255,255,255,0.08)",borderRadius:10,padding:"10px 12px",marginBottom:8}}>
                           <div style={{fontSize:11,color:subtext,marginBottom:6}}>💳 Pago por <strong style={{color:iPaid?MY_COLOR:PARTNER_COLOR}}>{paidByName}</strong></div>
-                          <div style={{display:"flex",alignItems:"center",gap:8}}>
-                            <div style={{flex:1,background:`${owedColor}15`,borderRadius:8,padding:"8px 10px",textAlign:"center" as const}}>
-                              <div style={{fontSize:10,color:owedColor,fontWeight:600,marginBottom:2}}>{owedByName} deve a {paidByName}</div>
-                              <div style={{fontSize:18,fontWeight:800,color:owedColor}}>{fmt(owedAmount)}</div>
-                            </div>
+                          <div style={{flex:1,background:`${owedColor}15`,borderRadius:8,padding:"8px 10px",textAlign:"center" as const}}>
+                            <div style={{fontSize:10,color:owedColor,fontWeight:600,marginBottom:2}}>{owedByName} deve a {paidByName}</div>
+                            <div style={{fontSize:18,fontWeight:800,color:owedColor}}>{fmt(owedAmount)}</div>
                           </div>
                         </div>
                       );
                     })()}
-                    <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:6,marginBottom:8}}>
-                      <div style={{background:`${MY_COLOR}12`,borderRadius:8,padding:"6px 10px"}}>
-                        <div style={{fontSize:10,color:MY_COLOR,fontWeight:600,marginBottom:2}}>{userName} · parte</div>
-                        <div style={{fontSize:14,fontWeight:800,color:MY_COLOR}}>{fmt(myShare)}</div>
-                      </div>
-                      <div style={{background:`${PARTNER_COLOR}12`,borderRadius:8,padding:"6px 10px"}}>
-                        <div style={{fontSize:10,color:PARTNER_COLOR,fontWeight:600,marginBottom:2}}>{partnerName} · parte</div>
-                        <div style={{fontSize:14,fontWeight:800,color:PARTNER_COLOR}}>{fmt(ptShare)}</div>
-                      </div>
-                    </div>
                     <button onClick={()=>marcarLiquidado(e)} style={{width:"100%",padding:"8px 0",background:"rgba(52,211,153,0.15)",border:"1px solid rgba(52,211,153,0.3)",borderRadius:9,color:"#34d399",fontSize:12,fontWeight:700,cursor:"pointer",fontFamily:"'Sora',sans-serif"}}>✓ Marcar como liquidado</button>
                   </div>
                 );
               })}
-              {/* Total por liquidar */}
-              <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:8,marginTop:12}}>
-                <div style={{background:`${MY_COLOR}15`,border:`1px solid ${MY_COLOR}30`,borderRadius:10,padding:"10px 12px",textAlign:"center" as const}}>
-                  <div style={{fontSize:10,color:MY_COLOR,marginBottom:3}}>Total {userName}</div>
-                  <div style={{fontSize:18,fontWeight:800,color:MY_COLOR}}>{fmt(myDebt)}</div>
-                </div>
-                <div style={{background:`${PARTNER_COLOR}15`,border:`1px solid ${PARTNER_COLOR}30`,borderRadius:10,padding:"10px 12px",textAlign:"center" as const}}>
-                  <div style={{fontSize:10,color:PARTNER_COLOR,marginBottom:3}}>Total {partnerName}</div>
-                  <div style={{fontSize:18,fontWeight:800,color:PARTNER_COLOR}}>{fmt(partnerDebt)}</div>
-                </div>
-              </div>
             </div>
           </>
         ):(
