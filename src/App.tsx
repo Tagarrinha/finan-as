@@ -606,6 +606,8 @@ function MainApp({user,userName,onLogout}:{user:SBUser;userName:string;onLogout:
   const [editingExp,setEditingExp]=useState<number|null>(null);
   const [editingInc,setEditingInc]=useState<number|null>(null);
   const [hideValues, setHideValues] = useState(false);
+  const [chartView, setChartView] = useState<"networth"|"fluxo">("fluxo");
+
 
   useEffect(()=>{loadAll();},[user.id]);
 
@@ -1068,60 +1070,79 @@ async function handleCoupleSettlement(valor: number) {
   </div>
 
   {/* ── EVOLUÇÃO + NET WORTH ── */}
-  <div style={{marginBottom:14}}>
-    <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:10}}>
-      <div style={{fontSize:11,fontWeight:700,color:T.subtext,letterSpacing:"0.1em",textTransform:"uppercase"}}>Evolução</div>
-      <span style={{fontSize:11,color:T.subtext}}>{new Date().getFullYear()}</span>
-    </div>
-    <div style={S.card}>
-      {/* Net Worth summary */}
-      {accounts.length>0&&(()=>{
-        const nw=totalSaldo;
-        const prevNW=accounts.reduce((s,a)=>s+Number(a.saldo),0);
-        return(
-          <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:14,paddingBottom:12,borderBottom:`1px solid ${T.cardBorder}`}}>
-            <div>
-              <div style={{fontSize:10,fontWeight:700,color:T.subtext,letterSpacing:"0.08em",textTransform:"uppercase",marginBottom:2}}>💎 Net Worth</div>
-              <div style={{fontSize:22,fontWeight:800,color:nw>=0?T.positive:T.negative,letterSpacing:"-0.5px"}}>{hv(fmt(nw))}</div>
-            </div>
-            <div style={{display:"flex",gap:6}}>
-              {accounts.map(a=>(
-                <div key={a.id} style={{background:`${T.accent}15`,borderRadius:8,padding:"4px 8px",textAlign:"center" as const}}>
-                  <div style={{fontSize:10,color:T.subtext}}>{a.icon}</div>
-                  <div style={{fontSize:11,fontWeight:700,color:Number(a.saldo)>=0?T.positive:T.negative}}>{fmt(Number(a.saldo))}</div>
-                </div>
-              ))}
-            </div>
-          </div>
-        );
-      })()}
-      {/* Gráfico */}
-      <div style={{display:"flex",alignItems:"flex-end",gap:4,height:100,marginBottom:10}}>
-        {MONTHS.map((m,i)=>{
-          const rev=monthlyRev[world]?.[String(new Date().getFullYear())]?.[i]||0;
-          const exp=expenses.filter(e=>e.world===world&&new Date(e.data).getMonth()===i&&new Date(e.data).getFullYear()===new Date().getFullYear()).reduce((s,e)=>s+Number(e.valor),0);
-          const maxVal=Math.max(...MONTHS.map((_,j)=>{const r=monthlyRev[world]?.[String(new Date().getFullYear())]?.[j]||0;const ex=expenses.filter(e=>e.world===world&&new Date(e.data).getMonth()===j&&new Date(e.data).getFullYear()===new Date().getFullYear()).reduce((s,e)=>s+Number(e.valor),0);return Math.max(r,ex);}),1);
-          const rH=Math.round((rev/maxVal)*88)||2;
-          const eH=Math.round((exp/maxVal)*88)||2;
-          const isCurrent=i===new Date().getMonth();
-          return(
-            <div key={i} style={{flex:1,display:"flex",flexDirection:"column",alignItems:"center",gap:3}}>
-              <div style={{display:"flex",alignItems:"flex-end",gap:1,height:88}}>
-                <div style={{width:"45%",height:rH,background:isCurrent?T.positive:`${T.positive}55`,borderRadius:"3px 3px 0 0",transition:"height .4s"}}/>
-                <div style={{width:"45%",height:eH,background:isCurrent?T.negative:`${T.negative}55`,borderRadius:"3px 3px 0 0",transition:"height .4s"}}/>
-              </div>
-              <span style={{fontSize:7,color:isCurrent?T.accent:T.subtext,fontWeight:isCurrent?700:400}}>{m}</span>
-            </div>
-          );
-        })}
-      </div>
-      <div style={{display:"flex",gap:16,paddingTop:8,borderTop:`1px solid ${T.cardBorder}`}}>
-        <div style={{display:"flex",alignItems:"center",gap:6,fontSize:11,color:"#94a3b8"}}><div style={{width:10,height:10,borderRadius:2,background:T.positive}}/>Receitas</div>
-        <div style={{display:"flex",alignItems:"center",gap:6,fontSize:11,color:"#94a3b8"}}><div style={{width:10,height:10,borderRadius:2,background:T.negative}}/>Despesas</div>
-        <div style={{marginLeft:"auto",fontSize:11,color:T.subtext}}>mês actual destacado</div>
-      </div>
-    </div>
+<div style={{marginBottom:14}}>
+  <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:10}}>
+    <div style={{fontSize:11,fontWeight:700,color:T.subtext,letterSpacing:"0.1em",textTransform:"uppercase"}}>Evolução</div>
+    <span style={{fontSize:11,color:T.subtext}}>{new Date().getFullYear()}</span>
   </div>
+        <div style={S.card}>
+        <div style={{display:"flex",gap:6,marginBottom:14}}>
+          <button onClick={()=>setChartView("fluxo")} style={{flex:1,padding:"7px 0",border:`1px solid ${chartView==="fluxo"?T.accent:"rgba(255,255,255,0.1)"}`,borderRadius:8,background:chartView==="fluxo"?`${T.accent}20`:"transparent",color:chartView==="fluxo"?T.accent:"#64748b",fontSize:11,fontWeight:700,cursor:"pointer",fontFamily:"'Sora',sans-serif"}}>
+            📊 Receitas vs Despesas
+          </button>
+          <button onClick={()=>setChartView("networth")} style={{flex:1,padding:"7px 0",border:`1px solid ${chartView==="networth"?T.accent:"rgba(255,255,255,0.1)"}`,borderRadius:8,background:chartView==="networth"?`${T.accent}20`:"transparent",color:chartView==="networth"?T.accent:"#64748b",fontSize:11,fontWeight:700,cursor:"pointer",fontFamily:"'Sora',sans-serif"}}>
+            💎 Net Worth
+          </button>
+        </div>
+        {chartView==="fluxo"&&(
+          <>
+            <div style={{display:"flex",alignItems:"flex-end",gap:4,height:100,marginBottom:10}}>
+              {MONTHS.map((m,i)=>{
+                const rev=monthlyRev[world]?.[String(new Date().getFullYear())]?.[i]||0;
+                const exp=expenses.filter(e=>e.world===world&&new Date(e.data).getMonth()===i&&new Date(e.data).getFullYear()===new Date().getFullYear()).reduce((s,e)=>s+Number(e.valor),0);
+                const maxVal=Math.max(...MONTHS.map((_,j)=>{const r=monthlyRev[world]?.[String(new Date().getFullYear())]?.[j]||0;const ex=expenses.filter(e=>e.world===world&&new Date(e.data).getMonth()===j&&new Date(e.data).getFullYear()===new Date().getFullYear()).reduce((s,e)=>s+Number(e.valor),0);return Math.max(r,ex);}),1);
+                const rH=Math.round((rev/maxVal)*88)||2;
+                const eH=Math.round((exp/maxVal)*88)||2;
+                const isCurrent=i===new Date().getMonth();
+                return(
+                  <div key={i} style={{flex:1,display:"flex",flexDirection:"column",alignItems:"center",gap:3}}>
+                    <div style={{display:"flex",alignItems:"flex-end",gap:1,height:88}}>
+                      <div style={{width:"45%",height:rH,background:isCurrent?T.positive:`${T.positive}55`,borderRadius:"3px 3px 0 0",transition:"height .4s"}}/>
+                      <div style={{width:"45%",height:eH,background:isCurrent?T.negative:`${T.negative}55`,borderRadius:"3px 3px 0 0",transition:"height .4s"}}/>
+                    </div>
+                    <span style={{fontSize:7,color:isCurrent?T.accent:T.subtext,fontWeight:isCurrent?700:400}}>{m}</span>
+                  </div>
+                );
+              })}
+            </div>
+            <div style={{display:"flex",gap:16,paddingTop:8,borderTop:`1px solid ${T.cardBorder}`}}>
+              <div style={{display:"flex",alignItems:"center",gap:6,fontSize:11,color:"#94a3b8"}}><div style={{width:10,height:10,borderRadius:2,background:T.positive}}/>Receitas</div>
+              <div style={{display:"flex",alignItems:"center",gap:6,fontSize:11,color:"#94a3b8"}}><div style={{width:10,height:10,borderRadius:2,background:T.negative}}/>Despesas</div>
+              <div style={{marginLeft:"auto",fontSize:11,color:T.subtext}}>mês actual destacado</div>
+            </div>
+          </>
+        )}
+        {chartView==="networth"&&(
+          <>
+            <div style={{textAlign:"center" as const,marginBottom:10}}>
+              <div style={{fontSize:10,fontWeight:700,color:T.subtext,textTransform:"uppercase" as const,letterSpacing:"0.08em",marginBottom:4}}>Net Worth actual</div>
+              <div style={{fontSize:28,fontWeight:800,color:totalSaldo>=0?T.positive:T.negative}}>{hv(fmt(totalSaldo))}</div>
+            </div>
+            <div style={{display:"flex",alignItems:"flex-end",gap:4,height:100,marginBottom:10}}>
+              {MONTHS.map((m,i)=>{
+                const isCurrent=i===new Date().getMonth();
+                const isPast=i<new Date().getMonth();
+                const nw=isCurrent||isPast?totalSaldo:0;
+                const maxVal=totalSaldo||1;
+                const h=isCurrent||isPast?Math.round((Math.abs(nw)/Math.abs(maxVal))*88)||2:2;
+                return(
+                  <div key={i} style={{flex:1,display:"flex",flexDirection:"column",alignItems:"center",gap:3}}>
+                    <div style={{height:88,display:"flex",alignItems:"flex-end"}}>
+                      <div style={{width:"70%",height:isCurrent||isPast?h:4,background:isCurrent?T.accent:isPast?`${T.accent}55`:"rgba(255,255,255,0.05)",borderRadius:"3px 3px 0 0",transition:"height .4s"}}/>
+                    </div>
+                    <span style={{fontSize:7,color:isCurrent?T.accent:T.subtext,fontWeight:isCurrent?700:400}}>{m}</span>
+                  </div>
+                );
+              })}
+            </div>
+            <div style={{paddingTop:8,borderTop:`1px solid ${T.cardBorder}`,fontSize:11,color:T.subtext,textAlign:"center" as const}}>
+              Valor actual aplicado ao mês corrente
+            </div>
+          </>
+        )}
+      </div>
+</div>
+
 
   {/* ── CONTAS ── */}
   {accounts.length>0&&(
