@@ -6,6 +6,7 @@ import MonthComparison from "./MonthComparison";
 import WorldEditor from "./WorldEditor";
 import CoupleMode from "./CoupleMode";
 import { supabase } from "./supabase";
+import ExportData from "./ExportData";
 
 type TypeKey = "necessidade"|"desejo"|"investimento";
 type ThemeKey = "original"|"aurora"|"ocean"|"nebula"|"verde"|"premium";
@@ -107,6 +108,7 @@ const LEFT_NAV_ITEMS: NavItem[] = [
   { id:"despesas",    label:"Despesas",    icon:"📥" },
   { id:"rendimentos", label:"Rendimentos", icon:"💶" },
   { id:"comparacao",  label:"Comparação",  icon:"📈" },
+  { id:"exportar",    label:"Exportar",    icon:"📤" },
   { id:"definicoes",  label:"Definições",  icon:"⚙️" },
 ];
 
@@ -1207,6 +1209,17 @@ async function handleCoupleSettlement(valor: number) {
             cardBg={T.cardBg} cardBorder={T.cardBorder} subtext={T.subtext}
             positive={T.positive} negative={T.negative}
             onSettlement={handleCoupleSettlement}
+          />
+        )}
+        {/* EXPORTAR */}
+        {tab==="exportar"&&(
+          <ExportData
+            expenses={expenses} incomes={incomes} accounts={accounts}
+            expCats={expCats} incCats={incCats} world={world}
+            world1Name={world1Name} world2Name={world2Name}
+            userName={userName} accent={T.accent} accentDark={T.accentDark}
+            cardBg={T.cardBg} cardBorder={T.cardBorder} subtext={T.subtext}
+            positive={T.positive} negative={T.negative}
           />
         )}
 

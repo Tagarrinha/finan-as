@@ -525,8 +525,7 @@ const jointBalance = totalContributions - totalSettledExpenses;
                 ))}
               </div>
             </div>
-            {/* Quem pagou */}
-            <div style={{marginBottom:12}}>
+            {!form.liquidado&&<div style={{marginBottom:12}}>
               <div style={{fontSize:10,color:subtext,marginBottom:8}}>Quem pagou?</div>
               <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:8}}>
                 <button onClick={()=>setForm(f=>({...f,pagoPor:"me"}))} style={{padding:"10px 8px",border:`1.5px solid ${form.pagoPor==="me"?MY_COLOR:"rgba(255,255,255,0.08)"}`,borderRadius:12,background:form.pagoPor==="me"?`${MY_COLOR}18`:"rgba(255,255,255,0.04)",color:form.pagoPor==="me"?MY_COLOR:"#64748b",fontWeight:700,fontSize:12,cursor:"pointer",fontFamily:"'Sora',sans-serif",textAlign:"center" as const}}>
@@ -538,7 +537,7 @@ const jointBalance = totalContributions - totalSettledExpenses;
                   <div>{partnerName}</div>
                 </button>
               </div>
-            </div>
+            </div>}
             {/* Estado — Liquidado / Por liquidar */}
             <div style={{marginBottom:14}}>
               <div style={{fontSize:10,color:subtext,marginBottom:8}}>Estado do pagamento</div>
