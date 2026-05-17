@@ -607,6 +607,7 @@ function MainApp({user,userName,onLogout}:{user:SBUser;userName:string;onLogout:
   const [editingInc,setEditingInc]=useState<number|null>(null);
   const [hideValues, setHideValues] = useState(false);
   const [chartView, setChartView] = useState<"networth"|"fluxo">("fluxo");
+  const [nwSnapshots, setNwSnapshots] = useState<{mes:number;ano:number;valor:number}[]>([]);
 
 
   useEffect(()=>{loadAll();},[user.id]);
@@ -614,7 +615,7 @@ function MainApp({user,userName,onLogout}:{user:SBUser;userName:string;onLogout:
   async function loadAll(){
     setDataLoading(true);
     const uid=user.id;
-    const [expR,incR,accR,trR,recR,goalsR,mrR,setR]=await Promise.all([
+    const [expR,incR,accR,trR,recR,goalsR,mrR,setR,snapR]=await Promise.all([
       supabase.from("expenses").select("*").eq("user_id",uid).order("data",{ascending:false}),
       supabase.from("incomes").select("*").eq("user_id",uid).order("data",{ascending:false}),
       supabase.from("accounts").select("*").eq("user_id",uid).order("created_at"),
@@ -623,15 +624,26 @@ function MainApp({user,userName,onLogout}:{user:SBUser;userName:string;onLogout:
       supabase.from("savings_goals").select("*").eq("user_id",uid).order("prazo"),
       supabase.from("monthly_revenue").select("*").eq("user_id",uid),
       supabase.from("user_settings").select("*").eq("user_id",uid).single(),
+      supabase.from("net_worth_snapshots").select("mes,ano,valor").eq("user_id",uid).eq("ano",new Date().getFullYear()),
     ]);
     if(expR.data)setExpenses(expR.data as Expense[]);
     if(incR.data)setIncomes(incR.data as Income[]);
-    if(accR.data)setAccounts(accR.data as BankAccount[]);
+    if(accR.data){
+      setAccounts(accR.data as BankAccount[]);
+      // Guarda snapshot do net worth do mês actual
+      const valor = (accR.data as BankAccount[]).reduce((s,a)=>s+Number(a.saldo),0);
+      const now = new Date();
+      supabase.from("net_worth_snapshots").upsert(
+        { user_id:uid, mes:now.getMonth(), ano:now.getFullYear(), valor },
+        { onConflict:"user_id,mes,ano" }
+      );
+    }
     if(trR.data)setTransfers(trR.data as Transfer[]);
     if(recR.data)setRecurring(recR.data as RecurringExpense[]);
     if(goalsR.data)setGoals(goalsR.data as SavingsGoal[]);
     if(mrR.data){const rev:Record<string,Record<string,number[]>>={};(mrR.data as any[]).forEach(r=>{if(!rev[r.world])rev[r.world]={};if(!rev[r.world][r.year])rev[r.world][r.year]=new Array(12).fill(0);rev[r.world][r.year][r.month]=Number(r.valor);});setMonthlyRev(rev);}
     if(setR.data){const s=setR.data as any;setBudgetTargets({necessidade:s.budget_necessidade,desejo:s.budget_desejo,investimento:s.budget_investimento});if(s.enabled_p_exp)setEnabledPExp(s.enabled_p_exp);if(s.enabled_p_inc)setEnabledPInc(s.enabled_p_inc);if(s.enabled_c_exp)setEnabledCExp(s.enabled_c_exp);if(s.enabled_c_inc)setEnabledCInc(s.enabled_c_inc);if(s.custom_exp_cats)setCustomExpCats(s.custom_exp_cats);if(s.custom_inc_cats)setCustomIncCats(s.custom_inc_cats);if(s.theme)setThemeKey(s.theme as ThemeKey);if(s.world1_name)setWorld1Name(s.world1_name);if(s.world1_icon)setWorld1Icon(s.world1_icon);if(s.world2_name)setWorld2Name(s.world2_name);if(s.world2_icon)setWorld2Icon(s.world2_icon);if(!s.tour_done)setShowTour(true);}
+    if(snapR.data)setNwSnapshots(snapR.data as {mes:number;ano:number;valor:number}[]);
     setDataLoading(false);
   }
 
@@ -1112,7 +1124,7 @@ async function handleCoupleSettlement(valor: number) {
             </div>
           </>
         )}
-        {chartView==="networth"&&(
+      {chartView==="networth"&&(
           <>
             <div style={{textAlign:"center" as const,marginBottom:10}}>
               <div style={{fontSize:10,fontWeight:700,color:T.subtext,textTransform:"uppercase" as const,letterSpacing:"0.08em",marginBottom:4}}>Net Worth actual</div>
@@ -1120,15 +1132,14 @@ async function handleCoupleSettlement(valor: number) {
             </div>
             <div style={{display:"flex",alignItems:"flex-end",gap:4,height:100,marginBottom:10}}>
               {MONTHS.map((m,i)=>{
+                const snap=nwSnapshots.find(s=>s.mes===i);
+                const maxVal=Math.max(...nwSnapshots.map(s=>s.valor),1);
+                const h=snap?Math.round((snap.valor/maxVal)*88)||2:2;
                 const isCurrent=i===new Date().getMonth();
-                const isPast=i<new Date().getMonth();
-                const nw=isCurrent||isPast?totalSaldo:0;
-                const maxVal=totalSaldo||1;
-                const h=isCurrent||isPast?Math.round((Math.abs(nw)/Math.abs(maxVal))*88)||2:2;
                 return(
                   <div key={i} style={{flex:1,display:"flex",flexDirection:"column",alignItems:"center",gap:3}}>
                     <div style={{height:88,display:"flex",alignItems:"flex-end"}}>
-                      <div style={{width:"70%",height:isCurrent||isPast?h:4,background:isCurrent?T.accent:isPast?`${T.accent}55`:"rgba(255,255,255,0.05)",borderRadius:"3px 3px 0 0",transition:"height .4s"}}/>
+                      <div style={{width:"70%",height:snap?h:4,background:isCurrent?T.accent:snap?`${T.accent}55`:"rgba(255,255,255,0.05)",borderRadius:"3px 3px 0 0",transition:"height .4s"}}/>
                     </div>
                     <span style={{fontSize:7,color:isCurrent?T.accent:T.subtext,fontWeight:isCurrent?700:400}}>{m}</span>
                   </div>
@@ -1136,7 +1147,7 @@ async function handleCoupleSettlement(valor: number) {
               })}
             </div>
             <div style={{paddingTop:8,borderTop:`1px solid ${T.cardBorder}`,fontSize:11,color:T.subtext,textAlign:"center" as const}}>
-              Valor actual aplicado ao mês corrente
+              Evolução do Net Worth em {new Date().getFullYear()}
             </div>
           </>
         )}
