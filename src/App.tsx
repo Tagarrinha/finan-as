@@ -415,197 +415,106 @@ const FEATURES=[
   {icon:"🔄",title:"Despesas recorrentes",desc:"Renda, ginásio, seguros — registados automaticamente"},
 ];
 
+// ============================================================
+// PASSO 1 — Copia landing.html para public/
+// cp landing.html ~/Desktop/finan-as/public/landing.html
+//
+// PASSO 2 — No App.tsx, substitui a função WelcomeScreen
+// completa por esta abaixo
+// ============================================================
+
 function WelcomeScreen() {
-  const [mode,setMode]=useState<"welcome"|"login"|"register">("welcome");
-  const [name,setName]=useState("");const [email,setEmail]=useState("");const [password,setPassword]=useState("");
-  const [error,setError]=useState("");const [loading,setLoading]=useState(false);
-  const [featIdx,setFeatIdx]=useState(0);const [animKey,setAnimKey]=useState(0);
-  useEffect(()=>{
-    if(mode!=="welcome")return;
-    const t=setInterval(()=>{setFeatIdx(p=>(p+1)%FEATURES.length);setAnimKey(p=>p+1);},3000);
-    return ()=>clearInterval(t);
-  },[mode]);
-  async function handleAuth(){
-    setError("");setLoading(true);
-    try{
-      if(mode==="register"){
-        if(!name.trim()||!email.trim()||!password.trim()){setError("Preenche todos os campos.");setLoading(false);return;}
-        const{error:e}=await supabase.auth.signUp({email,password,options:{data:{name}}});
-        if(e)throw e;
-      }else{
-        if(!email.trim()||!password.trim()){setError("Preenche email e password.");setLoading(false);return;}
-        const{error:e}=await supabase.auth.signInWithPassword({email,password});
-        if(e)throw e;
+  const [mode, setMode] = useState<"welcome" | "login" | "register">("welcome");
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
+
+  // Escuta mensagens do iframe (landing.html)
+  useEffect(() => {
+    function handleMessage(e: MessageEvent) {
+      if (e.data?.type === "OPEN_REGISTER") setMode("register");
+      if (e.data?.type === "OPEN_LOGIN") setMode("login");
+    }
+    window.addEventListener("message", handleMessage);
+    return () => window.removeEventListener("message", handleMessage);
+  }, []);
+
+  async function handleAuth() {
+    setError(""); setLoading(true);
+    try {
+      if (mode === "register") {
+        if (!name.trim() || !email.trim() || !password.trim()) { setError("Preenche todos os campos."); setLoading(false); return; }
+        const { error: e } = await supabase.auth.signUp({ email, password, options: { data: { name } } });
+        if (e) throw e;
+      } else {
+        if (!email.trim() || !password.trim()) { setError("Preenche email e password."); setLoading(false); return; }
+        const { error: e } = await supabase.auth.signInWithPassword({ email, password });
+        if (e) throw e;
       }
-    }catch(e:any){
-      const msg=e.message||"Erro";
-      if(msg.includes("Invalid login"))setError("Email ou password incorretos.");
-      else if(msg.includes("already registered"))setError("Email já registado.");
+    } catch (e: any) {
+      const msg = e.message || "Erro";
+      if (msg.includes("Invalid login")) setError("Email ou password incorretos.");
+      else if (msg.includes("already registered")) setError("Email já registado.");
       else setError(msg);
     }
     setLoading(false);
   }
-  const inp:CSSProperties={width:"100%",background:"rgba(255,255,255,0.06)",border:"1px solid rgba(255,255,255,0.1)",borderRadius:10,padding:"13px 14px",color:"#e2e8f0",fontSize:14,boxSizing:"border-box",outline:"none",fontFamily:"'Sora',sans-serif"};
-  const lbl:CSSProperties={fontSize:11,fontWeight:700,color:"#64748b",textTransform:"uppercase",letterSpacing:"0.08em",display:"block",marginBottom:6};
-  if(mode==="login"||mode==="register") return(
-    <div style={{minHeight:"100vh",background:"#080810",display:"flex",flexDirection:"column",fontFamily:"'Sora',sans-serif"}}>
-      <link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700;800&display=swap" rel="stylesheet"/>
+
+  const inp: CSSProperties = { width: "100%", background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 10, padding: "13px 14px", color: "#e2e8f0", fontSize: 14, boxSizing: "border-box", outline: "none", fontFamily: "'Sora',sans-serif" };
+  const lbl: CSSProperties = { fontSize: 11, fontWeight: 700, color: "#64748b", textTransform: "uppercase", letterSpacing: "0.08em", display: "block", marginBottom: 6 };
+
+  // ECRÃ LOGIN / REGISTER — mantém o teu design original
+  if (mode === "login" || mode === "register") return (
+    <div style={{ minHeight: "100vh", background: "#0A0D14", display: "flex", flexDirection: "column", fontFamily: "'Sora',sans-serif" }}>
+      <link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700;800&display=swap" rel="stylesheet" />
       <style>{`@keyframes fadeUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}} input::placeholder{color:#374151}`}</style>
-      <div style={{padding:"18px 20px",display:"flex",alignItems:"center",gap:10,borderBottom:"1px solid rgba(255,255,255,0.04)"}}>
-        <button onClick={()=>{setMode("welcome");setError("");}} style={{background:"rgba(255,255,255,0.06)",border:"1px solid rgba(255,255,255,0.08)",borderRadius:8,padding:"7px 12px",color:"#64748b",fontSize:13,cursor:"pointer",fontFamily:"'Sora',sans-serif"}}>←</button>
-        <span style={{fontSize:16}}>💰</span><span style={{fontSize:13,fontWeight:700,color:"#475569"}}>Finanças Pessoais</span>
+      <div style={{ padding: "18px 20px", display: "flex", alignItems: "center", gap: 10, borderBottom: "1px solid rgba(255,255,255,0.06)" }}>
+        <button onClick={() => { setMode("welcome"); setError(""); }} style={{ background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.08)", borderRadius: 8, padding: "7px 12px", color: "#64748b", fontSize: 13, cursor: "pointer", fontFamily: "'Sora',sans-serif" }}>←</button>
+        <div style={{ width: 26, height: 26, borderRadius: 8, background: "linear-gradient(135deg,#5DA9FF,#8B6DFF)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 13 }}>🖤</div>
+        <span style={{ fontSize: 13, fontWeight: 700, color: "#475569" }}>MyOwnFintrack</span>
       </div>
-      <div style={{flex:1,display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",padding:"24px 20px 40px"}}>
-        <div style={{width:"100%",maxWidth:380,animation:"fadeUp .45s ease"}}>
-          <div style={{textAlign:"center",marginBottom:28}}>
-            <div style={{fontSize:12,fontWeight:700,color:"#f97316",textTransform:"uppercase",letterSpacing:"0.12em",marginBottom:8}}>{mode==="login"?"Bem-vindo de volta":"Começa gratuitamente"}</div>
-            <div style={{fontSize:24,fontWeight:800,color:"#f1f5f9",letterSpacing:"-0.5px",lineHeight:1.25}}>{mode==="login"?"Entra na tua conta":"Cria a tua conta agora"}</div>
+      <div style={{ flex: 1, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", padding: "24px 20px 40px" }}>
+        <div style={{ width: "100%", maxWidth: 380, animation: "fadeUp .45s ease" }}>
+          <div style={{ textAlign: "center", marginBottom: 28 }}>
+            <div style={{ fontSize: 12, fontWeight: 700, background: "linear-gradient(135deg,#5DA9FF,#8B6DFF)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", textTransform: "uppercase", letterSpacing: "0.12em", marginBottom: 8 }}>
+              {mode === "login" ? "Bem-vindo de volta" : "Começa gratuitamente"}
+            </div>
+            <div style={{ fontSize: 24, fontWeight: 800, color: "#f1f5f9", letterSpacing: "-0.5px", lineHeight: 1.25 }}>
+              {mode === "login" ? "Entra na tua conta" : "Cria a tua conta agora"}
+            </div>
           </div>
-          <div style={{background:"rgba(255,255,255,0.03)",border:"1px solid rgba(255,255,255,0.08)",borderRadius:20,padding:"26px 22px"}}>
-            <div style={{display:"flex",background:"rgba(255,255,255,0.05)",borderRadius:12,padding:4,marginBottom:22}}>
-              {(["login","register"] as const).map(s=>(
-                <button key={s} onClick={()=>{setMode(s);setError("");}} style={{flex:1,padding:"9px 0",border:"none",borderRadius:9,background:mode===s?"rgba(249,115,22,0.25)":"transparent",color:mode===s?"#f97316":"#475569",fontWeight:700,fontSize:13,cursor:"pointer",fontFamily:"'Sora',sans-serif"}}>{s==="login"?"Entrar":"Criar conta"}</button>
+          <div style={{ background: "rgba(21,27,45,0.8)", border: "1px solid rgba(255,255,255,0.08)", borderRadius: 20, padding: "26px 22px" }}>
+            <div style={{ display: "flex", background: "rgba(255,255,255,0.05)", borderRadius: 12, padding: 4, marginBottom: 22 }}>
+              {(["login", "register"] as const).map(s => (
+                <button key={s} onClick={() => { setMode(s); setError(""); }} style={{ flex: 1, padding: "9px 0", border: "none", borderRadius: 9, background: mode === s ? "rgba(93,169,255,0.2)" : "transparent", color: mode === s ? "#5DA9FF" : "#475569", fontWeight: 700, fontSize: 13, cursor: "pointer", fontFamily: "'Sora',sans-serif" }}>
+                  {s === "login" ? "Entrar" : "Criar conta"}
+                </button>
               ))}
             </div>
-            {mode==="register"&&<div style={{marginBottom:12}}><label style={lbl}>Nome</label><input style={inp} placeholder="O teu nome" value={name} onChange={e=>setName(e.target.value)}/></div>}
-            <div style={{marginBottom:12}}><label style={lbl}>Email</label><input style={inp} type="email" placeholder="email@exemplo.com" value={email} onChange={e=>setEmail(e.target.value)}/></div>
-            <div style={{marginBottom:error?12:22}}><label style={lbl}>Password</label><input style={inp} type="password" placeholder="••••••••" value={password} onChange={e=>setPassword(e.target.value)} onKeyDown={e=>e.key==="Enter"&&handleAuth()}/></div>
-            {error&&<div style={{background:"#450a0a",border:"1px solid rgba(239,68,68,0.3)",borderRadius:9,padding:"10px 13px",marginBottom:16,fontSize:12,color:"#f87171"}}>⚠️ {error}</div>}
-            <button onClick={handleAuth} disabled={loading} style={{width:"100%",padding:"14px 0",background:"linear-gradient(135deg,#f97316,#ef4444)",border:"none",borderRadius:12,color:"#fff",fontWeight:800,fontSize:15,cursor:loading?"not-allowed":"pointer",fontFamily:"'Sora',sans-serif",opacity:loading?0.7:1}}>
-              {loading?"A processar...":mode==="login"?"Entrar →":"Criar conta →"}
+            {mode === "register" && <div style={{ marginBottom: 12 }}><label style={lbl}>Nome</label><input style={inp} placeholder="O teu nome" value={name} onChange={e => setName(e.target.value)} /></div>}
+            <div style={{ marginBottom: 12 }}><label style={lbl}>Email</label><input style={inp} type="email" placeholder="email@exemplo.com" value={email} onChange={e => setEmail(e.target.value)} /></div>
+            <div style={{ marginBottom: error ? 12 : 22 }}><label style={lbl}>Password</label><input style={inp} type="password" placeholder="••••••••" value={password} onChange={e => setPassword(e.target.value)} onKeyDown={e => e.key === "Enter" && handleAuth()} /></div>
+            {error && <div style={{ background: "#450a0a", border: "1px solid rgba(239,68,68,0.3)", borderRadius: 9, padding: "10px 13px", marginBottom: 16, fontSize: 12, color: "#f87171" }}>⚠️ {error}</div>}
+            <button onClick={handleAuth} disabled={loading} style={{ width: "100%", padding: "14px 0", background: "linear-gradient(135deg,#5DA9FF,#8B6DFF)", border: "none", borderRadius: 12, color: "#fff", fontWeight: 800, fontSize: 15, cursor: loading ? "not-allowed" : "pointer", fontFamily: "'Sora',sans-serif", opacity: loading ? 0.7 : 1, boxShadow: "0 4px 20px rgba(93,169,255,0.3)" }}>
+              {loading ? "A processar..." : mode === "login" ? "Entrar →" : "Criar conta →"}
             </button>
           </div>
-          <div style={{textAlign:"center",marginTop:18,fontSize:11,color:"#1f2937"}}>🔒 Dados privados e encriptados</div>
+          <div style={{ textAlign: "center", marginTop: 18, fontSize: 11, color: "#1f2937" }}>🔒 Dados privados e encriptados</div>
         </div>
       </div>
     </div>
   );
-  const feature=FEATURES[featIdx];
-  return(
-    <div style={{minHeight:"100vh",background:"#0A0D14",fontFamily:"'Sora',sans-serif",color:"#f1f5f9",overflowX:"hidden"}}>
-      <link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700;800&display=swap" rel="stylesheet"/>
-      <style>{`
-        @keyframes fadeUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
-        @keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:0.5;transform:scale(1.4)}}
-        @keyframes gradientShift{0%{background-position:0% 50%}50%{background-position:100% 50%}100%{background-position:0% 50%}}
-        .welcome-btn-primary:active{transform:scale(0.98)!important}
-        .welcome-card:hover{border-color:rgba(93,169,255,0.2)!important;transform:translateY(-2px)}
-        input::placeholder{color:#374151}
-      `}</style>
- 
-      {/* Background glows */}
-      <div style={{position:"fixed",top:-120,left:"50%",transform:"translateX(-50%)",width:600,height:500,borderRadius:"50%",background:"radial-gradient(ellipse,rgba(139,109,255,0.13) 0%,rgba(93,169,255,0.07) 40%,transparent 70%)",pointerEvents:"none",zIndex:0}}/>
-      <div style={{position:"fixed",bottom:-200,right:-100,width:500,height:500,borderRadius:"50%",background:"radial-gradient(ellipse,rgba(93,169,255,0.07) 0%,transparent 70%)",pointerEvents:"none",zIndex:0}}/>
- 
-      {/* NAV */}
-      <div style={{position:"relative",zIndex:10,padding:"18px 24px",display:"flex",justifyContent:"space-between",alignItems:"center",borderBottom:"1px solid rgba(255,255,255,0.06)",backdropFilter:"blur(20px)"}}>
-        <div style={{display:"flex",alignItems:"center",gap:10}}>
-          <div style={{width:30,height:30,borderRadius:9,background:"linear-gradient(135deg,#5DA9FF,#8B6DFF)",display:"flex",alignItems:"center",justifyContent:"center",fontSize:14}}>🖤</div>
-          <span style={{fontSize:15,fontWeight:700,color:"#f1f5f9"}}>MyOwnFintrack</span>
-        </div>
-        <button onClick={()=>setMode("login")} style={{background:"rgba(93,169,255,0.1)",border:"1px solid rgba(93,169,255,0.25)",borderRadius:10,padding:"9px 18px",color:"#5DA9FF",fontSize:13,fontWeight:600,cursor:"pointer",fontFamily:"'Sora',sans-serif",transition:"all 0.2s"}}>
-          Entrar
-        </button>
-      </div>
- 
-      {/* HERO */}
-      <div style={{position:"relative",zIndex:1,padding:"56px 24px 40px",textAlign:"center",animation:"fadeUp 0.6s ease"}}>
-        {/* Badge */}
-        <div style={{display:"inline-flex",alignItems:"center",gap:8,background:"rgba(139,109,255,0.12)",border:"1px solid rgba(139,109,255,0.3)",borderRadius:99,padding:"6px 16px",marginBottom:28}}>
-          <div style={{width:6,height:6,borderRadius:"50%",background:"#8B6DFF",animation:"pulse 2s infinite"}}/>
-          <span style={{fontSize:12,color:"#8B6DFF",fontWeight:600}}>Controlo financeiro inteligente</span>
-        </div>
- 
-        {/* Headline */}
-        <h1 style={{fontSize:34,fontWeight:800,color:"#f1f5f9",letterSpacing:"-1.5px",lineHeight:1.1,margin:"0 0 16px",padding:"0 4px"}}>
-          Controla o teu dinheiro<br/>
-          <span style={{background:"linear-gradient(135deg,#5DA9FF,#8B6DFF)",WebkitBackgroundClip:"text",WebkitTextFillColor:"transparent",backgroundClip:"text"}}>sem complicações</span>
-        </h1>
- 
-        <p style={{fontSize:15,color:"#94a3b8",lineHeight:1.7,margin:"0 0 36px",padding:"0 8px"}}>
-          Despesas, metas, contas e modo casal —<br/>tudo num só lugar, sempre sincronizado.
-        </p>
- 
-        {/* CTAs */}
-        <div style={{display:"flex",flexDirection:"column",gap:12,padding:"0 4px",marginBottom:40}}>
-          <button
-            className="welcome-btn-primary"
-            onClick={()=>setMode("register")}
-            style={{width:"100%",padding:"16px 0",background:"linear-gradient(135deg,#5DA9FF,#8B6DFF)",border:"none",borderRadius:14,color:"#fff",fontWeight:800,fontSize:16,cursor:"pointer",fontFamily:"'Sora',sans-serif",boxShadow:"0 8px 32px rgba(93,169,255,0.3)",transition:"all 0.2s"}}
-          >
-            Começar grátis →
-          </button>
-          <button
-            onClick={()=>setMode("login")}
-            style={{width:"100%",padding:"14px 0",background:"rgba(255,255,255,0.04)",border:"1px solid rgba(93,169,255,0.2)",borderRadius:14,color:"#94a3b8",fontWeight:700,fontSize:14,cursor:"pointer",fontFamily:"'Sora',sans-serif",transition:"all 0.2s"}}
-          >
-            Já tenho conta — Entrar
-          </button>
-        </div>
-      </div>
- 
-      {/* FEATURE CAROUSEL */}
-      <div style={{margin:"0 20px 28px",background:"rgba(21,27,45,0.8)",border:"1px solid rgba(255,255,255,0.08)",borderRadius:20,padding:"20px",backdropFilter:"blur(10px)"}}>
-        <div key={animKey} style={{animation:"fadeUp .4s ease"}}>
-          <div style={{display:"flex",alignItems:"center",gap:12,marginBottom:10}}>
-            <div style={{width:48,height:48,borderRadius:14,background:"rgba(93,169,255,0.12)",border:"1px solid rgba(93,169,255,0.2)",display:"flex",alignItems:"center",justifyContent:"center",fontSize:24}}>{feature.icon}</div>
-            <div>
-              <div style={{fontSize:15,fontWeight:700,color:"#f1f5f9"}}>{feature.title}</div>
-              <div style={{fontSize:12,color:"#667085",marginTop:3}}>{feature.desc}</div>
-            </div>
-          </div>
-          <div style={{display:"flex",gap:5,justifyContent:"center",marginTop:14}}>
-            {FEATURES.map((_,i)=>(
-              <div key={i} style={{width:i===featIdx?20:6,height:6,borderRadius:99,background:i===featIdx?"linear-gradient(90deg,#5DA9FF,#8B6DFF)":"rgba(255,255,255,0.1)",backgroundColor:i===featIdx?"#5DA9FF":"rgba(255,255,255,0.1)",transition:"all .3s ease"}}/>
-            ))}
-          </div>
-        </div>
-      </div>
- 
-      {/* FEATURE GRID */}
-      <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:10,padding:"0 20px",marginBottom:32}}>
-        {FEATURES.map((f,i)=>(
-          <div
-            key={i}
-            className="welcome-card"
-            style={{background:"rgba(21,27,45,0.6)",border:"1px solid rgba(255,255,255,0.07)",borderRadius:16,padding:"16px 14px",transition:"all 0.3s"}}
-          >
-            <div style={{fontSize:24,marginBottom:10}}>{f.icon}</div>
-            <div style={{fontSize:13,fontWeight:700,color:"#f1f5f9",marginBottom:4}}>{f.title}</div>
-            <div style={{fontSize:11,color:"#667085",lineHeight:1.5}}>{f.desc}</div>
-          </div>
-        ))}
-      </div>
- 
-      {/* STATS ROW */}
-      <div style={{display:"grid",gridTemplateColumns:"1fr 1fr 1fr",gap:8,padding:"0 20px",marginBottom:32}}>
-        {[
-          {val:"2 mundos",label:"Pessoal & Clínica"},
-          {val:"100%",label:"Privado & seguro"},
-          {val:"Grátis",label:"Para começar"},
-        ].map((s,i)=>(
-          <div key={i} style={{background:"rgba(21,27,45,0.6)",border:"1px solid rgba(255,255,255,0.07)",borderRadius:14,padding:"14px 10px",textAlign:"center"}}>
-            <div style={{fontSize:15,fontWeight:800,background:"linear-gradient(135deg,#5DA9FF,#8B6DFF)",WebkitBackgroundClip:"text",WebkitTextFillColor:"transparent",backgroundClip:"text"}}>{s.val}</div>
-            <div style={{fontSize:10,color:"#667085",marginTop:3,lineHeight:1.3}}>{s.label}</div>
-          </div>
-        ))}
-      </div>
- 
-      {/* FINAL CTA */}
-      <div style={{padding:"0 20px 52px"}}>
-        <div style={{background:"linear-gradient(135deg,rgba(139,109,255,0.1),rgba(93,169,255,0.07))",border:"1px solid rgba(93,169,255,0.2)",borderRadius:22,padding:"28px 22px",textAlign:"center",boxShadow:"0 0 60px rgba(139,109,255,0.08)"}}>
-          <div style={{fontSize:20,fontWeight:800,color:"#f1f5f9",marginBottom:8,letterSpacing:"-0.5px"}}>Pronto para começar?</div>
-          <div style={{fontSize:13,color:"#667085",marginBottom:20}}>Grátis, seguro e sempre contigo.</div>
-          <button
-            onClick={()=>setMode("register")}
-            style={{width:"100%",padding:"15px 0",background:"linear-gradient(135deg,#5DA9FF,#8B6DFF)",border:"none",borderRadius:13,color:"#fff",fontWeight:800,fontSize:15,cursor:"pointer",fontFamily:"'Sora',sans-serif",boxShadow:"0 4px 20px rgba(93,169,255,0.3)"}}
-          >
-            Criar conta gratuita →
-          </button>
-          <div style={{fontSize:11,color:"#334155",marginTop:14}}>🔒 Grátis para sempre · Sem cartão de crédito</div>
-        </div>
-      </div>
- 
+
+  // ECRÃ WELCOME — iframe com a landing page
+  return (
+    <div style={{ width: "100vw", height: "100vh", overflow: "hidden", background: "#0A0D14" }}>
+      <iframe
+        src="/landing.html"
+        style={{ width: "100%", height: "100%", border: "none", display: "block" }}
+        title="MyOwnFintrack Landing"
+      />
     </div>
   );
 }
