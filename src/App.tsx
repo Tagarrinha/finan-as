@@ -281,7 +281,7 @@ function LeftNav({ isOpen, onClose, activeTab, onNavigate, accent, accentDark, o
         {/* Header */}
         <div className="lnav-header">
           <div className="lnav-logo">
-            <div className="lnav-logo-icon">💰</div>
+            <div className="lnav-logo-icon"><img src="/favicon.svg" width="18" height="18" style={{borderRadius:4}}/></div>
             <div className="lnav-logo-text">
               FinTrack
               <span className="lnav-logo-sub">myownfintrack</span>
@@ -529,7 +529,7 @@ export default function Financas() {
     return ()=>subscription.unsubscribe();
   },[]);
   async function loadProfile(uid:string){const{data}=await supabase.from("profiles").select("name").eq("id",uid).single();if(data)setUserName(data.name);}
-  if(loading)return(<div style={{minHeight:"100vh",background:"#080810",display:"flex",alignItems:"center",justifyContent:"center",fontFamily:"'Sora',sans-serif"}}><div style={{textAlign:"center"}}><div style={{fontSize:40,marginBottom:12}}>💰</div><div style={{fontSize:14,color:"#475569"}}>A carregar...</div></div></div>);
+  if(loading)return(<div style={{minHeight:"100vh",background:"#080810",display:"flex",alignItems:"center",justifyContent:"center",fontFamily:"'Sora',sans-serif"}}><div style={{textAlign:"center"}}><div style={{fontSize:40,marginBottom:12}}><img src="/favicon.svg" width="40" height="40" style={{borderRadius:9}}/></div><div style={{fontSize:14,color:"#475569"}}>A carregar...</div></div></div>);
   if(!sbUser)return <WelcomeScreen/>;
   return <MainApp user={sbUser} userName={userName} onLogout={()=>supabase.auth.signOut()}/>;
 }
@@ -729,7 +729,7 @@ async function handleCoupleSettlement(valor: number) {
   const sSel:CSSProperties={width:"100%",background:"#111827",border:"1px solid rgba(255,255,255,0.1)",borderRadius:8,padding:"9px 11px",color:"#e2e8f0",fontSize:13,boxSizing:"border-box",outline:"none"};
   const selCat=expCats.find(c=>c.id===expForm.cat);
 
-  if(dataLoading)return(<div style={{minHeight:"100vh",background:T.root,display:"flex",alignItems:"center",justifyContent:"center",fontFamily:"'Sora',sans-serif"}}><div style={{textAlign:"center"}}><div style={{fontSize:36,marginBottom:12}}>💰</div><div style={{fontSize:14,color:T.subtext}}>A carregar...</div></div></div>);
+  if(dataLoading)return(<div style={{minHeight:"100vh",background:T.root,display:"flex",alignItems:"center",justifyContent:"center",fontFamily:"'Sora',sans-serif"}}><div style={{textAlign:"center"}}><div style={{fontSize:36,marginBottom:12}}><img src="/favicon.svg" width="36" height="36" style={{borderRadius:9}}/></div><div style={{fontSize:14,color:T.subtext}}>A carregar...</div></div></div>);
 
   return(
     <div style={S.root}>
