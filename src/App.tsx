@@ -474,7 +474,7 @@ function WelcomeScreen() {
       <style>{`@keyframes fadeUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}} input::placeholder{color:#374151}`}</style>
       <div style={{ padding: "18px 20px", display: "flex", alignItems: "center", gap: 10, borderBottom: "1px solid rgba(255,255,255,0.06)" }}>
         <button onClick={() => { setMode("welcome"); setError(""); }} style={{ background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.08)", borderRadius: 8, padding: "7px 12px", color: "#64748b", fontSize: 13, cursor: "pointer", fontFamily: "'Sora',sans-serif" }}>←</button>
-        <div style={{ width: 26, height: 26, borderRadius: 8, background: "linear-gradient(135deg,#5DA9FF,#8B6DFF)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 13 }}>🖤</div>
+        <div style={{ width: 26, height: 26, borderRadius: 8, overflow: "hidden" }}><img src="/favicon.svg" width="26" height="26" style={{borderRadius:8}}/></div>
         <span style={{ fontSize: 13, fontWeight: 700, color: "#475569" }}>MyOwnFintrack</span>
       </div>
       <div style={{ flex: 1, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", padding: "24px 20px 40px" }}>
