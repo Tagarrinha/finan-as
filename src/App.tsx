@@ -7,6 +7,8 @@ import WorldEditor from "./WorldEditor";
 import CoupleMode from "./CoupleMode";
 import { supabase } from "./supabase";
 import ExportData from "./ExportData";
+import SubscriptionModal from "./SubscriptionModal";
+import { usePlan } from "./usePlan";
 
 type TypeKey = "necessidade"|"desejo"|"investimento";
 type ThemeKey = "original"|"aurora"|"ocean"|"nebula"|"verde"|"premium";
@@ -543,6 +545,8 @@ function MainApp({user,userName,onLogout}:{user:SBUser;userName:string;onLogout:
   const [showAddModal,setShowAddModal]=useState(false);
   const [themeKey,setThemeKey]=useState<ThemeKey>("premium");
   const T=THEMES[themeKey];
+  const { plan, isBeta, isPremium, hasFullAccess, setPlan } = usePlan(user.id);
+  const [showPricing, setShowPricing] = useState(false);
   const [showTour,setShowTour]=useState(false);
   const [expenses,setExpenses]=useState<Expense[]>([]);
   const [incomes,setIncomes]=useState<Income[]>([]);
@@ -854,6 +858,9 @@ async function handleCoupleSettlement(valor: number) {
               <button onClick={()=>updateBudget(DEFAULT_BUDGET)} style={{width:"100%",marginTop:8,padding:"7px 0",background:"rgba(255,255,255,0.05)",border:"1px solid rgba(255,255,255,0.1)",borderRadius:8,color:"#94a3b8",fontSize:11,fontWeight:600,cursor:"pointer",fontFamily:"'Sora',sans-serif"}}>Repor sugestão (75/10/15)</button>
             </div>
             <div style={{borderTop:`1px solid ${T.cardBorder}`,paddingTop:16,display:"flex",flexDirection:"column" as const,gap:8}}>
+              <button onClick={()=>setShowPricing(true)} style={{width:"100%",padding:"10px 0",background:`${T.accent}12`,border:`1px solid ${T.accent}30`,borderRadius:9,color:T.accent,fontSize:13,fontWeight:700,cursor:"pointer",fontFamily:"'Sora',sans-serif",marginBottom:8}}>
+  💎 {isPremium?"Plano Premium ✓":hasFullAccess?"Acesso via casal ✓":"Fazer upgrade"}
+</button>
               <button onClick={()=>setShowTour(true)} style={{width:"100%",padding:"9px 0",background:`${T.accent}12`,border:`1px solid ${T.accent}30`,borderRadius:9,color:T.accent,fontSize:12,fontWeight:700,cursor:"pointer",fontFamily:"'Sora',sans-serif"}}>🎓 Ver tour novamente</button>
               <button onClick={onLogout} style={{width:"100%",padding:"10px 0",background:"rgba(239,68,68,0.08)",border:"1px solid rgba(239,68,68,0.2)",borderRadius:9,color:"#f87171",fontSize:13,fontWeight:700,cursor:"pointer",fontFamily:"'Sora',sans-serif"}}>Terminar sessão</button>
             </div>
@@ -1214,13 +1221,24 @@ async function handleCoupleSettlement(valor: number) {
 
         {/* MODO CASAL */}
         {tab==="casal"&&(
-          <CoupleMode
-            userId={user.id} userEmail={user.email||""} userName={userName}
-            expCats={expCats} accent={T.accent} accentDark={T.accentDark}
-            cardBg={T.cardBg} cardBorder={T.cardBorder} subtext={T.subtext}
-            positive={T.positive} negative={T.negative}
-            onSettlement={handleCoupleSettlement}
-          />
+          hasFullAccess ? (
+            <CoupleMode
+              userId={user.id} userEmail={user.email||""} userName={userName}
+              expCats={expCats} accent={T.accent} accentDark={T.accentDark}
+              cardBg={T.cardBg} cardBorder={T.cardBorder} subtext={T.subtext}
+              positive={T.positive} negative={T.negative}
+              onSettlement={handleCoupleSettlement}
+            />
+          ) : (
+            <div style={{textAlign:"center",padding:"60px 24px",fontFamily:"'Sora',sans-serif"}}>
+              <div style={{fontSize:48,marginBottom:16}}>💑</div>
+              <div style={{fontSize:20,fontWeight:800,color:"#f1f5f9",marginBottom:8,letterSpacing:"-0.5px"}}>Modo casal</div>
+              <div style={{fontSize:14,color:"#667085",marginBottom:28,lineHeight:1.7}}>Gere despesas partilhadas com o teu parceiro/a.<br/>Disponível no plano Premium.</div>
+              <button onClick={()=>setShowPricing(true)} style={{padding:"14px 32px",background:"linear-gradient(135deg,#5DA9FF,#8B6DFF)",border:"none",borderRadius:12,color:"white",fontWeight:700,fontSize:15,cursor:"pointer",fontFamily:"'Sora',sans-serif",boxShadow:"0 4px 20px rgba(93,169,255,0.3)"}}>
+                Ver planos →
+              </button>
+            </div>
+          )
         )}
         {/* EXPORTAR */}
         {tab==="exportar"&&(
@@ -1375,12 +1393,26 @@ async function handleCoupleSettlement(valor: number) {
                     <div style={{fontSize:11,fontWeight:400,opacity:0.8}}>Regista um novo rendimento</div>
                   </div>
                 </button>
-              </div>
+             </div>
             </div>
           </div>
         </>
       )}
-
+      {showPricing&&(
+        <SubscriptionModal
+          userId={user.id}
+          userEmail={user.email||""}
+          currentPlan={plan}
+          isBeta={isBeta}
+          accent={T.accent}
+          accent2={T.accent2}
+          cardBg={T.cardBg}
+          cardBorder={T.cardBorder}
+          subtext={T.subtext}
+          onClose={()=>setShowPricing(false)}
+          onPlanUpdate={(p)=>setPlan(p as any)}
+        />
+      )}
     </div>
   );
 }
