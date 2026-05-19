@@ -3,8 +3,6 @@
 // Coloca em src/SubscriptionModal.tsx
 // ============================================================
 
-import { useState, useEffect } from "react";
-import { supabase } from "./supabase";
 
 interface Plan {
   id: "free" | "individual" | "premium";
@@ -93,29 +91,7 @@ export default function SubscriptionModal({
   onClose,
   onPlanUpdate,
 }: SubscriptionModalProps) {
-  const [loading, setLoading] = useState(false);
-  const [success, setSuccess] = useState(false);
 
-  // Detecta retorno do Stripe via URL param
-  useEffect(() => {
-    const params = new URLSearchParams(window.location.search);
-    if (params.get("payment") === "success") {
-      setSuccess(true);
-      // Limpa o URL
-      window.history.replaceState({}, "", window.location.pathname);
-    }
-  }, []);
-
-  async function handleManualUpgrade(plan: "individual" | "premium") {
-    setLoading(true);
-    await supabase.from("subscriptions").upsert(
-      { user_id: userId, plan, status: "active", updated_at: new Date().toISOString() },
-      { onConflict: "user_id" }
-    );
-    onPlanUpdate(plan);
-    setLoading(false);
-    onClose();
-  }
 
   function openStripe(link: string, plan: "individual" | "premium") {
     // Adiciona email e client_reference_id ao link para identificar o utilizador
@@ -180,17 +156,6 @@ export default function SubscriptionModal({
                 : "Cancela quando quiseres. Sem compromissos."}
             </div>
           </div>
-
-          {/* Success message */}
-          {success && (
-            <div style={{
-              background: "rgba(87,227,160,0.1)", border: "1px solid rgba(87,227,160,0.3)",
-              borderRadius: 12, padding: "14px 16px", marginBottom: 20,
-              fontSize: 13, color: "#57E3A0", fontWeight: 600, textAlign: "center",
-            }}>
-              ✅ Pagamento confirmado! Clica em "Ativar plano" abaixo para atualizar o teu acesso.
-            </div>
-          )}
 
           {/* Plans */}
           <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
@@ -269,22 +234,6 @@ export default function SubscriptionModal({
                       >
                         {plan.cta} →
                       </button>
-
-                      {/* Botão secundário — após pagar, ativa manualmente */}
-                      {success && (
-                        <button
-                          onClick={() => handleManualUpgrade(plan.id as "individual" | "premium")}
-                          disabled={loading}
-                          style={{
-                            width: "100%", padding: "10px 0", borderRadius: 10,
-                            background: "rgba(87,227,160,0.1)", border: "1px solid rgba(87,227,160,0.3)",
-                            color: "#57E3A0", fontSize: 12, fontWeight: 700, cursor: "pointer",
-                            fontFamily: "'Sora',sans-serif",
-                          }}
-                        >
-                          {loading ? "A ativar..." : "✓ Já paguei — Ativar plano"}
-                        </button>
-                      )}
                     </div>
                   )}
                 </div>
