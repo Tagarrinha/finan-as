@@ -757,7 +757,7 @@ async function handleCoupleSettlement(valor: number) {
         onSettings={() => { setLeftNavOpen(false); setSidebarOpen(true); }}
       />
 
-      {/* SIDEBAR (existing right ⚙️ panel — unchanged) */}
+     {/* SIDEBAR (existing right ⚙️ panel — unchanged) */}
       {sidebarOpen&&<div onClick={()=>setSidebarOpen(false)} style={{position:"fixed",inset:0,background:"rgba(0,0,0,0.6)",zIndex:40}}/>}
       <div style={{position:"fixed",top:0,right:0,bottom:0,width:300,background:"#0f1117",borderLeft:`1px solid ${T.cardBorder}`,zIndex:50,transform:sidebarOpen?"translateX(0)":"translateX(100%)",transition:"transform .3s ease",display:"flex",flexDirection:"column" as const,fontFamily:"'Sora',sans-serif"}}>
         <div style={{padding:"18px 20px 0",borderBottom:`1px solid ${T.cardBorder}`,flexShrink:0}}>
@@ -767,8 +767,8 @@ async function handleCoupleSettlement(valor: number) {
           </div>
           <div style={{display:"flex",gap:2}}>
             {(["contas","categorias","config"] as const).map(tab_=>(
-              <button key={t} onClick={()=>setSidebarTab(t)} style={{flex:1,padding:"7px 0",border:"none",borderRadius:"7px 7px 0 0",background:sidebarTab===t?"rgba(255,255,255,0.07)":"transparent",color:sidebarTab===t?T.accent:T.subtext,fontWeight:700,fontSize:11,cursor:"pointer",fontFamily:"'Sora',sans-serif",borderBottom:sidebarTab===t?`2px solid ${T.accent}`:"2px solid transparent"}}>
-                {t==="contas"?"🏦":t==="categorias"?"🏷️":"⚙️"}
+              <button key={tab_} onClick={()=>setSidebarTab(tab_)} style={{flex:1,padding:"7px 0",border:"none",borderRadius:"7px 7px 0 0",background:sidebarTab===tab_?"rgba(255,255,255,0.07)":"transparent",color:sidebarTab===tab_?T.accent:T.subtext,fontWeight:700,fontSize:11,cursor:"pointer",fontFamily:"'Sora',sans-serif",borderBottom:sidebarTab===tab_?`2px solid ${T.accent}`:"2px solid transparent"}}>
+                {tab_==="contas"?"🏦":tab_==="categorias"?"🏷️":"⚙️"}
               </button>
             ))}
           </div>
