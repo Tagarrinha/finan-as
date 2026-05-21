@@ -1,9 +1,6 @@
 // ============================================================
 // supabase/functions/stripe-webhook/index.ts
-// Cria a pasta e ficheiro em:
-// ~/Desktop/finan-as/supabase/functions/stripe-webhook/index.ts
 // ============================================================
-
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 import Stripe from "https://esm.sh/stripe@13.3.0?target=deno";
@@ -22,6 +19,22 @@ const PRICE_TO_PLAN: Record<string, string> = {
   "price_1TYVKGDTJaEAWlCFCVPIU7a0": "individual",
   "price_1TYVLwDTJaEAWlCFMU8ZNasn": "premium",
 };
+
+async function sendSubscriptionEmail(userId: string, plan: string) {
+  try {
+    await fetch(`${Deno.env.get("SUPABASE_URL")}/functions/v1/subscription-email`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${Deno.env.get("SUPABASE_ANON_KEY")}`,
+      },
+      body: JSON.stringify({ user_id: userId, plan }),
+    });
+    console.log(`Subscription email sent for user ${userId}: ${plan}`);
+  } catch (err) {
+    console.error("Error sending subscription email:", err);
+  }
+}
 
 serve(async (req) => {
   const signature = req.headers.get("stripe-signature");
@@ -50,9 +63,8 @@ serve(async (req) => {
         const subscription = event.data.object as Stripe.Subscription;
         const customerId = subscription.customer as string;
         const priceId = subscription.items.data[0]?.price.id;
-        const status = subscription.status; // active, canceled, past_due, etc.
+        const status = subscription.status;
 
-        // Determina o plano baseado no price ID
         const plan = PRICE_TO_PLAN[priceId] || "free";
         const isActive = status === "active" || status === "trialing";
 
@@ -64,7 +76,6 @@ serve(async (req) => {
           .single();
 
         if (subData?.user_id) {
-          // Atualiza subscrição existente
           await supabase.from("subscriptions").upsert({
             user_id: subData.user_id,
             stripe_customer_id: customerId,
@@ -75,8 +86,14 @@ serve(async (req) => {
           }, { onConflict: "user_id" });
 
           console.log(`Updated plan for user ${subData.user_id}: ${plan}`);
+
+          // Envia email de confirmação apenas quando subscrição é criada
+          if (event.type === "customer.subscription.created" && isActive) {
+            await sendSubscriptionEmail(subData.user_id, plan);
+          }
+
         } else {
-          // Tenta encontrar pelo client_reference_id (passado no Payment Link)
+          // Tenta encontrar pelo client_reference_id
           const sessions = await stripe.checkout.sessions.list({
             customer: customerId,
             limit: 1,
@@ -95,6 +112,11 @@ serve(async (req) => {
             }, { onConflict: "user_id" });
 
             console.log(`Created plan for user ${userId}: ${plan}`);
+
+            // Envia email de confirmação
+            if (isActive) {
+              await sendSubscriptionEmail(userId, plan);
+            }
           }
         }
         break;
@@ -104,7 +126,6 @@ serve(async (req) => {
         const subscription = event.data.object as Stripe.Subscription;
         const customerId = subscription.customer as string;
 
-        // Volta ao plano free
         await supabase.from("subscriptions")
           .update({
             plan: "free",
