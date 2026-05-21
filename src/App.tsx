@@ -1227,6 +1227,7 @@ async function handleCoupleSettlement(valor: number) {
             accent={T.accent} accentDark={T.accentDark} cardBg={T.cardBg}
             cardBorder={T.cardBorder} subtext={T.subtext} positive={T.positive} negative={T.negative}
             recurring={recurring} setRecurring={setRecurring} onApplyDue={applyRecurring}
+            lang={lang}
           />
         )}
 
