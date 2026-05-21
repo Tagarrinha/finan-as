@@ -547,6 +547,17 @@ function MainApp({user,userName,onLogout}:{user:SBUser;userName:string;onLogout:
   const [themeKey,setThemeKey]=useState<ThemeKey>("premium");
   const T=THEMES[themeKey];
   const [lang, setLang] = useState<Lang>("pt");
+  const TYPE_META: Record<TypeKey,{label:string;color:string;bg:string;icon:string}> = {
+  necessidade: {label:"Necessidade",color:"#3b82f6",bg:"#1e3a5f33",icon:"🏠"},
+  desejo:      {label:"Desejo",     color:"#f59e0b",bg:"#78350f33",icon:"✨"},
+  investimento:{label:"Investimento",color:"#10b981",bg:"#064e3b33",icon:"📈"},
+};
+const TIPO_ACC: Record<BankAccount["tipo"],{label:string;icon:string;cor:string}> = {
+  corrente:    {label:"Conta Corrente",    icon:"💳",cor:"#3b82f6"},
+  poupanca:    {label:"Conta Poupança",    icon:"🏦",cor:"#10b981"},
+  investimento:{label:"Conta Investimento",icon:"📈",cor:"#a78bfa"},
+  outro:       {label:"Outra Conta",       icon:"📂",cor:"#f59e0b"},
+};
   const { plan, isBeta, isPremium, hasFullAccess, setPlan } = usePlan(user.id);
   const [showPricing, setShowPricing] = useState(false);
   const [showTour,setShowTour]=useState(false);
@@ -863,7 +874,7 @@ async function handleCoupleSettlement(valor: number) {
             </div>
             <div style={{marginBottom:24}}>
               <div style={{fontSize:11,fontWeight:700,color:T.accent,textTransform:"uppercase" as const,letterSpacing:"0.08em",marginBottom:12}}>{t[lang].budgetGoals}</div>
-              {(Object.entries(TYPE_META) as [TypeKey,typeof TYPE_META[TypeKey]][]).map(([type,meta])=>(<div key={type} style={{marginBottom:12}}><div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:5}}><span style={{fontSize:13,color:meta.color}}>{meta.icon} {meta.label}</span><span style={{fontSize:13,fontWeight:700,color:meta.color}}>{budgetTargets[type]}%</span></div><input type="range" min={0} max={100} value={budgetTargets[type]} onChange={e=>updateBudget({...budgetTargets,[type]:Number(e.target.value)})} style={{width:"100%",accentColor:meta.color}}/></div>))}
+              {(Object.entries(TYPE_META) as [TypeKey,{label:string;color:string;bg:string;icon:string}][]).map(([type,meta])=>(<div key={type} style={{marginBottom:12}}><div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:5}}><span style={{fontSize:13,color:meta.color}}>{meta.icon} {meta.label}</span><span style={{fontSize:13,fontWeight:700,color:meta.color}}>{budgetTargets[type]}%</span></div><input type="range" min={0} max={100} value={budgetTargets[type]} onChange={e=>updateBudget({...budgetTargets,[type]:Number(e.target.value)})} style={{width:"100%",accentColor:meta.color}}/></div>))}
               <div style={{textAlign:"center" as const,fontSize:12,fontWeight:700,padding:"8px 12px",borderRadius:8,background:(budgetTargets.necessidade+budgetTargets.desejo+budgetTargets.investimento)===100?"#064e3b33":"#450a0a",color:(budgetTargets.necessidade+budgetTargets.desejo+budgetTargets.investimento)===100?T.positive:"#f87171",marginTop:4}}>
                 Total: {budgetTargets.necessidade+budgetTargets.desejo+budgetTargets.investimento}% {(budgetTargets.necessidade+budgetTargets.desejo+budgetTargets.investimento)===100?t[lang].correct:`⚠️ ${t[lang].totalMustBe100}`}
               </div>
@@ -933,7 +944,7 @@ async function handleCoupleSettlement(valor: number) {
           <div style={{fontSize:10,fontWeight:700,color:T.subtext,textTransform:"uppercase" as const,letterSpacing:"0.1em",marginBottom:10}}>Mês</div>
           <div style={{display:"grid",gridTemplateColumns:"1fr 1fr 1fr",gap:6}}>
             <button onClick={()=>setFMonth("todos")} style={{padding:"6px 8px",borderRadius:99,border:`1px solid ${fMonth==="todos"?T.accent:"rgba(255,255,255,0.1)"}`,background:fMonth==="todos"?`${T.accent}20`:"transparent",color:fMonth==="todos"?T.accent:"#94a3b8",fontSize:11,fontWeight:700,cursor:"pointer",fontFamily:"'Sora',sans-serif"}}>Todos</button>
-            {MONTHS.map((m,i)=>(
+            {t[lang].months.map((m,i)=>(
               <button key={i} onClick={()=>setFMonth(String(i))} style={{padding:"6px 8px",borderRadius:99,border:`1px solid ${fMonth===String(i)?T.accent:"rgba(255,255,255,0.1)"}`,background:fMonth===String(i)?`${T.accent}20`:"transparent",color:fMonth===String(i)?T.accent:"#94a3b8",fontSize:11,fontWeight:700,cursor:"pointer",fontFamily:"'Sora',sans-serif"}}>{m}</button>
             ))}
           </div>
@@ -1014,7 +1025,7 @@ async function handleCoupleSettlement(valor: number) {
   )}
   {/* ── ALERTA ORÇAMENTO ── */}
   {(()=>{
-    const overItems=(Object.entries(TYPE_META) as [TypeKey,typeof TYPE_META[TypeKey]][]).filter(([type])=>{
+    const overItems=(Object.entries(TYPE_META) as [TypeKey,{label:string;color:string;bg:string;icon:string}][]).filter(([type])=>{
       const actual=byType[type]||0;
       return actual>totalInc*(budgetTargets[type]/100)&&totalInc>0;
     });
@@ -1038,7 +1049,7 @@ async function handleCoupleSettlement(valor: number) {
   <div style={{marginBottom:14}}>
     <div style={{fontSize:11,fontWeight:700,color:T.subtext,letterSpacing:"0.1em",textTransform:"uppercase",marginBottom:10}}>{t[lang].composition}</div>
     <div style={S.card}>
-      {(Object.entries(TYPE_META) as [TypeKey,typeof TYPE_META[TypeKey]][]).map(([type,meta])=>{
+      {(Object.entries(TYPE_META) as [TypeKey,{label:string;color:string;bg:string;icon:string}][]).map(([type,meta])=>{
         const actual=byType[type]||0,target=budgetTargets[type],targetAmt=totalInc*(target/100),actualPct=pct(actual,totalInc),over=actual>targetAmt&&totalInc>0;
         return(
           <div key={type} style={{marginBottom:18}}>
@@ -1096,7 +1107,7 @@ async function handleCoupleSettlement(valor: number) {
         {chartView==="fluxo"&&(
           <>
             <div style={{display:"flex",alignItems:"flex-end",gap:4,height:100,marginBottom:10}}>
-              {MONTHS.map((m,i)=>{
+              {t[lang].months.map((m,i)=>{
                 const rev=monthlyRev[world]?.[String(new Date().getFullYear())]?.[i]||0;
                 const exp=expenses.filter(e=>e.world===world&&new Date(e.data).getMonth()===i&&new Date(e.data).getFullYear()===new Date().getFullYear()).reduce((s,e)=>s+Number(e.valor),0);
                 const maxVal=Math.max(...MONTHS.map((_,j)=>{const r=monthlyRev[world]?.[String(new Date().getFullYear())]?.[j]||0;const ex=expenses.filter(e=>e.world===world&&new Date(e.data).getMonth()===j&&new Date(e.data).getFullYear()===new Date().getFullYear()).reduce((s,e)=>s+Number(e.valor),0);return Math.max(r,ex);}),1);
@@ -1128,7 +1139,7 @@ async function handleCoupleSettlement(valor: number) {
               <div style={{fontSize:28,fontWeight:800,color:totalSaldo>=0?T.positive:T.negative}}>{hv(fmt(totalSaldo))}</div>
             </div>
             <div style={{display:"flex",alignItems:"flex-end",gap:4,height:100,marginBottom:10}}>
-              {MONTHS.map((m,i)=>{
+              {t[lang].months.map((m,i)=>{
                 const snap=nwSnapshots.find(s=>s.mes===i);
                 const maxVal=Math.max(...nwSnapshots.map(s=>s.valor),1);
                 const h=snap?Math.round((snap.valor/maxVal)*88)||2:2;
@@ -1201,7 +1212,7 @@ async function handleCoupleSettlement(valor: number) {
             <span style={{fontSize:12,color:T.subtext}}>{myExpenses.length} {t[lang].expensesLabel.toLowerCase()}</span>
             <span style={{fontSize:17,fontWeight:800,color:T.negative}}>{fmt(totalExp)}</span>
           </div>
-          {myExpenses.length>0&&(<div style={{display:"grid",gridTemplateColumns:"1fr 1fr 1fr",gap:8,marginBottom:14}}>{(Object.entries(TYPE_META) as [TypeKey,typeof TYPE_META[TypeKey]][]).map(([type,meta])=>{const actual=byType[type]||0,target=budgetTargets[type],over=actual>totalInc*(target/100)&&totalInc>0;return(<div key={type} style={{background:over?"#450a0a":meta.bg,border:`1px solid ${over?"#ef4444":meta.color}40`,borderRadius:10,padding:"10px 8px",textAlign:"center"}}><div style={{fontSize:16,marginBottom:2}}>{meta.icon}</div><div style={{fontSize:12,fontWeight:800,color:over?"#ef4444":meta.color}}>{fmt(actual)}</div><div style={{fontSize:10,color:T.subtext,marginTop:1}}>{pct(actual,totalInc)}% / {target}%</div>{over&&<div style={{fontSize:10,color:"#ef4444",fontWeight:700,marginTop:2}}>⚠️</div>}</div>);})}</div>)}
+          {myExpenses.length>0&&(<div style={{display:"grid",gridTemplateColumns:"1fr 1fr 1fr",gap:8,marginBottom:14}}>{(Object.entries(TYPE_META) as [TypeKey,{label:string;color:string;bg:string;icon:string}][]).map(([type,meta])=>{const actual=byType[type]||0,target=budgetTargets[type],over=actual>totalInc*(target/100)&&totalInc>0;return(<div key={type} style={{background:over?"#450a0a":meta.bg,border:`1px solid ${over?"#ef4444":meta.color}40`,borderRadius:10,padding:"10px 8px",textAlign:"center"}}><div style={{fontSize:16,marginBottom:2}}>{meta.icon}</div><div style={{fontSize:12,fontWeight:800,color:over?"#ef4444":meta.color}}>{fmt(actual)}</div><div style={{fontSize:10,color:T.subtext,marginTop:1}}>{pct(actual,totalInc)}% / {target}%</div>{over&&<div style={{fontSize:10,color:"#ef4444",fontWeight:700,marginTop:2}}>⚠️</div>}</div>);})}</div>)}
           <div style={S.card}>
             {myExpenses.length===0&&<div style={{color:T.subtext,fontSize:13,textAlign:"center",padding:"24px 0"}}>{t[lang].noExpensesPeriod}</div>}
             {myExpenses.map(e=>{const cat=expCats.find(c=>c.id===e.cat);return(<div key={e.id} style={{display:"flex",alignItems:"center",gap:10,padding:"11px 0",borderBottom:`1px solid ${T.cardBorder}`}}><span style={{fontSize:20,minWidth:28,textAlign:"center"}}>{cat?.icon||"📦"}</span><div style={{flex:1,minWidth:0}}><div style={{fontSize:13,fontWeight:600,color:"#e2e8f0",whiteSpace:"nowrap",overflow:"hidden",textOverflow:"ellipsis"}}>{e.descricao}{e.subcat?<span style={{color:T.subtext}}> · {e.subcat}</span>:""}</div><div style={{display:"flex",alignItems:"center",gap:5,marginTop:3}}><span style={{fontSize:10,color:T.subtext}}>{new Date(e.data+"T12:00:00").toLocaleDateString(lang==="pt"?"pt-PT":"en-GB")}</span><Tag type={e.tipo}/></div></div><span style={{fontSize:14,fontWeight:700,color:T.negative,minWidth:68,textAlign:"right"}}>{fmt(Number(e.valor))}</span><button onClick={()=>{setEditingExp(e.id);setExpForm({descricao:e.descricao,valor:String(e.valor),cat:e.cat,subcat:e.subcat,data:e.data,tipo:e.tipo});window.scrollTo({top:0,behavior:"smooth"});}} style={{background:"none",border:"none",cursor:"pointer",color:T.accent,fontSize:15,padding:"0 2px"}}>✏️</button>
@@ -1307,7 +1318,7 @@ async function handleCoupleSettlement(valor: number) {
           <div style={S.card}>
             <SectionTitle>Receita mensal — {revYear} (toca para editar)</SectionTitle>
             <div style={{display:"grid",gridTemplateColumns:"repeat(3,1fr)",gap:8}}>
-              {MONTHS.map((m,i)=>{
+              {t[lang].months.map((m,i)=>{
                 const v=revArr[i]||0,expM=expenses.filter(e=>e.world===world&&new Date(e.data).getMonth()===i&&String(new Date(e.data).getFullYear())===revYear).reduce((s,e)=>s+Number(e.valor),0),net=v-expM;
                 return(<div key={i} onClick={()=>{setRevEdit(i);setRevVal(String(v));}} style={{background:T.cardBg,border:`1px solid ${revEdit===i?T.accent:T.cardBorder}`,borderRadius:10,padding:"10px 12px",cursor:"pointer",transition:"border .2s"}}>
                   <div style={{fontSize:11,color:T.subtext,marginBottom:4,fontWeight:600}}>{m}</div>
@@ -1320,7 +1331,7 @@ async function handleCoupleSettlement(valor: number) {
           <div style={S.card}>
             <SectionTitle>Receita vs Despesas — {revYear}</SectionTitle>
             <div style={{display:"flex",alignItems:"flex-end",gap:4,height:90,marginBottom:8}}>
-              {MONTHS.map((m,i)=>{
+              {t[lang].months.map((m,i)=>{
                 const rev=revArr[i]||0,exp=expenses.filter(e=>e.world===world&&new Date(e.data).getMonth()===i&&String(new Date(e.data).getFullYear())===revYear).reduce((s,e)=>s+Number(e.valor),0),rH=Math.round((rev/maxBar)*78)||2,eH=Math.round((exp/maxBar)*78)||2;
                 return(<div key={i} style={{flex:1,display:"flex",flexDirection:"column",alignItems:"center",gap:2}}><div style={{display:"flex",alignItems:"flex-end",gap:1,height:78}}><div style={{width:"45%",height:rH,background:T.positive,borderRadius:"3px 3px 0 0",transition:"height .4s"}}/><div style={{width:"45%",height:eH,background:T.negative,borderRadius:"3px 3px 0 0",transition:"height .4s"}}/></div><span style={{fontSize:8,color:T.subtext}}>{m}</span></div>);
               })}

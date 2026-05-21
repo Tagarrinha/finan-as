@@ -1,5 +1,4 @@
 export type Lang = "pt" | "en";
-
 export const t = {
   pt: {
     dashboard: "Dashboard",
@@ -122,6 +121,14 @@ export const t = {
     emailExists: "Email já registado.",
     fillAllFields: "Preenche todos os campos.",
     fillEmailPassword: "Preenche email e password.",
+    typeNecessidade: "Necessidade",
+    typeDesejo: "Desejo",
+    typeInvestimento: "Investimento",
+    accCorrente: "Conta Corrente",
+    accPoupanca: "Conta Poupança",
+    accInvestimento: "Conta Investimento",
+    accOutro: "Outra Conta",
+    months: ["Jan","Fev","Mar","Abr","Mai","Jun","Jul","Ago","Set","Out","Nov","Dez"],
   },
   en: {
     dashboard: "Dashboard",
@@ -244,5 +251,13 @@ export const t = {
     emailExists: "Email already registered.",
     fillAllFields: "Please fill in all fields.",
     fillEmailPassword: "Please fill in email and password.",
+    typeNecessidade: "Needs",
+    typeDesejo: "Wants",
+    typeInvestimento: "Investments",
+    accCorrente: "Current Account",
+    accPoupanca: "Savings Account",
+    accInvestimento: "Investment Account",
+    accOutro: "Other Account",
+    months: ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"],
   },
 };
