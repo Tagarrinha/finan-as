@@ -9,6 +9,7 @@ import { supabase } from "./supabase";
 import ExportData from "./ExportData";
 import SubscriptionModal from "./SubscriptionModal";
 import { usePlan } from "./usePlan";
+import { t, Lang } from "./i18n";
 
 type TypeKey = "necessidade"|"desejo"|"investimento";
 type ThemeKey = "original"|"aurora"|"ocean"|"nebula"|"verde"|"premium";
@@ -545,6 +546,7 @@ function MainApp({user,userName,onLogout}:{user:SBUser;userName:string;onLogout:
   const [showAddModal,setShowAddModal]=useState(false);
   const [themeKey,setThemeKey]=useState<ThemeKey>("premium");
   const T=THEMES[themeKey];
+  const [lang, setLang] = useState<Lang>("pt");
   const { plan, isBeta, isPremium, hasFullAccess, setPlan } = usePlan(user.id);
   const [showPricing, setShowPricing] = useState(false);
   const [showTour,setShowTour]=useState(false);
@@ -842,11 +844,21 @@ async function handleCoupleSettlement(valor: number) {
               </div>
             </div>
           </>}
-          {sidebarTab==="config"&&<>
+         {sidebarTab==="config"&&<>
             <div style={{marginBottom:24}}>
               <div style={{fontSize:11,fontWeight:700,color:T.accent,textTransform:"uppercase" as const,letterSpacing:"0.08em",marginBottom:12}}>🎨 Tema</div>
               <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:8}}>
                 {(Object.entries(THEMES) as [ThemeKey,AppTheme][]).map(([key,theme])=>{const active=themeKey===key;return(<button key={key} onClick={()=>changeTheme(key)} style={{padding:"12px 8px",background:active?`${theme.accent}20`:"rgba(255,255,255,0.04)",border:`1.5px solid ${active?theme.accent:"rgba(255,255,255,0.08)"}`,borderRadius:12,cursor:"pointer",fontFamily:"'Sora',sans-serif",textAlign:"center" as const,transition:"all .2s"}}><div style={{fontSize:20,marginBottom:4}}>{theme.emoji}</div><div style={{fontSize:12,fontWeight:700,color:active?theme.accent:"#94a3b8"}}>{theme.name}</div><div style={{display:"flex",justifyContent:"center",gap:3,marginTop:6}}>{[theme.accent,theme.accent2,theme.positive].map((c,i)=><div key={i} style={{width:10,height:10,borderRadius:"50%",background:c}}/>)}</div>{active&&<div style={{fontSize:9,color:theme.accent,marginTop:4,fontWeight:700}}>✓ Ativo</div>}</button>);})}
+              </div>
+            </div>
+            <div style={{marginBottom:24}}>
+              <div style={{fontSize:11,fontWeight:700,color:T.accent,textTransform:"uppercase" as const,letterSpacing:"0.08em",marginBottom:12}}>🌐 Idioma / Language</div>
+              <div style={{display:"flex",background:"rgba(255,255,255,0.05)",borderRadius:12,padding:4}}>
+                {(["pt","en"] as Lang[]).map(l=>(
+                  <button key={l} onClick={()=>setLang(l)} style={{flex:1,padding:"9px 0",border:"none",borderRadius:9,background:lang===l?`${T.accent}20`:"transparent",color:lang===l?T.accent:"#475569",fontWeight:700,fontSize:13,cursor:"pointer",fontFamily:"'Sora',sans-serif"}}>
+                    {l==="pt"?"🇵🇹 PT":"🇬🇧 EN"}
+                  </button>
+                ))}
               </div>
             </div>
             <div style={{marginBottom:24}}>
