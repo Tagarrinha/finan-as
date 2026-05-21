@@ -1238,6 +1238,7 @@ async function handleCoupleSettlement(valor: number) {
             positive={T.positive} negative={T.negative}
             goals={goals} setGoals={setGoals}
             monthlyIncome={totalInc}
+            lang={lang}
           />
         )}
 
