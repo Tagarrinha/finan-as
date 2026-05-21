@@ -766,7 +766,7 @@ async function handleCoupleSettlement(valor: number) {
             <button onClick={()=>setSidebarOpen(false)} style={{background:"none",border:"none",color:"#64748b",fontSize:20,cursor:"pointer",padding:4}}>✕</button>
           </div>
           <div style={{display:"flex",gap:2}}>
-            {(["contas","categorias","config"] as const).map(t=>(
+            {(["contas","categorias","config"] as const).map(tab_=>(
               <button key={t} onClick={()=>setSidebarTab(t)} style={{flex:1,padding:"7px 0",border:"none",borderRadius:"7px 7px 0 0",background:sidebarTab===t?"rgba(255,255,255,0.07)":"transparent",color:sidebarTab===t?T.accent:T.subtext,fontWeight:700,fontSize:11,cursor:"pointer",fontFamily:"'Sora',sans-serif",borderBottom:sidebarTab===t?`2px solid ${T.accent}`:"2px solid transparent"}}>
                 {t==="contas"?"🏦":t==="categorias"?"🏷️":"⚙️"}
               </button>
@@ -815,7 +815,7 @@ async function handleCoupleSettlement(valor: number) {
                 )}
               </div>
             );})}
-            {transfers.length>0&&(<div style={{marginTop:8,marginBottom:14}}><div style={{fontSize:10,fontWeight:700,color:T.subtext,textTransform:"uppercase" as const,letterSpacing:"0.08em",marginBottom:10}}>Últimas transferências</div>{transfers.slice(0,5).map(t=>{const from=accounts.find(a=>a.id===t.from_account_id),to=accounts.find(a=>a.id===t.to_account_id);return(<div key={t.id} style={{display:"flex",alignItems:"center",gap:8,padding:"8px 0",borderBottom:`1px solid ${T.cardBorder}`}}><span style={{fontSize:14}}>🔄</span><div style={{flex:1,minWidth:0}}><div style={{fontSize:12,color:"#e2e8f0",whiteSpace:"nowrap",overflow:"hidden",textOverflow:"ellipsis"}}>{t.descricao}</div><div style={{fontSize:10,color:T.subtext}}>{from?.nome||"?"} → {to?.nome||"?"}</div></div><span style={{fontSize:12,fontWeight:700,color:T.accent2}}>{fmt(Number(t.valor))}</span></div>);})}</div>)}
+            {transfers.length>0&&(<div style={{marginTop:8,marginBottom:14}}><div style={{fontSize:10,fontWeight:700,color:T.subtext,textTransform:"uppercase" as const,letterSpacing:"0.08em",marginBottom:10}}>Últimas transferências</div>{transfers.slice(0,5).map(tr=>{const from=accounts.find(a=>a.id===tr.from_account_id),to=accounts.find(a=>a.id===tr.to_account_id);return(<div key={tr.id} style={{display:"flex",alignItems:"center",gap:8,padding:"8px 0",borderBottom:`1px solid ${T.cardBorder}`}}><span style={{fontSize:14}}>🔄</span><div style={{flex:1,minWidth:0}}><div style={{fontSize:12,color:"#e2e8f0",whiteSpace:"nowrap",overflow:"hidden",textOverflow:"ellipsis"}}>{tr.descricao}</div><div style={{fontSize:10,color:T.subtext}}>{from?.nome||"?"} → {to?.nome||"?"}</div></div><span style={{fontSize:12,fontWeight:700,color:T.accent2}}>{fmt(Number(tr.valor))}</span></div>);})}</div>)}
             <div style={{background:T.cardBg,border:`1px dashed ${T.cardBorder}`,borderRadius:12,padding:"14px",marginTop:8}}>
               <div style={{fontSize:11,fontWeight:700,color:T.subtext,textTransform:"uppercase" as const,marginBottom:10}}>+ Nova conta</div>
               <input style={{...sInp,marginBottom:8}} placeholder="Nome da conta" value={newAccName} onChange={e=>setNewAccName(e.target.value)}/>
