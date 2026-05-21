@@ -9,7 +9,6 @@ import { supabase } from "./supabase";
 import ExportData from "./ExportData";
 import SubscriptionModal from "./SubscriptionModal";
 import { usePlan } from "./usePlan";
-import { t, Lang } from "./i18n";
 
 type TypeKey = "necessidade"|"desejo"|"investimento";
 type ThemeKey = "original"|"aurora"|"ocean"|"nebula"|"verde"|"premium";
@@ -327,7 +326,7 @@ function Tour({userName,accent,onFinish}:{userName:string;accent:string;onFinish
       <div style={{position:"fixed",inset:0,background:"rgba(0,0,0,0.75)",zIndex:100,pointerEvents:"none"}}/>
       <div style={{position:"fixed",zIndex:101,left:"50%",transform:"translateX(-50%)",bottom:cur.anchor==="top"?"auto":80,top:cur.anchor==="top"?140:"auto",width:"calc(100% - 40px)",maxWidth:360,background:"#13141f",border:`1px solid ${accent}50`,borderRadius:20,padding:"22px 22px 18px",boxShadow:`0 8px 40px rgba(0,0,0,0.6)`,fontFamily:"'Sora',sans-serif"}}>
         <div style={{display:"flex",gap:5,marginBottom:16}}>
-          {TOUR_STEPS.map((_,idx)=><div key={i} style={{height:4,flex:1,borderRadius:99,background:i<=step?accent:"rgba(255,255,255,0.1)",transition:"background .3s"}}/>)}
+          {TOUR_STEPS.map((_,i)=><div key={i} style={{height:4,flex:1,borderRadius:99,background:i<=step?accent:"rgba(255,255,255,0.1)",transition:"background .3s"}}/>)}
         </div>
         {step===0?(
           <div style={{textAlign:"center",marginBottom:16}}>
@@ -547,8 +546,6 @@ function MainApp({user,userName,onLogout}:{user:SBUser;userName:string;onLogout:
   const [themeKey,setThemeKey]=useState<ThemeKey>("premium");
   const T=THEMES[themeKey];
   const { plan, isBeta, isPremium, hasFullAccess, setPlan } = usePlan(user.id);
-  const [lang, setLang] = useState<Lang>("pt");
-  const i = t[lang];
   const [showPricing, setShowPricing] = useState(false);
   const [showTour,setShowTour]=useState(false);
   const [expenses,setExpenses]=useState<Expense[]>([]);
@@ -657,7 +654,7 @@ function MainApp({user,userName,onLogout}:{user:SBUser;userName:string;onLogout:
   const maxCat=Math.max(...byCat.map(c=>c.total),1);
   const maxInc=Math.max(...byIncCat.map(c=>c.total),1);
   const revArr:number[]=monthlyRev[world]?.[revYear]||new Array(12).fill(0);
-  const maxBar=Math.max(...revArr,...MONTHS.map((_,idx)=>expenses.filter(e=>e.world===world&&new Date(e.data).getMonth()===i&&String(new Date(e.data).getFullYear())===revYear).reduce((s,e)=>s+Number(e.valor),0)),1);
+  const maxBar=Math.max(...revArr,...MONTHS.map((_,i)=>expenses.filter(e=>e.world===world&&new Date(e.data).getMonth()===i&&String(new Date(e.data).getFullYear())===revYear).reduce((s,e)=>s+Number(e.valor),0)),1);
   const overBudget=(Object.entries(budgetTargets) as [TypeKey,number][]).filter(([type,target])=>(byType[type]||0)>totalInc*(target/100)&&totalInc>0);
   const totalSaldo=accounts.reduce((s,a)=>s+Number(a.saldo),0);
   const dueRecurring=recurring.filter(r=>r.world===world&&r.ativa&&r.proxima_data<=today).length;
@@ -757,7 +754,7 @@ async function handleCoupleSettlement(valor: number) {
         onSettings={() => { setLeftNavOpen(false); setSidebarOpen(true); }}
       />
 
-     {/* SIDEBAR (existing right ⚙️ panel — unchanged) */}
+      {/* SIDEBAR (existing right ⚙️ panel — unchanged) */}
       {sidebarOpen&&<div onClick={()=>setSidebarOpen(false)} style={{position:"fixed",inset:0,background:"rgba(0,0,0,0.6)",zIndex:40}}/>}
       <div style={{position:"fixed",top:0,right:0,bottom:0,width:300,background:"#0f1117",borderLeft:`1px solid ${T.cardBorder}`,zIndex:50,transform:sidebarOpen?"translateX(0)":"translateX(100%)",transition:"transform .3s ease",display:"flex",flexDirection:"column" as const,fontFamily:"'Sora',sans-serif"}}>
         <div style={{padding:"18px 20px 0",borderBottom:`1px solid ${T.cardBorder}`,flexShrink:0}}>
@@ -766,9 +763,9 @@ async function handleCoupleSettlement(valor: number) {
             <button onClick={()=>setSidebarOpen(false)} style={{background:"none",border:"none",color:"#64748b",fontSize:20,cursor:"pointer",padding:4}}>✕</button>
           </div>
           <div style={{display:"flex",gap:2}}>
-            {(["contas","categorias","config"] as const).map(tab_=>(
-              <button key={tab_} onClick={()=>setSidebarTab(tab_)} style={{flex:1,padding:"7px 0",border:"none",borderRadius:"7px 7px 0 0",background:sidebarTab===tab_?"rgba(255,255,255,0.07)":"transparent",color:sidebarTab===tab_?T.accent:T.subtext,fontWeight:700,fontSize:11,cursor:"pointer",fontFamily:"'Sora',sans-serif",borderBottom:sidebarTab===tab_?`2px solid ${T.accent}`:"2px solid transparent"}}>
-                {tab_==="contas"?"🏦":tab_==="categorias"?"🏷️":"⚙️"}
+            {(["contas","categorias","config"] as const).map(t=>(
+              <button key={t} onClick={()=>setSidebarTab(t)} style={{flex:1,padding:"7px 0",border:"none",borderRadius:"7px 7px 0 0",background:sidebarTab===t?"rgba(255,255,255,0.07)":"transparent",color:sidebarTab===t?T.accent:T.subtext,fontWeight:700,fontSize:11,cursor:"pointer",fontFamily:"'Sora',sans-serif",borderBottom:sidebarTab===t?`2px solid ${T.accent}`:"2px solid transparent"}}>
+                {t==="contas"?"🏦":t==="categorias"?"🏷️":"⚙️"}
               </button>
             ))}
           </div>
@@ -815,7 +812,7 @@ async function handleCoupleSettlement(valor: number) {
                 )}
               </div>
             );})}
-            {transfers.length>0&&(<div style={{marginTop:8,marginBottom:14}}><div style={{fontSize:10,fontWeight:700,color:T.subtext,textTransform:"uppercase" as const,letterSpacing:"0.08em",marginBottom:10}}>Últimas transferências</div>{transfers.slice(0,5).map(tr=>{const from=accounts.find(a=>a.id===tr.from_account_id),to=accounts.find(a=>a.id===tr.to_account_id);return(<div key={tr.id} style={{display:"flex",alignItems:"center",gap:8,padding:"8px 0",borderBottom:`1px solid ${T.cardBorder}`}}><span style={{fontSize:14}}>🔄</span><div style={{flex:1,minWidth:0}}><div style={{fontSize:12,color:"#e2e8f0",whiteSpace:"nowrap",overflow:"hidden",textOverflow:"ellipsis"}}>{tr.descricao}</div><div style={{fontSize:10,color:T.subtext}}>{from?.nome||"?"} → {to?.nome||"?"}</div></div><span style={{fontSize:12,fontWeight:700,color:T.accent2}}>{fmt(Number(tr.valor))}</span></div>);})}</div>)}
+            {transfers.length>0&&(<div style={{marginTop:8,marginBottom:14}}><div style={{fontSize:10,fontWeight:700,color:T.subtext,textTransform:"uppercase" as const,letterSpacing:"0.08em",marginBottom:10}}>Últimas transferências</div>{transfers.slice(0,5).map(t=>{const from=accounts.find(a=>a.id===t.from_account_id),to=accounts.find(a=>a.id===t.to_account_id);return(<div key={t.id} style={{display:"flex",alignItems:"center",gap:8,padding:"8px 0",borderBottom:`1px solid ${T.cardBorder}`}}><span style={{fontSize:14}}>🔄</span><div style={{flex:1,minWidth:0}}><div style={{fontSize:12,color:"#e2e8f0",whiteSpace:"nowrap",overflow:"hidden",textOverflow:"ellipsis"}}>{t.descricao}</div><div style={{fontSize:10,color:T.subtext}}>{from?.nome||"?"} → {to?.nome||"?"}</div></div><span style={{fontSize:12,fontWeight:700,color:T.accent2}}>{fmt(Number(t.valor))}</span></div>);})}</div>)}
             <div style={{background:T.cardBg,border:`1px dashed ${T.cardBorder}`,borderRadius:12,padding:"14px",marginTop:8}}>
               <div style={{fontSize:11,fontWeight:700,color:T.subtext,textTransform:"uppercase" as const,marginBottom:10}}>+ Nova conta</div>
               <input style={{...sInp,marginBottom:8}} placeholder="Nome da conta" value={newAccName} onChange={e=>setNewAccName(e.target.value)}/>
@@ -846,38 +843,30 @@ async function handleCoupleSettlement(valor: number) {
             </div>
           </>}
           {sidebarTab==="config"&&<>
-  <div style={{marginBottom:24}}>
-    <div style={{fontSize:11,fontWeight:700,color:T.accent,textTransform:"uppercase" as const,letterSpacing:"0.08em",marginBottom:12}}>🎨 {i.theme}</div>
-    <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:8}}>
-      {(Object.entries(THEMES) as [ThemeKey,AppTheme][]).map(([key,theme])=>{const active=themeKey===key;return(<button key={key} onClick={()=>changeTheme(key)} style={{padding:"12px 8px",background:active?`${theme.accent}20`:"rgba(255,255,255,0.04)",border:`1.5px solid ${active?theme.accent:"rgba(255,255,255,0.08)"}`,borderRadius:12,cursor:"pointer",fontFamily:"'Sora',sans-serif",textAlign:"center" as const,transition:"all .2s"}}><div style={{fontSize:20,marginBottom:4}}>{theme.emoji}</div><div style={{fontSize:12,fontWeight:700,color:active?theme.accent:"#94a3b8"}}>{theme.name}</div><div style={{display:"flex",justifyContent:"center",gap:3,marginTop:6}}>{[theme.accent,theme.accent2,theme.positive].map((c,idx)=><div key={idx} style={{width:10,height:10,borderRadius:"50%",background:c}}/>)}</div>{active&&<div style={{fontSize:9,color:theme.accent,marginTop:4,fontWeight:700}}>{i.active}</div>}</button>);})}
-    </div>
-  </div>
-  <div style={{marginBottom:24}}>
-    <div style={{fontSize:11,fontWeight:700,color:T.accent,textTransform:"uppercase" as const,letterSpacing:"0.08em",marginBottom:12}}>🌐 Idioma / Language</div>
-    <div style={{display:"flex",background:"rgba(255,255,255,0.05)",borderRadius:12,padding:4}}>
-      {(["pt","en"] as Lang[]).map(l=>(
-        <button key={l} onClick={()=>setLang(l)} style={{flex:1,padding:"9px 0",border:"none",borderRadius:9,background:lang===l?`${T.accent}20`:"transparent",color:lang===l?T.accent:"#475569",fontWeight:700,fontSize:13,cursor:"pointer",fontFamily:"'Sora',sans-serif"}}>
-          {l==="pt"?"🇵🇹 PT":"🇬🇧 EN"}
-        </button>
-      ))}
-    </div>
-  </div>
-  <div style={{marginBottom:24}}>
-    <div style={{fontSize:11,fontWeight:700,color:T.accent,textTransform:"uppercase" as const,letterSpacing:"0.08em",marginBottom:12}}>{i.budgetGoals}</div>
-    {(Object.entries(TYPE_META) as [TypeKey,typeof TYPE_META[TypeKey]][]).map(([type,meta])=>(<div key={type} style={{marginBottom:12}}><div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:5}}><span style={{fontSize:13,color:meta.color}}>{meta.icon} {meta.label}</span><span style={{fontSize:13,fontWeight:700,color:meta.color}}>{budgetTargets[type]}%</span></div><input type="range" min={0} max={100} value={budgetTargets[type]} onChange={e=>updateBudget({...budgetTargets,[type]:Number(e.target.value)})} style={{width:"100%",accentColor:meta.color}}/></div>))}
-    <div style={{textAlign:"center" as const,fontSize:12,fontWeight:700,padding:"8px 12px",borderRadius:8,background:(budgetTargets.necessidade+budgetTargets.desejo+budgetTargets.investimento)===100?"#064e3b33":"#450a0a",color:(budgetTargets.necessidade+budgetTargets.desejo+budgetTargets.investimento)===100?T.positive:"#f87171",marginTop:4}}>
-      Total: {budgetTargets.necessidade+budgetTargets.desejo+budgetTargets.investimento}% {(budgetTargets.necessidade+budgetTargets.desejo+budgetTargets.investimento)===100?i.correct:`⚠️ ${i.totalMustBe100}`}
-    </div>
-    <button onClick={()=>updateBudget(DEFAULT_BUDGET)} style={{width:"100%",marginTop:8,padding:"7px 0",background:"rgba(255,255,255,0.05)",border:"1px solid rgba(255,255,255,0.1)",borderRadius:8,color:"#94a3b8",fontSize:11,fontWeight:600,cursor:"pointer",fontFamily:"'Sora',sans-serif"}}>{i.resetSuggestion}</button>
-  </div>
-  <div style={{borderTop:`1px solid ${T.cardBorder}`,paddingTop:16,display:"flex",flexDirection:"column" as const,gap:8}}>
-    <button onClick={()=>setShowPricing(true)} style={{width:"100%",padding:"10px 0",background:`${T.accent}12`,border:`1px solid ${T.accent}30`,borderRadius:9,color:T.accent,fontSize:13,fontWeight:700,cursor:"pointer",fontFamily:"'Sora',sans-serif",marginBottom:8}}>
-      💎 {isPremium?i.premiumPlan:hasFullAccess?i.coupleAccess:i.upgradePlan}
-    </button>
-    <button onClick={()=>setShowTour(true)} style={{width:"100%",padding:"9px 0",background:`${T.accent}12`,border:`1px solid ${T.accent}30`,borderRadius:9,color:T.accent,fontSize:12,fontWeight:700,cursor:"pointer",fontFamily:"'Sora',sans-serif"}}>{i.seeTourAgain}</button>
-    <button onClick={onLogout} style={{width:"100%",padding:"10px 0",background:"rgba(239,68,68,0.08)",border:"1px solid rgba(239,68,68,0.2)",borderRadius:9,color:"#f87171",fontSize:13,fontWeight:700,cursor:"pointer",fontFamily:"'Sora',sans-serif"}}>{i.logout}</button>
-  </div>
-</>}
+            <div style={{marginBottom:24}}>
+              <div style={{fontSize:11,fontWeight:700,color:T.accent,textTransform:"uppercase" as const,letterSpacing:"0.08em",marginBottom:12}}>🎨 Tema</div>
+              <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:8}}>
+                {(Object.entries(THEMES) as [ThemeKey,AppTheme][]).map(([key,theme])=>{const active=themeKey===key;return(<button key={key} onClick={()=>changeTheme(key)} style={{padding:"12px 8px",background:active?`${theme.accent}20`:"rgba(255,255,255,0.04)",border:`1.5px solid ${active?theme.accent:"rgba(255,255,255,0.08)"}`,borderRadius:12,cursor:"pointer",fontFamily:"'Sora',sans-serif",textAlign:"center" as const,transition:"all .2s"}}><div style={{fontSize:20,marginBottom:4}}>{theme.emoji}</div><div style={{fontSize:12,fontWeight:700,color:active?theme.accent:"#94a3b8"}}>{theme.name}</div><div style={{display:"flex",justifyContent:"center",gap:3,marginTop:6}}>{[theme.accent,theme.accent2,theme.positive].map((c,i)=><div key={i} style={{width:10,height:10,borderRadius:"50%",background:c}}/>)}</div>{active&&<div style={{fontSize:9,color:theme.accent,marginTop:4,fontWeight:700}}>✓ Ativo</div>}</button>);})}
+              </div>
+            </div>
+            <div style={{marginBottom:24}}>
+              <div style={{fontSize:11,fontWeight:700,color:T.accent,textTransform:"uppercase" as const,letterSpacing:"0.08em",marginBottom:12}}>Metas orçamentais</div>
+              {(Object.entries(TYPE_META) as [TypeKey,typeof TYPE_META[TypeKey]][]).map(([type,meta])=>(<div key={type} style={{marginBottom:12}}><div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:5}}><span style={{fontSize:13,color:meta.color}}>{meta.icon} {meta.label}</span><span style={{fontSize:13,fontWeight:700,color:meta.color}}>{budgetTargets[type]}%</span></div><input type="range" min={0} max={100} value={budgetTargets[type]} onChange={e=>updateBudget({...budgetTargets,[type]:Number(e.target.value)})} style={{width:"100%",accentColor:meta.color}}/></div>))}
+              <div style={{textAlign:"center" as const,fontSize:12,fontWeight:700,padding:"8px 12px",borderRadius:8,background:(budgetTargets.necessidade+budgetTargets.desejo+budgetTargets.investimento)===100?"#064e3b33":"#450a0a",color:(budgetTargets.necessidade+budgetTargets.desejo+budgetTargets.investimento)===100?T.positive:"#f87171",marginTop:4}}>
+                Total: {budgetTargets.necessidade+budgetTargets.desejo+budgetTargets.investimento}% {(budgetTargets.necessidade+budgetTargets.desejo+budgetTargets.investimento)===100?"✓ Correto":"⚠️ Deve ser 100%"}
+              </div>
+              <button onClick={()=>updateBudget(DEFAULT_BUDGET)} style={{width:"100%",marginTop:8,padding:"7px 0",background:"rgba(255,255,255,0.05)",border:"1px solid rgba(255,255,255,0.1)",borderRadius:8,color:"#94a3b8",fontSize:11,fontWeight:600,cursor:"pointer",fontFamily:"'Sora',sans-serif"}}>Repor sugestão (75/10/15)</button>
+            </div>
+            <div style={{borderTop:`1px solid ${T.cardBorder}`,paddingTop:16,display:"flex",flexDirection:"column" as const,gap:8}}>
+              <button onClick={()=>setShowPricing(true)} style={{width:"100%",padding:"10px 0",background:`${T.accent}12`,border:`1px solid ${T.accent}30`,borderRadius:9,color:T.accent,fontSize:13,fontWeight:700,cursor:"pointer",fontFamily:"'Sora',sans-serif",marginBottom:8}}>
+  💎 {isPremium?"Plano Premium ✓":hasFullAccess?"Acesso via casal ✓":"Fazer upgrade"}
+</button>
+              <button onClick={()=>setShowTour(true)} style={{width:"100%",padding:"9px 0",background:`${T.accent}12`,border:`1px solid ${T.accent}30`,borderRadius:9,color:T.accent,fontSize:12,fontWeight:700,cursor:"pointer",fontFamily:"'Sora',sans-serif"}}>🎓 Ver tour novamente</button>
+              <button onClick={onLogout} style={{width:"100%",padding:"10px 0",background:"rgba(239,68,68,0.08)",border:"1px solid rgba(239,68,68,0.2)",borderRadius:9,color:"#f87171",fontSize:13,fontWeight:700,cursor:"pointer",fontFamily:"'Sora',sans-serif"}}>Terminar sessão</button>
+            </div>
+          </>}
+        </div>
+      </div>
 
 {/* HEADER */}
 <div style={{padding:"12px 16px 0",position:"relative",zIndex:1,display:"flex",alignItems:"center",justifyContent:"space-between"}}>
