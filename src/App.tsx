@@ -1283,6 +1283,7 @@ async function handleCoupleSettlement(valor: number) {
             expenses={expenses} incomes={incomes} expCats={expCats} world={world}
             accent={T.accent} cardBg={T.cardBg} cardBorder={T.cardBorder}
             subtext={T.subtext} positive={T.positive} negative={T.negative}
+            lang={lang}
           />
         )}
 
