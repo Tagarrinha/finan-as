@@ -665,6 +665,7 @@ const jointBalance = totalContributions - totalSettledExpenses;
     negative={negative}
     items={recurringItems}
     setItems={setRecurringItems}
+    lang={lang}
     onApplyDue={async (r) => {
       const total = Number(r.valor);
       const s1 = total / 2;
