@@ -327,7 +327,7 @@ function Tour({userName,accent,onFinish}:{userName:string;accent:string;onFinish
       <div style={{position:"fixed",inset:0,background:"rgba(0,0,0,0.75)",zIndex:100,pointerEvents:"none"}}/>
       <div style={{position:"fixed",zIndex:101,left:"50%",transform:"translateX(-50%)",bottom:cur.anchor==="top"?"auto":80,top:cur.anchor==="top"?140:"auto",width:"calc(100% - 40px)",maxWidth:360,background:"#13141f",border:`1px solid ${accent}50`,borderRadius:20,padding:"22px 22px 18px",boxShadow:`0 8px 40px rgba(0,0,0,0.6)`,fontFamily:"'Sora',sans-serif"}}>
         <div style={{display:"flex",gap:5,marginBottom:16}}>
-          {TOUR_STEPS.map((_,i)=><div key={i} style={{height:4,flex:1,borderRadius:99,background:i<=step?accent:"rgba(255,255,255,0.1)",transition:"background .3s"}}/>)}
+          {TOUR_STEPS.map((_,idx)=><div key={i} style={{height:4,flex:1,borderRadius:99,background:i<=step?accent:"rgba(255,255,255,0.1)",transition:"background .3s"}}/>)}
         </div>
         {step===0?(
           <div style={{textAlign:"center",marginBottom:16}}>
@@ -657,7 +657,7 @@ function MainApp({user,userName,onLogout}:{user:SBUser;userName:string;onLogout:
   const maxCat=Math.max(...byCat.map(c=>c.total),1);
   const maxInc=Math.max(...byIncCat.map(c=>c.total),1);
   const revArr:number[]=monthlyRev[world]?.[revYear]||new Array(12).fill(0);
-  const maxBar=Math.max(...revArr,...MONTHS.map((_,i)=>expenses.filter(e=>e.world===world&&new Date(e.data).getMonth()===i&&String(new Date(e.data).getFullYear())===revYear).reduce((s,e)=>s+Number(e.valor),0)),1);
+  const maxBar=Math.max(...revArr,...MONTHS.map((_,idx)=>expenses.filter(e=>e.world===world&&new Date(e.data).getMonth()===i&&String(new Date(e.data).getFullYear())===revYear).reduce((s,e)=>s+Number(e.valor),0)),1);
   const overBudget=(Object.entries(budgetTargets) as [TypeKey,number][]).filter(([type,target])=>(byType[type]||0)>totalInc*(target/100)&&totalInc>0);
   const totalSaldo=accounts.reduce((s,a)=>s+Number(a.saldo),0);
   const dueRecurring=recurring.filter(r=>r.world===world&&r.ativa&&r.proxima_data<=today).length;
@@ -849,7 +849,7 @@ async function handleCoupleSettlement(valor: number) {
   <div style={{marginBottom:24}}>
     <div style={{fontSize:11,fontWeight:700,color:T.accent,textTransform:"uppercase" as const,letterSpacing:"0.08em",marginBottom:12}}>🎨 {i.theme}</div>
     <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:8}}>
-      {(Object.entries(THEMES) as [ThemeKey,AppTheme][]).map(([key,theme])=>{const active=themeKey===key;return(<button key={key} onClick={()=>changeTheme(key)} style={{padding:"12px 8px",background:active?`${theme.accent}20`:"rgba(255,255,255,0.04)",border:`1.5px solid ${active?theme.accent:"rgba(255,255,255,0.08)"}`,borderRadius:12,cursor:"pointer",fontFamily:"'Sora',sans-serif",textAlign:"center" as const,transition:"all .2s"}}><div style={{fontSize:20,marginBottom:4}}>{theme.emoji}</div><div style={{fontSize:12,fontWeight:700,color:active?theme.accent:"#94a3b8"}}>{theme.name}</div><div style={{display:"flex",justifyContent:"center",gap:3,marginTop:6}}>{[theme.accent,theme.accent2,theme.positive].map((c,i)=><div key={i} style={{width:10,height:10,borderRadius:"50%",background:c}}/>)}</div>{active&&<div style={{fontSize:9,color:theme.accent,marginTop:4,fontWeight:700}}>{i.active}</div>}</button>);})}
+      {(Object.entries(THEMES) as [ThemeKey,AppTheme][]).map(([key,theme])=>{const active=themeKey===key;return(<button key={key} onClick={()=>changeTheme(key)} style={{padding:"12px 8px",background:active?`${theme.accent}20`:"rgba(255,255,255,0.04)",border:`1.5px solid ${active?theme.accent:"rgba(255,255,255,0.08)"}`,borderRadius:12,cursor:"pointer",fontFamily:"'Sora',sans-serif",textAlign:"center" as const,transition:"all .2s"}}><div style={{fontSize:20,marginBottom:4}}>{theme.emoji}</div><div style={{fontSize:12,fontWeight:700,color:active?theme.accent:"#94a3b8"}}>{theme.name}</div><div style={{display:"flex",justifyContent:"center",gap:3,marginTop:6}}>{[theme.accent,theme.accent2,theme.positive].map((c,idx)=><div key={i} style={{width:10,height:10,borderRadius:"50%",background:c}}/>)}</div>{active&&<div style={{fontSize:9,color:theme.accent,marginTop:4,fontWeight:700}}>{i.active}</div>}</button>);})}
     </div>
   </div>
   <div style={{marginBottom:24}}>
