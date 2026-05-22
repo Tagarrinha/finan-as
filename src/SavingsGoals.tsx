@@ -13,13 +13,15 @@ interface Props {
   positive: string; negative: string;
   goals: SavingsGoal[]; setGoals: (v: SavingsGoal[]) => void;
   monthlyIncome: number; // ← NOVO
+  maxGoals?: number;
+  onUpgrade?: () => void;
 }
 
 const fmt = (n: number) => new Intl.NumberFormat("pt-PT", { style: "currency", currency: "EUR" }).format(n || 0);
 const CORES = ["#f97316","#3b82f6","#8b5cf6","#10b981","#f59e0b","#ec4899","#06b6d4","#ef4444"];
 const EMPTY_FORM = { descricao:"", emoji:"🎯", meta:"", prazo:"", cor:"#f97316" };
 
-export default function SavingsGoals({ userId, accent, accentDark, cardBg, cardBorder, subtext, positive, negative, goals, setGoals, monthlyIncome }: Props) { // ← monthlyIncome adicionado
+export default function SavingsGoals({ userId, accent, accentDark, cardBg, cardBorder, subtext, positive, negative, goals, setGoals, monthlyIncome, maxGoals, onUpgrade }: Props) { // ← monthlyIncome adicionado
   const today = new Date().toISOString().slice(0,10);
   const [showForm,     setShowForm]     = useState(false);
   const [editingId,    setEditingId]    = useState<number|null>(null);
@@ -108,7 +110,10 @@ export default function SavingsGoals({ userId, accent, accentDark, cardBg, cardB
       )}
 
       {/* Add/Edit button */}
-      <button onClick={()=>{if(showForm&&!editingId){resetForm();}else{setEditingId(null);setForm(EMPTY_FORM);setShowForm(true);}}} style={{width:"100%",marginBottom:14,padding:"11px 0",background:showForm?`${accent}18`:`linear-gradient(135deg,${accent},${accentDark})`,border:showForm?`1px solid ${accent}40`:"none",borderRadius:10,color:showForm?accent:"#fff",fontWeight:700,fontSize:13,cursor:"pointer",fontFamily:"'Sora',sans-serif",transition:"all .2s"}}>
+      <button onClick={()=>{
+  if(!showForm&&maxGoals&&goals.length>=maxGoals){onUpgrade?.();return;}
+  if(showForm&&!editingId){resetForm();}else{setEditingId(null);setForm(EMPTY_FORM);setShowForm(true);}
+}} style={{width:"100%",marginBottom:14,padding:"11px 0",background:showForm?`${accent}18`:`linear-gradient(135deg,${accent},${accentDark})`,border:showForm?`1px solid ${accent}40`:"none",borderRadius:10,color:showForm?accent:"#fff",fontWeight:700,fontSize:13,cursor:"pointer",fontFamily:"'Sora',sans-serif",transition:"all .2s"}}>
         {showForm?(editingId?"✕ Cancelar edição":"✕ Cancelar"):"+ Novo objetivo de poupança"}
       </button>
 

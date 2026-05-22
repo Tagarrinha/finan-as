@@ -878,7 +878,7 @@ async function handleCoupleSettlement(valor: number) {
   >
     ☰
   </button>
- <button onClick={()=>setHideValues(v=>!v)} style={{background:"rgba(255,255,255,0.05)",border:"1px solid rgba(255,255,255,0.1)",borderRadius:99,padding:"7px 10px",cursor:"pointer",display:"flex",alignItems:"center",justifyContent:"center"}}>
+ <button onClick={()=>setHideValues(v=>!v)} style={{background:"rgba(255,255,255,0.05)",border:"1px solid rgba(255,255,255,0.1)",borderRadius:99,padding:"7px 10px",cursor:"pointer",display:"flex",alignItems:"center",justifyContent:"center",width:38,height:38}}>
   {hideValues?(
     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.5)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
       <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94"/>
@@ -1200,12 +1200,21 @@ async function handleCoupleSettlement(valor: number) {
 
         {/* RECORRENTES */}
         {tab==="recorrentes"&&(
+          plan==="free" ? (
+            <div style={{textAlign:"center",padding:"60px 24px",fontFamily:"'Sora',sans-serif"}}>
+              <div style={{fontSize:48,marginBottom:16}}>🔄</div>
+              <div style={{fontSize:20,fontWeight:800,color:"#f1f5f9",marginBottom:8}}>Despesas recorrentes</div>
+              <div style={{fontSize:14,color:"#667085",marginBottom:28,lineHeight:1.7}}>Regista despesas fixas uma vez e a app avisa quando vencer.<br/>Disponível no plano Individual.</div>
+              <button onClick={()=>setShowPricing(true)} style={{padding:"14px 32px",background:"linear-gradient(135deg,#5DA9FF,#8B6DFF)",border:"none",borderRadius:12,color:"white",fontWeight:700,fontSize:15,cursor:"pointer",fontFamily:"'Sora',sans-serif",boxShadow:"0 4px 20px rgba(93,169,255,0.3)"}}>Ver planos →</button>
+            </div>
+          ) : (
           <RecurringExpenses
             userId={user.id} world={world} expCats={expCats}
             accent={T.accent} accentDark={T.accentDark} cardBg={T.cardBg}
             cardBorder={T.cardBorder} subtext={T.subtext} positive={T.positive} negative={T.negative}
             recurring={recurring} setRecurring={setRecurring} onApplyDue={applyRecurring}
           />
+          )
         )}
 
         {/* OBJETIVOS */}
@@ -1216,6 +1225,8 @@ async function handleCoupleSettlement(valor: number) {
             positive={T.positive} negative={T.negative}
             goals={goals} setGoals={setGoals}
             monthlyIncome={totalInc}
+            maxGoals={plan==="free"?1:undefined}
+            onUpgrade={()=>setShowPricing(true)}
           />
         )}
 
@@ -1242,6 +1253,14 @@ async function handleCoupleSettlement(valor: number) {
         )}
         {/* EXPORTAR */}
         {tab==="exportar"&&(
+          plan==="free" ? (
+            <div style={{textAlign:"center",padding:"60px 24px",fontFamily:"'Sora',sans-serif"}}>
+              <div style={{fontSize:48,marginBottom:16}}>📤</div>
+              <div style={{fontSize:20,fontWeight:800,color:"#f1f5f9",marginBottom:8}}>Exportar dados</div>
+              <div style={{fontSize:14,color:"#667085",marginBottom:28,lineHeight:1.7}}>Exporta as tuas despesas e rendimentos em PDF ou Excel.<br/>Disponível no plano Premium.</div>
+              <button onClick={()=>setShowPricing(true)} style={{padding:"14px 32px",background:"linear-gradient(135deg,#5DA9FF,#8B6DFF)",border:"none",borderRadius:12,color:"white",fontWeight:700,fontSize:15,cursor:"pointer",fontFamily:"'Sora',sans-serif",boxShadow:"0 4px 20px rgba(93,169,255,0.3)"}}>Ver planos →</button>
+            </div>
+          ) : (
           <ExportData
             expenses={expenses} incomes={incomes} accounts={accounts}
             expCats={expCats} incCats={incCats} world={world}
@@ -1250,6 +1269,7 @@ async function handleCoupleSettlement(valor: number) {
             cardBg={T.cardBg} cardBorder={T.cardBorder} subtext={T.subtext}
             positive={T.positive} negative={T.negative}
           />
+          )
         )}
 
         {/* COMPARAÇÃO MENSAL */}
