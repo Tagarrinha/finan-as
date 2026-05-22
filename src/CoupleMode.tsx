@@ -1,7 +1,6 @@
 import { useState, useEffect, CSSProperties } from "react";
 import { supabase } from "./supabase";
 import CoupleRecurring, { CoupleRecurringExpense } from "./CoupleRecurring";
-import { t } from "./i18n";
 
 type TypeKey = "necessidade"|"desejo"|"investimento";
 interface ExpCat { id:string; label:string; icon:string; type:TypeKey; }
@@ -15,7 +14,6 @@ interface Props {
   expCats:ExpCat[]; accent:string; accentDark:string;
   cardBg:string; cardBorder:string; subtext:string; positive:string; negative:string;
   onSettlement: (valor: number) => void;
-  lang: "pt"|"en";
 }
 
 const fmt = (n:number) => new Intl.NumberFormat("pt-PT",{style:"currency",currency:"EUR"}).format(n||0);
@@ -27,7 +25,7 @@ const TYPE_META: Record<TypeKey,{label:string;color:string;bg:string}> = {
 const MY_COLOR      = "#f97316";
 const PARTNER_COLOR = "#ec4899";
 
-export default function CoupleMode({ userId, userEmail, userName, expCats, accent, accentDark, cardBg, cardBorder, subtext, positive, negative, onSettlement, lang }: Props) {
+export default function CoupleMode({ userId, userEmail, userName, expCats, accent, accentDark, cardBg, cardBorder, subtext, positive, negative, onSettlement }: Props) {
   const [couple,      setCouple]      = useState<Couple|null>(null);
   const [account,     setAccount]     = useState<CoupleAccount|null>(null);
   const [expenses,    setExpenses]    = useState<CoupleExpense[]>([]);
@@ -277,16 +275,16 @@ const jointBalance = totalContributions - totalSettledExpenses;
     <div style={{fontFamily:"'Sora',sans-serif"}}>
       <div style={{textAlign:"center",padding:"32px 0 24px"}}>
         <div style={{fontSize:48,marginBottom:12}}>👫</div>
-        <div style={{fontSize:18,fontWeight:800,color:"#f1f5f9",marginBottom:6}}>{t[lang].coupleTitle}</div>
-        <div style={{fontSize:13,color:subtext,lineHeight:1.6}}>{t[lang].coupleSubtitle.split("\n").map((l,i)=><span key={i}>{l}{i===0&&<br/>}</span>)}</div>
+        <div style={{fontSize:18,fontWeight:800,color:"#f1f5f9",marginBottom:6}}>Modo Casal</div>
+        <div style={{fontSize:13,color:subtext,lineHeight:1.6}}>Partilha despesas com o teu parceiro/a.<br/>Cada um usa a sua própria conta.</div>
       </div>
       <div style={{background:cardBg,border:`1px solid ${accent}30`,borderRadius:16,padding:"20px"}}>
-        <div style={{fontSize:11,fontWeight:700,color:accent,textTransform:"uppercase" as const,letterSpacing:"0.08em",marginBottom:14}}>{t[lang].coupleInviteTitle}</div>
-        <div style={{fontSize:13,color:subtext,marginBottom:12,lineHeight:1.5}}>{t[lang].coupleInviteDesc}</div>
+        <div style={{fontSize:11,fontWeight:700,color:accent,textTransform:"uppercase" as const,letterSpacing:"0.08em",marginBottom:14}}>Convidar parceiro/a</div>
+        <div style={{fontSize:13,color:subtext,marginBottom:12,lineHeight:1.5}}>Introduz o email com que o teu parceiro/a se registou na app.</div>
         <input style={{...inp,marginBottom:10}} type="email" placeholder="email@exemplo.com" value={inviteEmail} onChange={e=>setInviteEmail(e.target.value)} onKeyDown={e=>e.key==="Enter"&&sendInvite()}/>
         {inviteErr&&<div style={{fontSize:12,color:"#f87171",marginBottom:10}}>⚠️ {inviteErr}</div>}
         <button onClick={sendInvite} disabled={inviting} style={{width:"100%",padding:"12px 0",background:`linear-gradient(135deg,${accent},${accentDark})`,border:"none",borderRadius:9,color:"#fff",fontWeight:700,fontSize:14,cursor:inviting?"not-allowed":"pointer",fontFamily:"'Sora',sans-serif",opacity:inviting?0.7:1}}>
-          {inviting?t[lang].coupleInviteSending:t[lang].coupleInviteSend}
+          {inviting?"A enviar convite...":"Enviar convite →"}
         </button>
       </div>
       <div style={{background:"rgba(255,255,255,0.03)",border:`1px solid ${cardBorder}`,borderRadius:12,padding:"14px 16px",marginTop:12}}>
@@ -314,18 +312,18 @@ const jointBalance = totalContributions - totalSettledExpenses;
         {isSender?(
           <div style={{background:"rgba(245,158,11,0.08)",border:"1px solid rgba(245,158,11,0.3)",borderRadius:16,padding:"24px",textAlign:"center" as const}}>
             <div style={{fontSize:36,marginBottom:12}}>⏳</div>
-            <div style={{fontSize:16,fontWeight:800,color:"#f1f5f9",marginBottom:8}}>{t[lang].couplePending}</div>
+            <div style={{fontSize:16,fontWeight:800,color:"#f1f5f9",marginBottom:8}}>Convite enviado!</div>
             <div style={{fontSize:13,color:subtext,marginBottom:16,lineHeight:1.6}}>Aguarda que <strong style={{color:"#f59e0b"}}>{couple.user2_email}</strong> abra o tab 👫 Casal na app para aceitar.</div>
-            <button onClick={dissolveCouple} style={{padding:"9px 20px",background:"rgba(239,68,68,0.08)",border:"1px solid rgba(239,68,68,0.2)",borderRadius:9,color:"#f87171",fontSize:12,fontWeight:600,cursor:"pointer",fontFamily:"'Sora',sans-serif"}}>{t[lang].coupleCancelInvite}</button>
+            <button onClick={dissolveCouple} style={{padding:"9px 20px",background:"rgba(239,68,68,0.08)",border:"1px solid rgba(239,68,68,0.2)",borderRadius:9,color:"#f87171",fontSize:12,fontWeight:600,cursor:"pointer",fontFamily:"'Sora',sans-serif"}}>Cancelar convite</button>
           </div>
         ):(
           <div style={{background:`${accent}08`,border:`1px solid ${accent}30`,borderRadius:16,padding:"24px",textAlign:"center" as const}}>
             <div style={{fontSize:36,marginBottom:12}}>💌</div>
-            <div style={{fontSize:16,fontWeight:800,color:"#f1f5f9",marginBottom:8}}>{t[lang].coupleInviteReceived}</div>
-            <div style={{fontSize:13,color:subtext,marginBottom:20,lineHeight:1.6}}><strong style={{color:accent}}>{couple.user1_email}</strong> convidou-te para o {t[lang].coupleTitle}.</div>
+            <div style={{fontSize:16,fontWeight:800,color:"#f1f5f9",marginBottom:8}}>Tens um convite!</div>
+            <div style={{fontSize:13,color:subtext,marginBottom:20,lineHeight:1.6}}><strong style={{color:accent}}>{couple.user1_email}</strong> convidou-te para o Modo Casal.</div>
             <div style={{display:"flex",gap:10}}>
-              <button onClick={acceptInvite} style={{flex:1,padding:"12px 0",background:`linear-gradient(135deg,${accent},${accentDark})`,border:"none",borderRadius:9,color:"#fff",fontWeight:700,fontSize:14,cursor:"pointer",fontFamily:"'Sora',sans-serif"}}>{t[lang].coupleAcceptBtn}</button>
-              <button onClick={rejectInvite} style={{flex:1,padding:"12px 0",background:"rgba(239,68,68,0.08)",border:"1px solid rgba(239,68,68,0.2)",borderRadius:9,color:"#f87171",fontWeight:700,fontSize:14,cursor:"pointer",fontFamily:"'Sora',sans-serif"}}>{t[lang].coupleRejectBtn}</button>
+              <button onClick={acceptInvite} style={{flex:1,padding:"12px 0",background:`linear-gradient(135deg,${accent},${accentDark})`,border:"none",borderRadius:9,color:"#fff",fontWeight:700,fontSize:14,cursor:"pointer",fontFamily:"'Sora',sans-serif"}}>✓ Aceitar</button>
+              <button onClick={rejectInvite} style={{flex:1,padding:"12px 0",background:"rgba(239,68,68,0.08)",border:"1px solid rgba(239,68,68,0.2)",borderRadius:9,color:"#f87171",fontWeight:700,fontSize:14,cursor:"pointer",fontFamily:"'Sora',sans-serif"}}>✕ Rejeitar</button>
             </div>
           </div>
         )}
@@ -344,9 +342,9 @@ const jointBalance = totalContributions - totalSettledExpenses;
         </div>
         <div style={{flex:1}}>
           <div style={{fontSize:14,fontWeight:800,color:"#f1f5f9"}}>{userName} & {partnerName}</div>
-          <div style={{fontSize:11,color:subtext,marginTop:2}}>{partnerEmail} · {t[lang].coupleActive}</div>
+          <div style={{fontSize:11,color:subtext,marginTop:2}}>{partnerEmail} · modo casal ativo</div>
         </div>
-        <button onClick={dissolveCouple} style={{padding:"5px 10px",background:"rgba(239,68,68,0.08)",border:"1px solid rgba(239,68,68,0.15)",borderRadius:8,color:"#f87171",fontSize:10,fontWeight:600,cursor:"pointer",fontFamily:"'Sora',sans-serif"}}>{t[lang].coupleEnd}</button>
+        <button onClick={dissolveCouple} style={{padding:"5px 10px",background:"rgba(239,68,68,0.08)",border:"1px solid rgba(239,68,68,0.15)",borderRadius:8,color:"#f87171",fontSize:10,fontWeight:600,cursor:"pointer",fontFamily:"'Sora',sans-serif"}}>✕ Terminar</button>
       </div>
 
       {/* Sync message */}
@@ -371,9 +369,9 @@ const jointBalance = totalContributions - totalSettledExpenses;
 
       {/* ── CONTA ── */}
       {tab==="conta"&&<>
-{/* ── {t[lang].coupleJointBalance} hero ── */}
+{/* ── Saldo conjunto hero ── */}
 <div style={{background:"linear-gradient(135deg,rgba(0,195,122,0.08),rgba(124,58,237,0.06))",border:"1px solid rgba(0,195,122,0.2)",borderRadius:20,padding:"24px 20px",marginBottom:16}}>
-  <div style={{fontSize:10,fontWeight:700,color:subtext,textTransform:"uppercase" as const,letterSpacing:"0.12em",marginBottom:8}}>{t[lang].coupleJointBalance}</div>
+  <div style={{fontSize:10,fontWeight:700,color:subtext,textTransform:"uppercase" as const,letterSpacing:"0.12em",marginBottom:8}}>Saldo Conjunto</div>
   <div style={{display:"flex",justifyContent:"space-between",alignItems:"flex-start",marginBottom:8}}>
     <div style={{fontSize:36,fontWeight:800,color:jointBalance>=0?"#f1f5f9":"#ff7d7d",letterSpacing:"-1px",lineHeight:1}}>{fmt(jointBalance)}</div>
     <div style={{width:44,height:44,borderRadius:"50%",background:"rgba(0,195,122,0.15)",border:"1px solid rgba(0,195,122,0.3)",display:"flex",alignItems:"center",justifyContent:"center",fontSize:22}}>💚</div>
@@ -390,7 +388,7 @@ const jointBalance = totalContributions - totalSettledExpenses;
   {/* ── Contribuições ── */}
   {!editContrib?(
     <>
-      <div style={{fontSize:14,fontWeight:700,color:"#f1f5f9",marginBottom:12}}>{t[lang].coupleContributions}</div>
+      <div style={{fontSize:14,fontWeight:700,color:"#f1f5f9",marginBottom:12}}>Contribuições do mês</div>
       <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:10,marginBottom:14}}>
         {[
           {nome:userName,cor:MY_COLOR,contrib:isUser1?account?.contribuicao_user1:account?.contribuicao_user2,initials:userName.slice(0,2).toUpperCase()},
@@ -432,10 +430,10 @@ const jointBalance = totalContributions - totalSettledExpenses;
 
       <div style={{display:"flex",flexDirection:"column" as const,gap:10,marginBottom:14}}>
         <button onClick={()=>setTab("acerto")} style={{width:"100%",padding:"14px 0",background:"linear-gradient(135deg,#00c37a,#00a86b)",border:"none",borderRadius:14,color:"#fff",fontWeight:700,fontSize:14,cursor:"pointer",fontFamily:"'Sora',sans-serif",display:"flex",alignItems:"center",justifyContent:"center",gap:8}}>
-          {t[lang].coupleSettle}
+          ⇄ Acertar contas
         </button>
         <button onClick={()=>{setEditContrib(true);setMyContrib(String(isUser1?account?.contribuicao_user1||0:account?.contribuicao_user2||0));setPartnerContrib(String(isUser1?account?.contribuicao_user2||0:account?.contribuicao_user1||0));}} style={{width:"100%",padding:"13px 0",background:"rgba(255,255,255,0.05)",border:"1px solid rgba(255,255,255,0.1)",borderRadius:14,color:"#e2e8f0",fontWeight:600,fontSize:13,cursor:"pointer",fontFamily:"'Sora',sans-serif",display:"flex",alignItems:"center",justifyContent:"center",gap:8}}>
-          {t[lang].coupleEditContrib}
+          ✏️ Editar contribuições
         </button>
       </div>
     </>
@@ -459,8 +457,8 @@ const jointBalance = totalContributions - totalSettledExpenses;
           </div>
         )}
         <div style={{background:cardBg,border:`1px solid ${cardBorder}`,borderRadius:12,padding:"14px 16px"}}>
-          <div style={{fontSize:10,fontWeight:700,color:subtext,textTransform:"uppercase" as const,letterSpacing:"0.08em",marginBottom:12}}>{t[lang].coupleRecentSettled}</div>
-          {liquidadas.length===0?<div style={{textAlign:"center" as const,color:subtext,fontSize:13,padding:"12px 0"}}>{t[lang].coupleNoSettled}</div>
+          <div style={{fontSize:10,fontWeight:700,color:subtext,textTransform:"uppercase" as const,letterSpacing:"0.08em",marginBottom:12}}>Despesas liquidadas recentes</div>
+          {liquidadas.length===0?<div style={{textAlign:"center" as const,color:subtext,fontSize:13,padding:"12px 0"}}>Sem despesas liquidadas.</div>
           :liquidadas.slice(0,5).map(e=>{
             const cat=expCats.find(c=>c.id===e.cat);
             const myShare=isUser1?e.split_user1:e.split_user2;
@@ -484,7 +482,7 @@ const jointBalance = totalContributions - totalSettledExpenses;
   if(showForm){setShowForm(false);setEditingExpenseId(null);setForm(f=>({...f,descricao:"",valor:"",subcat:""}));}
   else setShowForm(true);
 }} style={{width:"100%",marginBottom:14,padding:"11px 0",background:showForm?`${accent}18`:`linear-gradient(135deg,${accent},${accentDark})`,border:showForm?`1px solid ${accent}40`:"none",borderRadius:10,color:showForm?accent:"#fff",fontWeight:700,fontSize:13,cursor:"pointer",fontFamily:"'Sora',sans-serif"}}>
-  {showForm?(editingExpenseId?"✕ Cancelar edição":"✕ Cancelar"):"{t[lang].coupleAddExpense}"}
+  {showForm?(editingExpenseId?"✕ Cancelar edição":"✕ Cancelar"):"+ Adicionar despesa conjunta"}
 </button>
         {showForm&&(
           <div style={{background:cardBg,border:`1px solid ${accent}30`,borderRadius:14,padding:"16px",marginBottom:14}}>
@@ -503,11 +501,11 @@ const jointBalance = totalContributions - totalSettledExpenses;
             </div>
             {/* Split */}
             <div style={{marginBottom:10}}>
-              <div style={{fontSize:10,color:subtext,marginBottom:8}}>{t[lang].coupleSplit}</div>
+              <div style={{fontSize:10,color:subtext,marginBottom:8}}>Divisão</div>
               <div style={{display:"flex",gap:6,marginBottom:form.split==="custom"?10:0}}>
                 {["50/50","custom"].map(s=>(
                   <button key={s} onClick={()=>setForm(f=>({...f,split:s}))} style={{flex:1,padding:"8px 0",border:`1px solid ${form.split===s?accent:"rgba(255,255,255,0.1)"}`,borderRadius:8,background:form.split===s?`${accent}20`:"transparent",color:form.split===s?accent:"#64748b",fontSize:12,fontWeight:700,cursor:"pointer",fontFamily:"'Sora',sans-serif"}}>
-                    {s==="50/50"?"⚖️ 50/50":"{t[lang].coupleSplitCustom}"}
+                    {s==="50/50"?"⚖️ 50/50":"✏️ Personalizado"}
                   </button>
                 ))}
               </div>
@@ -528,7 +526,7 @@ const jointBalance = totalContributions - totalSettledExpenses;
               </div>
             </div>
             {!form.liquidado&&<div style={{marginBottom:12}}>
-              <div style={{fontSize:10,color:subtext,marginBottom:8}}>{t[lang].coupleWhoPayd}</div>
+              <div style={{fontSize:10,color:subtext,marginBottom:8}}>Quem pagou?</div>
               <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:8}}>
                 <button onClick={()=>setForm(f=>({...f,pagoPor:"me"}))} style={{padding:"10px 8px",border:`1.5px solid ${form.pagoPor==="me"?MY_COLOR:"rgba(255,255,255,0.08)"}`,borderRadius:12,background:form.pagoPor==="me"?`${MY_COLOR}18`:"rgba(255,255,255,0.04)",color:form.pagoPor==="me"?MY_COLOR:"#64748b",fontWeight:700,fontSize:12,cursor:"pointer",fontFamily:"'Sora',sans-serif",textAlign:"center" as const}}>
                   <div style={{fontSize:18,marginBottom:4}}>👤</div>
@@ -542,7 +540,7 @@ const jointBalance = totalContributions - totalSettledExpenses;
             </div>}
             {/* Estado — Liquidado / Por liquidar */}
             <div style={{marginBottom:14}}>
-              <div style={{fontSize:10,color:subtext,marginBottom:8}}>{t[lang].couplePaymentStatus}</div>
+              <div style={{fontSize:10,color:subtext,marginBottom:8}}>Estado do pagamento</div>
               <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:8}}>
                 <button onClick={()=>setForm(f=>({...f,liquidado:true}))} style={{padding:"12px 8px",border:`1.5px solid ${form.liquidado?"#34d399":"rgba(255,255,255,0.08)"}`,borderRadius:12,background:form.liquidado?"rgba(52,211,153,0.12)":"rgba(255,255,255,0.04)",color:form.liquidado?"#34d399":"#64748b",fontWeight:700,fontSize:12,cursor:"pointer",fontFamily:"'Sora',sans-serif",textAlign:"center" as const}}>
                   <div style={{fontSize:20,marginBottom:4}}>✅</div>
@@ -557,7 +555,7 @@ const jointBalance = totalContributions - totalSettledExpenses;
               </div>
             </div>
             <button onClick={editingExpenseId ? updateExpense : addExpense} disabled={saving} style={{width:"100%",padding:"11px 0",background:`linear-gradient(135deg,${editingExpenseId?"#f59e0b":accent},${editingExpenseId?"#d97706":accentDark})`,border:"none",borderRadius:9,color:"#fff",fontWeight:700,fontSize:13,cursor:saving?"not-allowed":"pointer",fontFamily:"'Sora',sans-serif",opacity:saving?0.7:1}}>
-  {saving?"{t[lang].coupleSaving}":(editingExpenseId?"✓ Guardar alterações":"+ Adicionar despesa")}
+  {saving?"A guardar...":(editingExpenseId?"✓ Guardar alterações":"+ Adicionar despesa")}
 </button>
           </div>
         )}
@@ -566,13 +564,12 @@ const jointBalance = totalContributions - totalSettledExpenses;
         {expenses.length===0&&!showForm&&(
           <div style={{textAlign:"center" as const,padding:"32px 0",color:subtext}}>
             <div style={{fontSize:32,marginBottom:10}}>💳</div>
-            <div style={{fontSize:14,fontWeight:700,color:"#e2e8f0",marginBottom:4}}>{t[lang].coupleNoExpenses}</div>
+            <div style={{fontSize:14,fontWeight:700,color:"#e2e8f0",marginBottom:4}}>Sem despesas conjuntas</div>
           </div>
         )}
         {porLiquidar.length>0&&(
           <>
-            <div style={{fontSize:11,fontWeight:700,color:"#f59e0b",textTransform:"uppercase" as const,letterSpacing:"0.08em",marginBottom:8}}>{t[lang].couplePendingLabel}
-</div>
+            <div style={{fontSize:11,fontWeight:700,color:"#f59e0b",textTransform:"uppercase" as const,letterSpacing:"0.08em",marginBottom:8}}>⏳ Por liquidar</div>
             {porLiquidar.map(e=>{
               const cat=expCats.find(c=>c.id===e.cat);
               const myShare=isUser1?e.split_user1:e.split_user2;
@@ -606,7 +603,7 @@ const jointBalance = totalContributions - totalSettledExpenses;
                     );
                   })()}
                   <div style={{display:"flex",gap:8}}>
-  <button onClick={()=>marcarLiquidado(e)} style={{flex:1,padding:"8px 0",background:"rgba(52,211,153,0.15)",border:"1px solid rgba(52,211,153,0.3)",borderRadius:9,color:"#34d399",fontSize:12,fontWeight:700,cursor:"pointer",fontFamily:"'Sora',sans-serif"}}>{t[lang].coupleMarkSettled}</button>
+  <button onClick={()=>marcarLiquidado(e)} style={{flex:1,padding:"8px 0",background:"rgba(52,211,153,0.15)",border:"1px solid rgba(52,211,153,0.3)",borderRadius:9,color:"#34d399",fontSize:12,fontWeight:700,cursor:"pointer",fontFamily:"'Sora',sans-serif"}}>✓ Marcar como liquidado</button>
   <button onClick={()=>openEditExpense(e)} style={{padding:"8px 12px",background:"rgba(245,158,11,0.08)",border:"1px solid rgba(245,158,11,0.2)",borderRadius:9,color:"#f59e0b",fontSize:12,cursor:"pointer"}}>✏️</button>
   <button onClick={()=>deleteExpense(e)} style={{padding:"8px 12px",background:"rgba(239,68,68,0.08)",border:"1px solid rgba(239,68,68,0.2)",borderRadius:9,color:"#f87171",fontSize:12,cursor:"pointer"}}>🗑️</button>
 </div>
@@ -617,7 +614,7 @@ const jointBalance = totalContributions - totalSettledExpenses;
         )}
         {liquidadas.length>0&&(
           <>
-            <div style={{fontSize:11,fontWeight:700,color:"#34d399",textTransform:"uppercase" as const,letterSpacing:"0.08em",marginBottom:8,marginTop:porLiquidar.length>0?16:0}}>{t[lang].coupleSettledLabel}</div>
+            <div style={{fontSize:11,fontWeight:700,color:"#34d399",textTransform:"uppercase" as const,letterSpacing:"0.08em",marginBottom:8,marginTop:porLiquidar.length>0?16:0}}>✅ Liquidadas</div>
             {liquidadas.map(e=>{
               const cat=expCats.find(c=>c.id===e.cat);
               const myShare=isUser1?e.split_user1:e.split_user2;
@@ -665,7 +662,6 @@ const jointBalance = totalContributions - totalSettledExpenses;
     negative={negative}
     items={recurringItems}
     setItems={setRecurringItems}
-    lang={lang}
     onApplyDue={async (r) => {
       const total = Number(r.valor);
       const s1 = total / 2;
@@ -695,14 +691,14 @@ const jointBalance = totalContributions - totalSettledExpenses;
       {tab==="acerto"&&<>
         {porLiquidar.length>0?(
           <>
-            {/* {t[lang].coupleSettlementSummary} */}
+            {/* Resumo do acerto */}
             {(()=>{
               const totalOwedByPartner = porLiquidar.filter(e=>e.pago_por===userId).reduce((s,e)=>s+(isUser1?e.split_user2:e.split_user1),0);
               const totalOwedByMe = porLiquidar.filter(e=>e.pago_por!==userId).reduce((s,e)=>s+(isUser1?e.split_user1:e.split_user2),0);
               const net = totalOwedByPartner - totalOwedByMe;
               return(
                 <div style={{background:"rgba(255,255,255,0.04)",border:"1px solid rgba(255,255,255,0.08)",borderRadius:14,padding:"16px",marginBottom:14,textAlign:"center" as const}}>
-                  <div style={{fontSize:10,fontWeight:700,color:subtext,textTransform:"uppercase" as const,letterSpacing:"0.08em",marginBottom:12}}>{t[lang].coupleSettlementSummary}</div>
+                  <div style={{fontSize:10,fontWeight:700,color:subtext,textTransform:"uppercase" as const,letterSpacing:"0.08em",marginBottom:12}}>Resumo do acerto</div>
                   {net>0?(
                     <><div style={{fontSize:12,color:PARTNER_COLOR,marginBottom:6}}>{partnerName} deve-te no total</div>
                     <div style={{fontSize:28,fontWeight:800,color:PARTNER_COLOR}}>{fmt(net)}</div></>
@@ -710,14 +706,14 @@ const jointBalance = totalContributions - totalSettledExpenses;
                     <><div style={{fontSize:12,color:MY_COLOR,marginBottom:6}}>Deves a {partnerName} no total</div>
                     <div style={{fontSize:28,fontWeight:800,color:MY_COLOR}}>{fmt(Math.abs(net))}</div></>
                   ):(
-                    <div style={{fontSize:14,fontWeight:700,color:"#34d399"}}>{t[lang].coupleEven}</div>
+                    <div style={{fontSize:14,fontWeight:700,color:"#34d399"}}>✓ Estão empatados!</div>
                   )}
                 </div>
               );
             })()}
             {/* Despesas por liquidar */}
             <div style={{background:"rgba(245,158,11,0.08)",border:"1px solid rgba(245,158,11,0.25)",borderRadius:14,padding:"14px 16px",marginBottom:14}}>
-              <div style={{fontSize:11,fontWeight:700,color:"#f59e0b",textTransform:"uppercase" as const,letterSpacing:"0.08em",marginBottom:12}}>{t[lang].couplePendingSection}</div>
+              <div style={{fontSize:11,fontWeight:700,color:"#f59e0b",textTransform:"uppercase" as const,letterSpacing:"0.08em",marginBottom:12}}>⏳ Despesas por liquidar</div>
               {porLiquidar.map(e=>{
                 const cat=expCats.find(c=>c.id===e.cat);
                 const myShare=isUser1?e.split_user1:e.split_user2;
@@ -747,7 +743,7 @@ const jointBalance = totalContributions - totalSettledExpenses;
                         </div>
                       );
                     })()}
-                    <button onClick={()=>marcarLiquidado(e)} style={{width:"100%",padding:"8px 0",background:"rgba(52,211,153,0.15)",border:"1px solid rgba(52,211,153,0.3)",borderRadius:9,color:"#34d399",fontSize:12,fontWeight:700,cursor:"pointer",fontFamily:"'Sora',sans-serif"}}>{t[lang].coupleMarkSettled}</button>
+                    <button onClick={()=>marcarLiquidado(e)} style={{width:"100%",padding:"8px 0",background:"rgba(52,211,153,0.15)",border:"1px solid rgba(52,211,153,0.3)",borderRadius:9,color:"#34d399",fontSize:12,fontWeight:700,cursor:"pointer",fontFamily:"'Sora',sans-serif"}}>✓ Marcar como liquidado</button>
                   </div>
                 );
               })}
@@ -756,15 +752,15 @@ const jointBalance = totalContributions - totalSettledExpenses;
         ):(
           <div style={{background:"rgba(52,211,153,0.08)",border:"1px solid rgba(52,211,153,0.2)",borderRadius:14,padding:"20px",textAlign:"center" as const,marginBottom:14}}>
             <div style={{fontSize:28,marginBottom:8}}>✅</div>
-            <div style={{fontSize:14,fontWeight:700,color:"#34d399"}}>{t[lang].coupleAllSettled}</div>
-            <div style={{fontSize:12,color:subtext,marginTop:4}}>{t[lang].coupleNoPending}</div>
+            <div style={{fontSize:14,fontWeight:700,color:"#34d399"}}>Tudo liquidado!</div>
+            <div style={{fontSize:12,color:subtext,marginTop:4}}>Não há despesas pendentes.</div>
           </div>
         )}
 
         {/* Histórico liquidadas */}
         {liquidadas.length>0&&(
           <div style={{background:cardBg,border:`1px solid ${cardBorder}`,borderRadius:12,padding:"14px 16px"}}>
-            <div style={{fontSize:10,fontWeight:700,color:subtext,textTransform:"uppercase" as const,letterSpacing:"0.08em",marginBottom:12}}>{t[lang].coupleSettledHistory}</div>
+            <div style={{fontSize:10,fontWeight:700,color:subtext,textTransform:"uppercase" as const,letterSpacing:"0.08em",marginBottom:12}}>✅ Histórico liquidado</div>
             {liquidadas.map(e=>{
               const cat=expCats.find(c=>c.id===e.cat);
               const myShare=isUser1?e.split_user1:e.split_user2;

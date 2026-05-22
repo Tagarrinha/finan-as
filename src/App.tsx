@@ -9,7 +9,6 @@ import { supabase } from "./supabase";
 import ExportData from "./ExportData";
 import SubscriptionModal from "./SubscriptionModal";
 import { usePlan } from "./usePlan";
-import { t, Lang } from "./i18n";
 
 type TypeKey = "necessidade"|"desejo"|"investimento";
 type ThemeKey = "original"|"aurora"|"ocean"|"nebula"|"verde"|"premium";
@@ -546,18 +545,6 @@ function MainApp({user,userName,onLogout}:{user:SBUser;userName:string;onLogout:
   const [showAddModal,setShowAddModal]=useState(false);
   const [themeKey,setThemeKey]=useState<ThemeKey>("premium");
   const T=THEMES[themeKey];
-  const [lang, setLang] = useState<Lang>("pt");
-  const TYPE_META: Record<TypeKey,{label:string;color:string;bg:string;icon:string}> = {
-  necessidade: {label:"Necessidade",color:"#3b82f6",bg:"#1e3a5f33",icon:"🏠"},
-  desejo:      {label:"Desejo",     color:"#f59e0b",bg:"#78350f33",icon:"✨"},
-  investimento:{label:"Investimento",color:"#10b981",bg:"#064e3b33",icon:"📈"},
-};
-const TIPO_ACC: Record<BankAccount["tipo"],{label:string;icon:string;cor:string}> = {
-  corrente:    {label:"Conta Corrente",    icon:"💳",cor:"#3b82f6"},
-  poupanca:    {label:"Conta Poupança",    icon:"🏦",cor:"#10b981"},
-  investimento:{label:"Conta Investimento",icon:"📈",cor:"#a78bfa"},
-  outro:       {label:"Outra Conta",       icon:"📂",cor:"#f59e0b"},
-};
   const { plan, isBeta, isPremium, hasFullAccess, setPlan } = usePlan(user.id);
   const [showPricing, setShowPricing] = useState(false);
   const [showTour,setShowTour]=useState(false);
@@ -784,24 +771,24 @@ async function handleCoupleSettlement(valor: number) {
           </div>
         </div>
         <div style={{flex:1,overflowY:"auto" as const,padding:"16px 20px",paddingBottom:"calc(120px + env(safe-area-inset-bottom, 0px))",WebkitOverflowScrolling:"touch" as const}}>
-         {sidebarTab==="contas"&&<>
+          {sidebarTab==="contas"&&<>
             <div style={{background:T.cardBg,border:`1px solid ${T.accent}30`,borderRadius:14,padding:"16px",marginBottom:14,textAlign:"center" as const}}>
-              <div style={{fontSize:10,color:T.subtext,textTransform:"uppercase" as const,letterSpacing:"0.08em",marginBottom:4}}>{t[lang].totalBalance}</div>
+              <div style={{fontSize:10,color:T.subtext,textTransform:"uppercase" as const,letterSpacing:"0.08em",marginBottom:4}}>Saldo Total</div>
               <div style={{fontSize:24,fontWeight:800,color:totalSaldo>=0?T.positive:T.negative}}>{hv(fmt(totalSaldo))}</div>
-              <div style={{fontSize:11,color:T.subtext,marginTop:2}}>{accounts.length} {accounts.length!==1?t[lang].accounts:t[lang].account}</div>
+              <div style={{fontSize:11,color:T.subtext,marginTop:2}}>{accounts.length} conta{accounts.length!==1?"s":""}</div>
             </div>
-            <button onClick={()=>setShowTransfer(!showTransfer)} style={{width:"100%",marginBottom:14,padding:"10px 0",background:showTransfer?`${T.accent2}22`:"rgba(255,255,255,0.05)",border:`1px solid ${showTransfer?T.accent2:"rgba(255,255,255,0.1)"}`,borderRadius:10,color:showTransfer?T.accent2:"#94a3b8",fontSize:13,fontWeight:700,cursor:"pointer",fontFamily:"'Sora',sans-serif"}}>🔄 {showTransfer?t[lang].cancel:t[lang].newTransfer}</button>
+            <button onClick={()=>setShowTransfer(!showTransfer)} style={{width:"100%",marginBottom:14,padding:"10px 0",background:showTransfer?`${T.accent2}22`:"rgba(255,255,255,0.05)",border:`1px solid ${showTransfer?T.accent2:"rgba(255,255,255,0.1)"}`,borderRadius:10,color:showTransfer?T.accent2:"#94a3b8",fontSize:13,fontWeight:700,cursor:"pointer",fontFamily:"'Sora',sans-serif"}}>🔄 {showTransfer?"Cancelar":"Nova transferência"}</button>
             {showTransfer&&(
               <div style={{background:`${T.accent2}0a`,border:`1px solid ${T.accent2}30`,borderRadius:12,padding:"14px",marginBottom:14}}>
-                <div style={{fontSize:11,fontWeight:700,color:T.accent2,textTransform:"uppercase" as const,marginBottom:10}}>🔄 {t[lang].transfer}</div>
-                <div style={{fontSize:11,color:T.subtext,marginBottom:4}}>{t[lang].from}</div>
-                <select style={{...sSel,marginBottom:8}} value={trFrom} onChange={e=>setTrFrom(e.target.value)}><option value="">{t[lang].originAccount}</option>{accounts.map(a=><option key={a.id} value={a.id}>{a.icon} {a.nome} ({fmt(Number(a.saldo))})</option>)}</select>
-                <div style={{fontSize:11,color:T.subtext,marginBottom:4}}>{t[lang].to}</div>
-                <select style={{...sSel,marginBottom:8}} value={trTo} onChange={e=>setTrTo(e.target.value)}><option value="">{t[lang].destAccount}</option>{accounts.filter(a=>String(a.id)!==trFrom).map(a=><option key={a.id} value={a.id}>{a.icon} {a.nome} ({fmt(Number(a.saldo))})</option>)}</select>
+                <div style={{fontSize:11,fontWeight:700,color:T.accent2,textTransform:"uppercase" as const,marginBottom:10}}>🔄 Transferência</div>
+                <div style={{fontSize:11,color:T.subtext,marginBottom:4}}>De</div>
+                <select style={{...sSel,marginBottom:8}} value={trFrom} onChange={e=>setTrFrom(e.target.value)}><option value="">Conta origem...</option>{accounts.map(a=><option key={a.id} value={a.id}>{a.icon} {a.nome} ({fmt(Number(a.saldo))})</option>)}</select>
+                <div style={{fontSize:11,color:T.subtext,marginBottom:4}}>Para</div>
+                <select style={{...sSel,marginBottom:8}} value={trTo} onChange={e=>setTrTo(e.target.value)}><option value="">Conta destino...</option>{accounts.filter(a=>String(a.id)!==trFrom).map(a=><option key={a.id} value={a.id}>{a.icon} {a.nome} ({fmt(Number(a.saldo))})</option>)}</select>
                 <input style={{...sInp,marginBottom:8}} type="number" placeholder="Valor (€)" value={trValor} onChange={e=>setTrValor(e.target.value)}/>
-                <input style={{...sInp,marginBottom:8}} placeholder={t[lang].optionalDesc} value={trDesc} onChange={e=>setTrDesc(e.target.value)}/>
+                <input style={{...sInp,marginBottom:8}} placeholder="Descrição (opcional)" value={trDesc} onChange={e=>setTrDesc(e.target.value)}/>
                 <input style={{...sInp,marginBottom:10}} type="date" value={trData} onChange={e=>setTrData(e.target.value)}/>
-                <button onClick={doTransfer} style={{width:"100%",padding:"10px 0",background:`linear-gradient(135deg,${T.accent2},${T.accent})`,border:"none",borderRadius:9,color:"#fff",fontWeight:700,fontSize:13,cursor:"pointer",fontFamily:"'Sora',sans-serif"}}>{t[lang].doTransfer}</button>
+                <button onClick={doTransfer} style={{width:"100%",padding:"10px 0",background:`linear-gradient(135deg,${T.accent2},${T.accent})`,border:"none",borderRadius:9,color:"#fff",fontWeight:700,fontSize:13,cursor:"pointer",fontFamily:"'Sora',sans-serif"}}>Transferir →</button>
               </div>
             )}
             {accounts.map(a=>{const meta=TIPO_ACC[a.tipo];return(
@@ -813,79 +800,69 @@ async function handleCoupleSettlement(valor: number) {
                 </div>
                 {editingAccId===a.id?(
                   <div style={{display:"flex",gap:6,marginTop:10}}>
-                    <input autoFocus style={{...sInp,flex:1}} type="number" value={editSaldo} onChange={e=>setEditSaldo(e.target.value)} onKeyDown={e=>{if(e.key==="Enter")saveAccountSaldo(a.id);if(e.key==="Escape")setEditingAccId(null);}} placeholder={t[lang].newBalance}/>
+                    <input autoFocus style={{...sInp,flex:1}} type="number" value={editSaldo} onChange={e=>setEditSaldo(e.target.value)} onKeyDown={e=>{if(e.key==="Enter")saveAccountSaldo(a.id);if(e.key==="Escape")setEditingAccId(null);}} placeholder="Novo saldo"/>
                     <button onClick={()=>saveAccountSaldo(a.id)} style={{padding:"8px 12px",background:`${T.accent}33`,border:`1px solid ${T.accent}50`,borderRadius:8,color:T.accent,fontSize:13,fontWeight:700,cursor:"pointer",fontFamily:"'Sora',sans-serif"}}>✓</button>
                     <button onClick={()=>setEditingAccId(null)} style={{padding:"8px 10px",background:"rgba(255,255,255,0.04)",border:"1px solid rgba(255,255,255,0.08)",borderRadius:8,color:"#64748b",fontSize:13,cursor:"pointer"}}>✕</button>
                   </div>
                 ):(
                   <div style={{display:"flex",gap:6,marginTop:8}}>
-                    <button onClick={()=>{setEditingAccId(a.id);setEditSaldo(String(a.saldo));}} style={{flex:1,padding:"6px 0",background:"rgba(255,255,255,0.05)",border:"1px solid rgba(255,255,255,0.09)",borderRadius:7,color:"#94a3b8",fontSize:11,fontWeight:600,cursor:"pointer",fontFamily:"'Sora',sans-serif"}}>{t[lang].editBalance}</button>
+                    <button onClick={()=>{setEditingAccId(a.id);setEditSaldo(String(a.saldo));}} style={{flex:1,padding:"6px 0",background:"rgba(255,255,255,0.05)",border:"1px solid rgba(255,255,255,0.09)",borderRadius:7,color:"#94a3b8",fontSize:11,fontWeight:600,cursor:"pointer",fontFamily:"'Sora',sans-serif"}}>✏️ Editar saldo</button>
                     <button onClick={()=>deleteAccount(a.id)} style={{padding:"6px 10px",background:"rgba(239,68,68,0.08)",border:"1px solid rgba(239,68,68,0.2)",borderRadius:7,color:"#f87171",fontSize:11,cursor:"pointer"}}>🗑️</button>
                   </div>
                 )}
               </div>
             );})}
-            {transfers.length>0&&(<div style={{marginTop:8,marginBottom:14}}><div style={{fontSize:10,fontWeight:700,color:T.subtext,textTransform:"uppercase" as const,letterSpacing:"0.08em",marginBottom:10}}>{t[lang].lastTransfers}</div>{transfers.slice(0,5).map(tr=>{const from=accounts.find(a=>a.id===tr.from_account_id),to=accounts.find(a=>a.id===tr.to_account_id);return(<div key={tr.id} style={{display:"flex",alignItems:"center",gap:8,padding:"8px 0",borderBottom:`1px solid ${T.cardBorder}`}}><span style={{fontSize:14}}>🔄</span><div style={{flex:1,minWidth:0}}><div style={{fontSize:12,color:"#e2e8f0",whiteSpace:"nowrap",overflow:"hidden",textOverflow:"ellipsis"}}>{tr.descricao}</div><div style={{fontSize:10,color:T.subtext}}>{from?.nome||"?"} → {to?.nome||"?"}</div></div><span style={{fontSize:12,fontWeight:700,color:T.accent2}}>{fmt(Number(tr.valor))}</span></div>);})}</div>)}
+            {transfers.length>0&&(<div style={{marginTop:8,marginBottom:14}}><div style={{fontSize:10,fontWeight:700,color:T.subtext,textTransform:"uppercase" as const,letterSpacing:"0.08em",marginBottom:10}}>Últimas transferências</div>{transfers.slice(0,5).map(t=>{const from=accounts.find(a=>a.id===t.from_account_id),to=accounts.find(a=>a.id===t.to_account_id);return(<div key={t.id} style={{display:"flex",alignItems:"center",gap:8,padding:"8px 0",borderBottom:`1px solid ${T.cardBorder}`}}><span style={{fontSize:14}}>🔄</span><div style={{flex:1,minWidth:0}}><div style={{fontSize:12,color:"#e2e8f0",whiteSpace:"nowrap",overflow:"hidden",textOverflow:"ellipsis"}}>{t.descricao}</div><div style={{fontSize:10,color:T.subtext}}>{from?.nome||"?"} → {to?.nome||"?"}</div></div><span style={{fontSize:12,fontWeight:700,color:T.accent2}}>{fmt(Number(t.valor))}</span></div>);})}</div>)}
             <div style={{background:T.cardBg,border:`1px dashed ${T.cardBorder}`,borderRadius:12,padding:"14px",marginTop:8}}>
-              <div style={{fontSize:11,fontWeight:700,color:T.subtext,textTransform:"uppercase" as const,marginBottom:10}}>{t[lang].newAccount}</div>
-              <input style={{...sInp,marginBottom:8}} placeholder={t[lang].accountName} value={newAccName} onChange={e=>setNewAccName(e.target.value)}/>
+              <div style={{fontSize:11,fontWeight:700,color:T.subtext,textTransform:"uppercase" as const,marginBottom:10}}>+ Nova conta</div>
+              <input style={{...sInp,marginBottom:8}} placeholder="Nome da conta" value={newAccName} onChange={e=>setNewAccName(e.target.value)}/>
               <select style={{...sSel,marginBottom:8}} value={newAccTipo} onChange={e=>setNewAccTipo(e.target.value as BankAccount["tipo"])}><option value="corrente">💳 Conta Corrente</option><option value="poupanca">🏦 Conta Poupança</option><option value="investimento">📈 Conta Investimento</option><option value="outro">📂 Outra</option></select>
-              <input style={{...sInp,marginBottom:10}} type="number" placeholder={t[lang].initialBalance} value={newAccSaldo} onChange={e=>setNewAccSaldo(e.target.value)} onKeyDown={e=>e.key==="Enter"&&addAccount()}/>
-              <button onClick={addAccount} style={{width:"100%",padding:"9px 0",background:`linear-gradient(135deg,${T.accent},${T.accentDark})`,border:"none",borderRadius:8,color:"#fff",fontWeight:700,fontSize:13,cursor:"pointer",fontFamily:"'Sora',sans-serif"}}>{t[lang].addAccount}</button>
+              <input style={{...sInp,marginBottom:10}} type="number" placeholder="Saldo inicial (€)" value={newAccSaldo} onChange={e=>setNewAccSaldo(e.target.value)} onKeyDown={e=>e.key==="Enter"&&addAccount()}/>
+              <button onClick={addAccount} style={{width:"100%",padding:"9px 0",background:`linear-gradient(135deg,${T.accent},${T.accentDark})`,border:"none",borderRadius:8,color:"#fff",fontWeight:700,fontSize:13,cursor:"pointer",fontFamily:"'Sora',sans-serif"}}>+ Adicionar conta</button>
             </div>
           </>}
           {sidebarTab==="categorias"&&<>
             <div style={{marginBottom:24}}>
-              <div style={{fontSize:11,fontWeight:700,color:T.accent,textTransform:"uppercase" as const,letterSpacing:"0.08em",marginBottom:12}}>{t[lang].expenseCategories}</div>
+              <div style={{fontSize:11,fontWeight:700,color:T.accent,textTransform:"uppercase" as const,letterSpacing:"0.08em",marginBottom:12}}>Categorias de despesa</div>
               {allExpCats.map(c=>{const on=enabledExpCats.includes(c.id);return(<div key={c.id} style={{display:"flex",alignItems:"center",gap:8,marginBottom:6}}><div onClick={()=>toggleExp(c.id)} style={{flex:1,display:"flex",alignItems:"center",gap:8,padding:"8px 10px",borderRadius:10,background:on?T.cardBg:"transparent",border:`1px solid ${on?T.cardBorder:"transparent"}`,cursor:"pointer"}}><span style={{fontSize:16}}>{c.icon}</span><span style={{flex:1,fontSize:13,color:on?"#e2e8f0":T.subtext,fontWeight:on?600:400}}>{c.label}</span>{c.custom&&<span style={{fontSize:9,color:T.accent,background:`${T.accent}20`,padding:"1px 6px",borderRadius:99}}>custom</span>}<div style={{width:16,height:16,borderRadius:4,background:on?T.accent:"rgba(255,255,255,0.08)",display:"flex",alignItems:"center",justifyContent:"center",fontSize:10,color:"#fff",fontWeight:700,flexShrink:0}}>{on?"✓":""}</div></div>{c.custom&&<button onClick={()=>deleteCustomExp(c.id)} style={{background:"rgba(239,68,68,0.1)",border:"1px solid rgba(239,68,68,0.2)",borderRadius:7,padding:"6px 8px",color:"#f87171",fontSize:11,cursor:"pointer"}}>🗑️</button>}</div>);})}
               <div style={{background:T.cardBg,border:`1px dashed ${T.cardBorder}`,borderRadius:10,padding:"12px",marginTop:10}}>
-                <div style={{fontSize:10,fontWeight:700,color:T.subtext,textTransform:"uppercase" as const,marginBottom:8}}>{t[lang].newCategory}</div>
-                <div style={{display:"flex",gap:6,marginBottom:6}}><input style={{...sInp,flex:"0 0 50px"}} placeholder="🏷️" value={newExpIcon} onChange={e=>setNewExpIcon(e.target.value)} maxLength={2}/><input style={{...sInp,flex:1}} placeholder={t[lang].categoryName} value={newExpLabel} onChange={e=>setNewExpLabel(e.target.value)}/></div>
+                <div style={{fontSize:10,fontWeight:700,color:T.subtext,textTransform:"uppercase" as const,marginBottom:8}}>+ Nova categoria</div>
+                <div style={{display:"flex",gap:6,marginBottom:6}}><input style={{...sInp,flex:"0 0 50px"}} placeholder="🏷️" value={newExpIcon} onChange={e=>setNewExpIcon(e.target.value)} maxLength={2}/><input style={{...sInp,flex:1}} placeholder="Nome" value={newExpLabel} onChange={e=>setNewExpLabel(e.target.value)}/></div>
                 <select style={{...sSel,marginBottom:8}} value={newExpType} onChange={e=>setNewExpType(e.target.value as TypeKey)}><option value="necessidade">🏠 Necessidade</option><option value="desejo">✨ Desejo</option><option value="investimento">📈 Investimento</option></select>
-                <button onClick={addCustomExp} style={{width:"100%",padding:"8px 0",background:`${T.accent}22`,border:`1px solid ${T.accent}40`,borderRadius:8,color:T.accent,fontSize:12,fontWeight:700,cursor:"pointer",fontFamily:"'Sora',sans-serif"}}>{t[lang].addCategory}</button>
+                <button onClick={addCustomExp} style={{width:"100%",padding:"8px 0",background:`${T.accent}22`,border:`1px solid ${T.accent}40`,borderRadius:8,color:T.accent,fontSize:12,fontWeight:700,cursor:"pointer",fontFamily:"'Sora',sans-serif"}}>+ Adicionar</button>
               </div>
             </div>
             <div style={{marginBottom:24}}>
-              <div style={{fontSize:11,fontWeight:700,color:T.positive,textTransform:"uppercase" as const,letterSpacing:"0.08em",marginBottom:12}}>{t[lang].incomeSources}</div>
+              <div style={{fontSize:11,fontWeight:700,color:T.positive,textTransform:"uppercase" as const,letterSpacing:"0.08em",marginBottom:12}}>Fontes de rendimento</div>
               {allIncCats.map(c=>{const on=enabledIncCats.includes(c.id);return(<div key={c.id} style={{display:"flex",alignItems:"center",gap:8,marginBottom:6}}><div onClick={()=>toggleInc(c.id)} style={{flex:1,display:"flex",alignItems:"center",gap:8,padding:"8px 10px",borderRadius:10,background:on?T.cardBg:"transparent",border:`1px solid ${on?T.cardBorder:"transparent"}`,cursor:"pointer"}}><span style={{fontSize:16}}>{c.icon}</span><span style={{flex:1,fontSize:13,color:on?"#e2e8f0":T.subtext,fontWeight:on?600:400}}>{c.label}</span>{c.custom&&<span style={{fontSize:9,color:T.positive,background:`${T.positive}20`,padding:"1px 6px",borderRadius:99}}>custom</span>}<div style={{width:16,height:16,borderRadius:4,background:on?T.positive:"rgba(255,255,255,0.08)",display:"flex",alignItems:"center",justifyContent:"center",fontSize:10,color:"#fff",fontWeight:700,flexShrink:0}}>{on?"✓":""}</div></div>{c.custom&&<button onClick={()=>deleteCustomInc(c.id)} style={{background:"rgba(239,68,68,0.1)",border:"1px solid rgba(239,68,68,0.2)",borderRadius:7,padding:"6px 8px",color:"#f87171",fontSize:11,cursor:"pointer"}}>🗑️</button>}</div>);})}
               <div style={{background:T.cardBg,border:`1px dashed ${T.cardBorder}`,borderRadius:10,padding:"12px",marginTop:10}}>
-                <div style={{fontSize:10,fontWeight:700,color:T.subtext,textTransform:"uppercase" as const,marginBottom:8}}>{t[lang].newSource}</div>
-                <div style={{display:"flex",gap:6,marginBottom:8}}><input style={{...sInp,flex:"0 0 50px"}} placeholder="💰" value={newIncIcon} onChange={e=>setNewIncIcon(e.target.value)} maxLength={2}/><input style={{...sInp,flex:1}} placeholder={t[lang].categoryName} value={newIncLabel} onChange={e=>setNewIncLabel(e.target.value)} onKeyDown={e=>e.key==="Enter"&&addCustomInc()}/></div>
-                <button onClick={addCustomInc} style={{width:"100%",padding:"8px 0",background:`${T.positive}18`,border:`1px solid ${T.positive}35`,borderRadius:8,color:T.positive,fontSize:12,fontWeight:700,cursor:"pointer",fontFamily:"'Sora',sans-serif"}}>{t[lang].addCategory}</button>
+                <div style={{fontSize:10,fontWeight:700,color:T.subtext,textTransform:"uppercase" as const,marginBottom:8}}>+ Nova fonte</div>
+                <div style={{display:"flex",gap:6,marginBottom:8}}><input style={{...sInp,flex:"0 0 50px"}} placeholder="💰" value={newIncIcon} onChange={e=>setNewIncIcon(e.target.value)} maxLength={2}/><input style={{...sInp,flex:1}} placeholder="Nome" value={newIncLabel} onChange={e=>setNewIncLabel(e.target.value)} onKeyDown={e=>e.key==="Enter"&&addCustomInc()}/></div>
+                <button onClick={addCustomInc} style={{width:"100%",padding:"8px 0",background:`${T.positive}18`,border:`1px solid ${T.positive}35`,borderRadius:8,color:T.positive,fontSize:12,fontWeight:700,cursor:"pointer",fontFamily:"'Sora',sans-serif"}}>+ Adicionar</button>
               </div>
             </div>
           </>}
-         {sidebarTab==="config"&&<>
+          {sidebarTab==="config"&&<>
             <div style={{marginBottom:24}}>
-              <div style={{fontSize:11,fontWeight:700,color:T.accent,textTransform:"uppercase" as const,letterSpacing:"0.08em",marginBottom:12}}>🎨 {t[lang].theme}</div>
+              <div style={{fontSize:11,fontWeight:700,color:T.accent,textTransform:"uppercase" as const,letterSpacing:"0.08em",marginBottom:12}}>🎨 Tema</div>
               <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:8}}>
-                {(Object.entries(THEMES) as [ThemeKey,AppTheme][]).map(([key,theme])=>{const active=themeKey===key;return(<button key={key} onClick={()=>changeTheme(key)} style={{padding:"12px 8px",background:active?`${theme.accent}20`:"rgba(255,255,255,0.04)",border:`1.5px solid ${active?theme.accent:"rgba(255,255,255,0.08)"}`,borderRadius:12,cursor:"pointer",fontFamily:"'Sora',sans-serif",textAlign:"center" as const,transition:"all .2s"}}><div style={{fontSize:20,marginBottom:4}}>{theme.emoji}</div><div style={{fontSize:12,fontWeight:700,color:active?theme.accent:"#94a3b8"}}>{theme.name}</div><div style={{display:"flex",justifyContent:"center",gap:3,marginTop:6}}>{[theme.accent,theme.accent2,theme.positive].map((c,i)=><div key={i} style={{width:10,height:10,borderRadius:"50%",background:c}}/>)}</div>{active&&<div style={{fontSize:9,color:theme.accent,marginTop:4,fontWeight:700}}>{t[lang].active}</div>}</button>);})}
+                {(Object.entries(THEMES) as [ThemeKey,AppTheme][]).map(([key,theme])=>{const active=themeKey===key;return(<button key={key} onClick={()=>changeTheme(key)} style={{padding:"12px 8px",background:active?`${theme.accent}20`:"rgba(255,255,255,0.04)",border:`1.5px solid ${active?theme.accent:"rgba(255,255,255,0.08)"}`,borderRadius:12,cursor:"pointer",fontFamily:"'Sora',sans-serif",textAlign:"center" as const,transition:"all .2s"}}><div style={{fontSize:20,marginBottom:4}}>{theme.emoji}</div><div style={{fontSize:12,fontWeight:700,color:active?theme.accent:"#94a3b8"}}>{theme.name}</div><div style={{display:"flex",justifyContent:"center",gap:3,marginTop:6}}>{[theme.accent,theme.accent2,theme.positive].map((c,i)=><div key={i} style={{width:10,height:10,borderRadius:"50%",background:c}}/>)}</div>{active&&<div style={{fontSize:9,color:theme.accent,marginTop:4,fontWeight:700}}>✓ Ativo</div>}</button>);})}
               </div>
             </div>
             <div style={{marginBottom:24}}>
-              <div style={{fontSize:11,fontWeight:700,color:T.accent,textTransform:"uppercase" as const,letterSpacing:"0.08em",marginBottom:12}}>🌐 Idioma / Language</div>
-              <div style={{display:"flex",background:"rgba(255,255,255,0.05)",borderRadius:12,padding:4}}>
-                {(["pt","en"] as Lang[]).map(l=>(
-                  <button key={l} onClick={()=>setLang(l)} style={{flex:1,padding:"9px 0",border:"none",borderRadius:9,background:lang===l?`${T.accent}20`:"transparent",color:lang===l?T.accent:"#475569",fontWeight:700,fontSize:13,cursor:"pointer",fontFamily:"'Sora',sans-serif"}}>
-                    {l==="pt"?"🇵🇹 PT":"🇬🇧 EN"}
-                  </button>
-                ))}
-              </div>
-            </div>
-            <div style={{marginBottom:24}}>
-              <div style={{fontSize:11,fontWeight:700,color:T.accent,textTransform:"uppercase" as const,letterSpacing:"0.08em",marginBottom:12}}>{t[lang].budgetGoals}</div>
-              {(Object.entries(TYPE_META) as [TypeKey,{label:string;color:string;bg:string;icon:string}][]).map(([type,meta])=>(<div key={type} style={{marginBottom:12}}><div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:5}}><span style={{fontSize:13,color:meta.color}}>{meta.icon} {meta.label}</span><span style={{fontSize:13,fontWeight:700,color:meta.color}}>{budgetTargets[type]}%</span></div><input type="range" min={0} max={100} value={budgetTargets[type]} onChange={e=>updateBudget({...budgetTargets,[type]:Number(e.target.value)})} style={{width:"100%",accentColor:meta.color}}/></div>))}
+              <div style={{fontSize:11,fontWeight:700,color:T.accent,textTransform:"uppercase" as const,letterSpacing:"0.08em",marginBottom:12}}>Metas orçamentais</div>
+              {(Object.entries(TYPE_META) as [TypeKey,typeof TYPE_META[TypeKey]][]).map(([type,meta])=>(<div key={type} style={{marginBottom:12}}><div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:5}}><span style={{fontSize:13,color:meta.color}}>{meta.icon} {meta.label}</span><span style={{fontSize:13,fontWeight:700,color:meta.color}}>{budgetTargets[type]}%</span></div><input type="range" min={0} max={100} value={budgetTargets[type]} onChange={e=>updateBudget({...budgetTargets,[type]:Number(e.target.value)})} style={{width:"100%",accentColor:meta.color}}/></div>))}
               <div style={{textAlign:"center" as const,fontSize:12,fontWeight:700,padding:"8px 12px",borderRadius:8,background:(budgetTargets.necessidade+budgetTargets.desejo+budgetTargets.investimento)===100?"#064e3b33":"#450a0a",color:(budgetTargets.necessidade+budgetTargets.desejo+budgetTargets.investimento)===100?T.positive:"#f87171",marginTop:4}}>
-                Total: {budgetTargets.necessidade+budgetTargets.desejo+budgetTargets.investimento}% {(budgetTargets.necessidade+budgetTargets.desejo+budgetTargets.investimento)===100?t[lang].correct:`⚠️ ${t[lang].totalMustBe100}`}
+                Total: {budgetTargets.necessidade+budgetTargets.desejo+budgetTargets.investimento}% {(budgetTargets.necessidade+budgetTargets.desejo+budgetTargets.investimento)===100?"✓ Correto":"⚠️ Deve ser 100%"}
               </div>
-              <button onClick={()=>updateBudget(DEFAULT_BUDGET)} style={{width:"100%",marginTop:8,padding:"7px 0",background:"rgba(255,255,255,0.05)",border:"1px solid rgba(255,255,255,0.1)",borderRadius:8,color:"#94a3b8",fontSize:11,fontWeight:600,cursor:"pointer",fontFamily:"'Sora',sans-serif"}}>{t[lang].resetSuggestion}</button>
+              <button onClick={()=>updateBudget(DEFAULT_BUDGET)} style={{width:"100%",marginTop:8,padding:"7px 0",background:"rgba(255,255,255,0.05)",border:"1px solid rgba(255,255,255,0.1)",borderRadius:8,color:"#94a3b8",fontSize:11,fontWeight:600,cursor:"pointer",fontFamily:"'Sora',sans-serif"}}>Repor sugestão (75/10/15)</button>
             </div>
             <div style={{borderTop:`1px solid ${T.cardBorder}`,paddingTop:16,display:"flex",flexDirection:"column" as const,gap:8}}>
               <button onClick={()=>setShowPricing(true)} style={{width:"100%",padding:"10px 0",background:`${T.accent}12`,border:`1px solid ${T.accent}30`,borderRadius:9,color:T.accent,fontSize:13,fontWeight:700,cursor:"pointer",fontFamily:"'Sora',sans-serif",marginBottom:8}}>
-  💎 {isPremium?t[lang].premiumPlan:hasFullAccess?t[lang].coupleAccess:t[lang].upgradePlan}
+  💎 {isPremium?"Plano Premium ✓":hasFullAccess?"Acesso via casal ✓":"Fazer upgrade"}
 </button>
-              <button onClick={()=>setShowTour(true)} style={{width:"100%",padding:"9px 0",background:`${T.accent}12`,border:`1px solid ${T.accent}30`,borderRadius:9,color:T.accent,fontSize:12,fontWeight:700,cursor:"pointer",fontFamily:"'Sora',sans-serif"}}>{t[lang].seeTourAgain}</button>
-              <button onClick={onLogout} style={{width:"100%",padding:"10px 0",background:"rgba(239,68,68,0.08)",border:"1px solid rgba(239,68,68,0.2)",borderRadius:9,color:"#f87171",fontSize:13,fontWeight:700,cursor:"pointer",fontFamily:"'Sora',sans-serif"}}>{t[lang].logout}</button>
+              <button onClick={()=>setShowTour(true)} style={{width:"100%",padding:"9px 0",background:`${T.accent}12`,border:`1px solid ${T.accent}30`,borderRadius:9,color:T.accent,fontSize:12,fontWeight:700,cursor:"pointer",fontFamily:"'Sora',sans-serif"}}>🎓 Ver tour novamente</button>
+              <button onClick={onLogout} style={{width:"100%",padding:"10px 0",background:"rgba(239,68,68,0.08)",border:"1px solid rgba(239,68,68,0.2)",borderRadius:9,color:"#f87171",fontSize:13,fontWeight:700,cursor:"pointer",fontFamily:"'Sora',sans-serif"}}>Terminar sessão</button>
             </div>
           </>}
         </div>
@@ -944,7 +921,7 @@ async function handleCoupleSettlement(valor: number) {
           <div style={{fontSize:10,fontWeight:700,color:T.subtext,textTransform:"uppercase" as const,letterSpacing:"0.1em",marginBottom:10}}>Mês</div>
           <div style={{display:"grid",gridTemplateColumns:"1fr 1fr 1fr",gap:6}}>
             <button onClick={()=>setFMonth("todos")} style={{padding:"6px 8px",borderRadius:99,border:`1px solid ${fMonth==="todos"?T.accent:"rgba(255,255,255,0.1)"}`,background:fMonth==="todos"?`${T.accent}20`:"transparent",color:fMonth==="todos"?T.accent:"#94a3b8",fontSize:11,fontWeight:700,cursor:"pointer",fontFamily:"'Sora',sans-serif"}}>Todos</button>
-            {t[lang].months.map((m,i)=>(
+            {MONTHS.map((m,i)=>(
               <button key={i} onClick={()=>setFMonth(String(i))} style={{padding:"6px 8px",borderRadius:99,border:`1px solid ${fMonth===String(i)?T.accent:"rgba(255,255,255,0.1)"}`,background:fMonth===String(i)?`${T.accent}20`:"transparent",color:fMonth===String(i)?T.accent:"#94a3b8",fontSize:11,fontWeight:700,cursor:"pointer",fontFamily:"'Sora',sans-serif"}}>{m}</button>
             ))}
           </div>
@@ -956,13 +933,13 @@ async function handleCoupleSettlement(valor: number) {
 </div>
 <div style={{...S.body,position:"relative",zIndex:1}}>
         {/* RESUMO */}
-    {tab==="resumo"&&<>
+        {tab==="resumo"&&<>
   {/* ── HERO ── */}
   <div style={{padding:"24px 0 20px",textAlign:"center"}}>
     <div style={{fontSize:11,fontWeight:700,color:T.subtext,letterSpacing:"0.15em",textTransform:"uppercase",marginBottom:8}}>
-      {new Date().toLocaleString(lang==="pt"?"pt-PT":"en-GB",{month:"short"}).toUpperCase()} · {new Date().getFullYear()}
+      {new Date().toLocaleString("pt-PT",{month:"short"}).toUpperCase()} · {new Date().getFullYear()}
     </div>
-    <div style={{fontSize:11,fontWeight:600,color:T.subtext,marginBottom:12,letterSpacing:"0.08em",textTransform:"uppercase"}}>{t[lang].monthResult}</div>
+    <div style={{fontSize:11,fontWeight:600,color:T.subtext,marginBottom:12,letterSpacing:"0.08em",textTransform:"uppercase"}}>Resultado do mês</div>
     <div style={{fontSize:56,fontWeight:800,color:balance>=0?T.positive:T.negative,letterSpacing:"-2px",lineHeight:1,marginBottom:16}}>
       {balance>=0?"+":""}{hv(fmt(balance))}
     </div>
@@ -979,24 +956,24 @@ async function handleCoupleSettlement(valor: number) {
       return(
         <div style={{display:"inline-flex",alignItems:"center",gap:6,background:up?"rgba(52,211,153,0.12)":"rgba(251,113,133,0.12)",border:`1px solid ${up?"rgba(52,211,153,0.3)":"rgba(251,113,133,0.3)"}`,borderRadius:99,padding:"6px 14px",fontSize:12,fontWeight:700,color:up?T.positive:T.negative}}>
           <span>{up?"↗":"↘"}</span>
-          <span>{up?"+":""}{diff}% {t[lang].vsPrevMonth}</span>
+          <span>{up?"+":""}{diff}% vs mês anterior</span>
         </div>
       );
     })()}
   </div>
 
- {/* ── FLUXO ── */}
+  {/* ── FLUXO ── */}
   <div style={{marginBottom:14}}>
-    <div style={{fontSize:11,fontWeight:700,color:T.subtext,letterSpacing:"0.1em",textTransform:"uppercase",marginBottom:10}}>{t[lang].flow}</div>
+    <div style={{fontSize:11,fontWeight:700,color:T.subtext,letterSpacing:"0.1em",textTransform:"uppercase",marginBottom:10}}>Fluxo</div>
     <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:10}}>
       <div style={{background:T.cardBg,border:`1px solid ${T.cardBorder}`,borderRadius:16,padding:"12px 14px",display:"flex",alignItems:"center",gap:10}}>
         <div style={{width:36,height:36,borderRadius:10,background:"rgba(52,211,153,0.15)",display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0}}>
           <svg width="18" height="18" viewBox="0 0 24 24" fill={T.positive}><path d="M20 12l-1.41-1.41L13 16.17V4h-2v12.17l-5.58-5.59L4 12l8 8 8-8z"/></svg>
         </div>
         <div>
-          <div style={{fontSize:10,fontWeight:700,color:T.subtext,letterSpacing:"0.08em",textTransform:"uppercase",marginBottom:2}}>{t[lang].receipts}</div>
+          <div style={{fontSize:10,fontWeight:700,color:T.subtext,letterSpacing:"0.08em",textTransform:"uppercase",marginBottom:2}}>Receitas</div>
           <div style={{fontSize:16,fontWeight:800,color:"#f1f5f9"}}>{hv(fmt(totalInc))}</div>
-          <div style={{fontSize:10,color:T.subtext}}>{myIncomes.length} {myIncomes.length!==1?t[lang].entriesPlural:t[lang].entries}</div>
+          <div style={{fontSize:10,color:T.subtext}}>{myIncomes.length} entrada{myIncomes.length!==1?"s":""}</div>
         </div>
       </div>
       <div style={{background:T.cardBg,border:`1px solid ${T.cardBorder}`,borderRadius:16,padding:"12px 14px",display:"flex",alignItems:"center",gap:10}}>
@@ -1004,9 +981,9 @@ async function handleCoupleSettlement(valor: number) {
           <svg width="18" height="18" viewBox="0 0 24 24" fill={T.negative}><path d="M4 12l1.41 1.41L11 7.83V20h2V7.83l5.58 5.59L20 12l-8-8-8 8z"/></svg>
         </div>
         <div>
-          <div style={{fontSize:10,fontWeight:700,color:T.subtext,letterSpacing:"0.08em",textTransform:"uppercase",marginBottom:2}}>{t[lang].expensesLabel}</div>
+          <div style={{fontSize:10,fontWeight:700,color:T.subtext,letterSpacing:"0.08em",textTransform:"uppercase",marginBottom:2}}>Despesas</div>
           <div style={{fontSize:16,fontWeight:800,color:"#f1f5f9"}}>{hv(fmt(totalExp))}</div>
-          <div style={{fontSize:10,color:T.subtext}}>{myExpenses.length} {myExpenses.length!==1?t[lang].itemsPlural:t[lang].items}</div>
+          <div style={{fontSize:10,color:T.subtext}}>{myExpenses.length} item{myExpenses.length!==1?"s":""}</div>
         </div>
       </div>
     </div>
@@ -1017,15 +994,16 @@ async function handleCoupleSettlement(valor: number) {
     <div onClick={()=>setTab("recorrentes")} style={{background:"rgba(245,158,11,0.08)",border:"1px solid rgba(245,158,11,0.3)",borderRadius:14,padding:"12px 14px",marginBottom:14,cursor:"pointer",display:"flex",alignItems:"center",gap:12}}>
       <div style={{width:32,height:32,borderRadius:9,background:"rgba(245,158,11,0.15)",display:"flex",alignItems:"center",justifyContent:"center",fontSize:16,flexShrink:0}}>🔔</div>
       <div style={{flex:1}}>
-        <div style={{fontSize:13,fontWeight:700,color:"#f59e0b"}}>{dueRecurring} {dueRecurring>1?t[lang].dueRecurringPlural:t[lang].dueRecurring}</div>
-        <div style={{fontSize:11,color:"#78350f",marginTop:1}}>{t[lang].tapToSee}</div>
+        <div style={{fontSize:13,fontWeight:700,color:"#f59e0b"}}>{dueRecurring} despesa{dueRecurring>1?"s":""} recorrente{dueRecurring>1?"s":""} a vencer</div>
+        <div style={{fontSize:11,color:"#78350f",marginTop:1}}>Toca para ver e registar</div>
       </div>
       <span style={{color:"#f59e0b"}}>→</span>
     </div>
   )}
+
   {/* ── ALERTA ORÇAMENTO ── */}
   {(()=>{
-    const overItems=(Object.entries(TYPE_META) as [TypeKey,{label:string;color:string;bg:string;icon:string}][]).filter(([type])=>{
+    const overItems=(Object.entries(TYPE_META) as [TypeKey,typeof TYPE_META[TypeKey]][]).filter(([type])=>{
       const actual=byType[type]||0;
       return actual>totalInc*(budgetTargets[type]/100)&&totalInc>0;
     });
@@ -1038,18 +1016,18 @@ async function handleCoupleSettlement(valor: number) {
       <div style={{background:"rgba(245,158,11,0.08)",border:"1px solid rgba(245,158,11,0.3)",borderRadius:14,padding:"12px 14px",marginBottom:14,display:"flex",alignItems:"flex-start",gap:12}}>
         <div style={{width:32,height:32,borderRadius:9,background:"rgba(245,158,11,0.15)",display:"flex",alignItems:"center",justifyContent:"center",fontSize:16,flexShrink:0}}>⚠️</div>
         <div>
-          <div style={{fontSize:13,fontWeight:700,color:"#f59e0b",marginBottom:2}}>{meta.label} {t[lang].overBudget}</div>
-          <div style={{fontSize:12,color:T.subtext}}>{actualPct}% — {t[lang].target} {target}%.</div>
+          <div style={{fontSize:13,fontWeight:700,color:"#f59e0b",marginBottom:2}}>{meta.label} acima do orçamento</div>
+          <div style={{fontSize:12,color:T.subtext}}>Estás em {actualPct}% — alvo {target}%.</div>
         </div>
       </div>
     );
   })()}
 
- {/* ── COMPOSIÇÃO ── */}
+  {/* ── COMPOSIÇÃO ── */}
   <div style={{marginBottom:14}}>
-    <div style={{fontSize:11,fontWeight:700,color:T.subtext,letterSpacing:"0.1em",textTransform:"uppercase",marginBottom:10}}>{t[lang].composition}</div>
+    <div style={{fontSize:11,fontWeight:700,color:T.subtext,letterSpacing:"0.1em",textTransform:"uppercase",marginBottom:10}}>Composição</div>
     <div style={S.card}>
-      {(Object.entries(TYPE_META) as [TypeKey,{label:string;color:string;bg:string;icon:string}][]).map(([type,meta])=>{
+      {(Object.entries(TYPE_META) as [TypeKey,typeof TYPE_META[TypeKey]][]).map(([type,meta])=>{
         const actual=byType[type]||0,target=budgetTargets[type],targetAmt=totalInc*(target/100),actualPct=pct(actual,totalInc),over=actual>targetAmt&&totalInc>0;
         return(
           <div key={type} style={{marginBottom:18}}>
@@ -1063,18 +1041,18 @@ async function handleCoupleSettlement(valor: number) {
             </div>
             <div style={{display:"flex",justifyContent:"space-between",marginTop:5}}>
               <span style={{fontSize:11,color:over?"#f87171":T.subtext}}>{fmt(actual)}</span>
-              <span style={{fontSize:11,color:T.subtext}}>{t[lang].limit} {fmt(targetAmt)}</span>
+              <span style={{fontSize:11,color:T.subtext}}>limite {fmt(targetAmt)}</span>
             </div>
           </div>
         );
       })}
-      {totalInc===0&&<div style={{color:T.subtext,fontSize:12,textAlign:"center",padding:"8px 0"}}>{t[lang].registerIncome}</div>}
+      {totalInc===0&&<div style={{color:T.subtext,fontSize:12,textAlign:"center",padding:"8px 0"}}>Regista rendimentos para ver a composição.</div>}
     </div>
   </div>
 
- {/* ── TOP CATEGORIAS ── */}
+  {/* ── TOP CATEGORIAS ── */}
   <div style={{marginBottom:14}}>
-    <div style={{fontSize:11,fontWeight:700,color:T.subtext,letterSpacing:"0.1em",textTransform:"uppercase",marginBottom:10}}>{t[lang].topCategories}</div>
+    <div style={{fontSize:11,fontWeight:700,color:T.subtext,letterSpacing:"0.1em",textTransform:"uppercase",marginBottom:10}}>Top categorias</div>
     <div style={S.card}>
       {byCat.filter(c=>c.total>0).slice(0,6).map(c=>(
         <div key={c.id} style={{marginBottom:12}}>
@@ -1085,20 +1063,20 @@ async function handleCoupleSettlement(valor: number) {
           <ProgressBar value={c.total} max={maxCat} color={TYPE_META[c.type]?.color||"#6b7280"} height={4}/>
         </div>
       ))}
-      {byCat.filter(c=>c.total>0).length===0&&<div style={{color:T.subtext,fontSize:13,textAlign:"center",padding:"16px 0"}}>{t[lang].noExpenses}</div>}
+      {byCat.filter(c=>c.total>0).length===0&&<div style={{color:T.subtext,fontSize:13,textAlign:"center",padding:"16px 0"}}>Sem despesas registadas.</div>}
     </div>
   </div>
 
   {/* ── EVOLUÇÃO + NET WORTH ── */}
 <div style={{marginBottom:14}}>
   <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:10}}>
-    <div style={{fontSize:11,fontWeight:700,color:T.subtext,letterSpacing:"0.1em",textTransform:"uppercase"}}>{t[lang].evolution}</div>
+    <div style={{fontSize:11,fontWeight:700,color:T.subtext,letterSpacing:"0.1em",textTransform:"uppercase"}}>Evolução</div>
     <span style={{fontSize:11,color:T.subtext}}>{new Date().getFullYear()}</span>
   </div>
         <div style={S.card}>
         <div style={{display:"flex",gap:6,marginBottom:14}}>
           <button onClick={()=>setChartView("fluxo")} style={{flex:1,padding:"7px 0",border:`1px solid ${chartView==="fluxo"?T.accent:"rgba(255,255,255,0.1)"}`,borderRadius:8,background:chartView==="fluxo"?`${T.accent}20`:"transparent",color:chartView==="fluxo"?T.accent:"#64748b",fontSize:11,fontWeight:700,cursor:"pointer",fontFamily:"'Sora',sans-serif"}}>
-            📊 {t[lang].receiptsVsExpenses}
+            📊 Receitas vs Despesas
           </button>
           <button onClick={()=>setChartView("networth")} style={{flex:1,padding:"7px 0",border:`1px solid ${chartView==="networth"?T.accent:"rgba(255,255,255,0.1)"}`,borderRadius:8,background:chartView==="networth"?`${T.accent}20`:"transparent",color:chartView==="networth"?T.accent:"#64748b",fontSize:11,fontWeight:700,cursor:"pointer",fontFamily:"'Sora',sans-serif"}}>
             💎 Net Worth
@@ -1107,7 +1085,7 @@ async function handleCoupleSettlement(valor: number) {
         {chartView==="fluxo"&&(
           <>
             <div style={{display:"flex",alignItems:"flex-end",gap:4,height:100,marginBottom:10}}>
-              {t[lang].months.map((m,i)=>{
+              {MONTHS.map((m,i)=>{
                 const rev=monthlyRev[world]?.[String(new Date().getFullYear())]?.[i]||0;
                 const exp=expenses.filter(e=>e.world===world&&new Date(e.data).getMonth()===i&&new Date(e.data).getFullYear()===new Date().getFullYear()).reduce((s,e)=>s+Number(e.valor),0);
                 const maxVal=Math.max(...MONTHS.map((_,j)=>{const r=monthlyRev[world]?.[String(new Date().getFullYear())]?.[j]||0;const ex=expenses.filter(e=>e.world===world&&new Date(e.data).getMonth()===j&&new Date(e.data).getFullYear()===new Date().getFullYear()).reduce((s,e)=>s+Number(e.valor),0);return Math.max(r,ex);}),1);
@@ -1126,20 +1104,20 @@ async function handleCoupleSettlement(valor: number) {
               })}
             </div>
             <div style={{display:"flex",gap:16,paddingTop:8,borderTop:`1px solid ${T.cardBorder}`}}>
-              <div style={{display:"flex",alignItems:"center",gap:6,fontSize:11,color:"#94a3b8"}}><div style={{width:10,height:10,borderRadius:2,background:T.positive}}/>{t[lang].receipts}</div>
-              <div style={{display:"flex",alignItems:"center",gap:6,fontSize:11,color:"#94a3b8"}}><div style={{width:10,height:10,borderRadius:2,background:T.negative}}/>{t[lang].expensesLabel}</div>
-              <div style={{marginLeft:"auto",fontSize:11,color:T.subtext}}>{t[lang].currentMonthHighlighted}</div>
+              <div style={{display:"flex",alignItems:"center",gap:6,fontSize:11,color:"#94a3b8"}}><div style={{width:10,height:10,borderRadius:2,background:T.positive}}/>Receitas</div>
+              <div style={{display:"flex",alignItems:"center",gap:6,fontSize:11,color:"#94a3b8"}}><div style={{width:10,height:10,borderRadius:2,background:T.negative}}/>Despesas</div>
+              <div style={{marginLeft:"auto",fontSize:11,color:T.subtext}}>mês actual destacado</div>
             </div>
           </>
         )}
       {chartView==="networth"&&(
           <>
             <div style={{textAlign:"center" as const,marginBottom:10}}>
-              <div style={{fontSize:10,fontWeight:700,color:T.subtext,textTransform:"uppercase" as const,letterSpacing:"0.08em",marginBottom:4}}>{t[lang].netWorthCurrent}</div>
+              <div style={{fontSize:10,fontWeight:700,color:T.subtext,textTransform:"uppercase" as const,letterSpacing:"0.08em",marginBottom:4}}>Net Worth actual</div>
               <div style={{fontSize:28,fontWeight:800,color:totalSaldo>=0?T.positive:T.negative}}>{hv(fmt(totalSaldo))}</div>
             </div>
             <div style={{display:"flex",alignItems:"flex-end",gap:4,height:100,marginBottom:10}}>
-              {t[lang].months.map((m,i)=>{
+              {MONTHS.map((m,i)=>{
                 const snap=nwSnapshots.find(s=>s.mes===i);
                 const maxVal=Math.max(...nwSnapshots.map(s=>s.valor),1);
                 const h=snap?Math.round((snap.valor/maxVal)*88)||2:2;
@@ -1155,7 +1133,7 @@ async function handleCoupleSettlement(valor: number) {
               })}
             </div>
             <div style={{paddingTop:8,borderTop:`1px solid ${T.cardBorder}`,fontSize:11,color:T.subtext,textAlign:"center" as const}}>
-              {t[lang].netWorthEvolution} {new Date().getFullYear()}
+              Evolução do Net Worth em {new Date().getFullYear()}
             </div>
           </>
         )}
@@ -1178,21 +1156,21 @@ async function handleCoupleSettlement(valor: number) {
 
         {/* DESPESAS */}
         {tab==="despesas"&&<>
-          {overBudget.length>0&&(<div style={{background:"#450a0a",border:"1px solid #ef4444",borderRadius:12,padding:"12px 14px",marginBottom:14}}><div style={{fontSize:12,fontWeight:700,color:"#fca5a5",marginBottom:5}}>⚠️ {t[lang].overBudgetWarning}</div>{overBudget.map(([type])=>{const actual=byType[type]||0,target=budgetTargets[type],targetAmt=totalInc*(target/100),meta=TYPE_META[type];return<div key={type} style={{fontSize:11,color:"#f87171",marginBottom:2}}>{meta.icon} {meta.label}: {pct(actual,totalInc)}% ({t[lang].target} {target}%) · {t[lang].excess} {fmt(actual-targetAmt)}</div>;})}</div>)}
+          {overBudget.length>0&&(<div style={{background:"#450a0a",border:"1px solid #ef4444",borderRadius:12,padding:"12px 14px",marginBottom:14}}><div style={{fontSize:12,fontWeight:700,color:"#fca5a5",marginBottom:5}}>⚠️ Orçamento excedido</div>{overBudget.map(([type])=>{const actual=byType[type]||0,target=budgetTargets[type],targetAmt=totalInc*(target/100),meta=TYPE_META[type];return<div key={type} style={{fontSize:11,color:"#f87171",marginBottom:2}}>{meta.icon} {meta.label}: {pct(actual,totalInc)}% (meta {target}%) · excesso {fmt(actual-targetAmt)}</div>;})}</div>)}
           <div style={S.card}>
-            <SectionTitle>{editingExp?t[lang].editExpense:t[lang].addExpense}</SectionTitle>
+            <SectionTitle>Adicionar Despesa</SectionTitle>
             <div style={S.row2}>
-              <div><label style={S.lbl}>{t[lang].description}</label><input style={S.inp} placeholder="Ex: Renda" value={expForm.descricao} onChange={e=>setExpForm(f=>({...f,descricao:e.target.value}))}/></div>
-              <div><label style={S.lbl}>{t[lang].value}</label><input style={S.inp} type="number" placeholder="0,00" value={expForm.valor} onChange={e=>setExpForm(f=>({...f,valor:e.target.value}))}/></div>
+              <div><label style={S.lbl}>Descrição</label><input style={S.inp} placeholder="Ex: Renda" value={expForm.descricao} onChange={e=>setExpForm(f=>({...f,descricao:e.target.value}))}/></div>
+              <div><label style={S.lbl}>Valor (€)</label><input style={S.inp} type="number" placeholder="0,00" value={expForm.valor} onChange={e=>setExpForm(f=>({...f,valor:e.target.value}))}/></div>
             </div>
             <div style={S.row2}>
-              <div><label style={S.lbl}>{t[lang].category}</label><select style={S.sel} value={expForm.cat} onChange={e=>setExpForm(f=>({...f,cat:e.target.value,subcat:""}))}>
-                <option value="">{t[lang].selectCategory}</option>{expCats.map(c=><option key={c.id} value={c.id}>{c.icon} {c.label}</option>)}
+              <div><label style={S.lbl}>Categoria</label><select style={S.sel} value={expForm.cat} onChange={e=>setExpForm(f=>({...f,cat:e.target.value,subcat:""}))}>
+                <option value="">Selecionar...</option>{expCats.map(c=><option key={c.id} value={c.id}>{c.icon} {c.label}</option>)}
               </select></div>
-              <div><label style={S.lbl}>{t[lang].date}</label><input style={S.inp} type="date" value={expForm.data} onChange={e=>setExpForm(f=>({...f,data:e.target.value}))}/></div>
+              <div><label style={S.lbl}>Data</label><input style={S.inp} type="date" value={expForm.data} onChange={e=>setExpForm(f=>({...f,data:e.target.value}))}/></div>
             </div>
-            {selCat?.sub&&(<div style={{marginBottom:10}}><label style={S.lbl}>{t[lang].subCategory}</label><div style={{display:"flex",flexWrap:"wrap",gap:7}}>{selCat.sub.map((s:string)=>{const active=expForm.subcat===s;return<button key={s} onClick={()=>setExpForm(f=>({...f,subcat:active?"":s}))} style={{padding:"7px 13px",border:`1.5px solid ${active?T.accent:"rgba(255,255,255,0.13)"}`,borderRadius:99,background:active?`${T.accent}22`:"rgba(255,255,255,0.04)",color:active?T.accent:"#94a3b8",fontSize:12,fontWeight:active?700:500,cursor:"pointer",fontFamily:"'Sora',sans-serif"}}>{s}</button>;})}</div></div>)}
-            <label style={{...S.lbl,marginTop:4,marginBottom:7}}>{t[lang].type}</label>
+            {selCat?.sub&&(<div style={{marginBottom:10}}><label style={S.lbl}>Sub-categoria</label><div style={{display:"flex",flexWrap:"wrap",gap:7}}>{selCat.sub.map((s:string)=>{const active=expForm.subcat===s;return<button key={s} onClick={()=>setExpForm(f=>({...f,subcat:active?"":s}))} style={{padding:"7px 13px",border:`1.5px solid ${active?T.accent:"rgba(255,255,255,0.13)"}`,borderRadius:99,background:active?`${T.accent}22`:"rgba(255,255,255,0.04)",color:active?T.accent:"#94a3b8",fontSize:12,fontWeight:active?700:500,cursor:"pointer",fontFamily:"'Sora',sans-serif"}}>{s}</button>;})}</div></div>)}
+            <label style={{...S.lbl,marginTop:4,marginBottom:7}}>Tipo</label>
             <TypeSelector value={expForm.tipo} onChange={(v:TypeKey)=>setExpForm(f=>({...f,tipo:v}))}/>
             {!editingExp&&(
   <div onClick={()=>setExpIsRecurring(v=>!v)} style={{display:"flex",alignItems:"center",gap:10,padding:"10px 12px",background:expIsRecurring?`${T.accent}15`:"rgba(255,255,255,0.03)",border:`1px solid ${expIsRecurring?T.accent:"rgba(255,255,255,0.08)"}`,borderRadius:9,cursor:"pointer",marginTop:10,marginBottom:6,userSelect:"none"}}>
@@ -1200,22 +1178,22 @@ async function handleCoupleSettlement(valor: number) {
       <div style={{position:"absolute",top:3,left:expIsRecurring?18:3,width:14,height:14,borderRadius:"50%",background:"#fff",transition:"left .2s"}}/>
     </div>
     <div>
-      <div style={{fontSize:13,fontWeight:600,color:expIsRecurring?"#f1f5f9":"#94a3b8"}}>🔄 {t[lang].recurringExpense}</div>
-      <div style={{fontSize:11,color:"#475569",marginTop:1}}>{expIsRecurring?t[lang].recurringActive:t[lang].recurringInactive}</div>
+      <div style={{fontSize:13,fontWeight:600,color:expIsRecurring?"#f1f5f9":"#94a3b8"}}>🔄 Despesa recorrente</div>
+      <div style={{fontSize:11,color:"#475569",marginTop:1}}>{expIsRecurring?"Será guardada como mensal":"Toca para activar"}</div>
     </div>
   </div>
 )}
-            <button style={btnAdd} onClick={()=>editingExp?updateExpense(editingExp):addExpense()}>{editingExp?t[lang].saveChanges:`+ ${t[lang].addExpense}`}</button>
-            {editingExp&&<button onClick={()=>{setEditingExp(null);setExpForm(f=>({...f,descricao:"",valor:"",subcat:""}));}} style={{width:"100%",marginTop:8,padding:"10px 0",background:"rgba(255,255,255,0.05)",border:`1px solid ${T.cardBorder}`,borderRadius:9,color:T.subtext,fontSize:13,fontWeight:600,cursor:"pointer",fontFamily:"'Sora',sans-serif"}}>{t[lang].cancelEdit}</button>}
+            <button style={btnAdd} onClick={()=>editingExp?updateExpense(editingExp):addExpense()}>{editingExp?"✓ Guardar alterações":"+ Adicionar Despesa"}</button>
+            {editingExp&&<button onClick={()=>{setEditingExp(null);setExpForm(f=>({...f,descricao:"",valor:"",subcat:""}));}} style={{width:"100%",marginTop:8,padding:"10px 0",background:"rgba(255,255,255,0.05)",border:`1px solid ${T.cardBorder}`,borderRadius:9,color:T.subtext,fontSize:13,fontWeight:600,cursor:"pointer",fontFamily:"'Sora',sans-serif"}}>✕ Cancelar edição</button>}
           </div>
           <div style={{...S.card,display:"flex",justifyContent:"space-between",alignItems:"center",padding:"12px 16px"}}>
-            <span style={{fontSize:12,color:T.subtext}}>{myExpenses.length} {t[lang].expensesLabel.toLowerCase()}</span>
+            <span style={{fontSize:12,color:T.subtext}}>{myExpenses.length} despesa(s)</span>
             <span style={{fontSize:17,fontWeight:800,color:T.negative}}>{fmt(totalExp)}</span>
           </div>
-          {myExpenses.length>0&&(<div style={{display:"grid",gridTemplateColumns:"1fr 1fr 1fr",gap:8,marginBottom:14}}>{(Object.entries(TYPE_META) as [TypeKey,{label:string;color:string;bg:string;icon:string}][]).map(([type,meta])=>{const actual=byType[type]||0,target=budgetTargets[type],over=actual>totalInc*(target/100)&&totalInc>0;return(<div key={type} style={{background:over?"#450a0a":meta.bg,border:`1px solid ${over?"#ef4444":meta.color}40`,borderRadius:10,padding:"10px 8px",textAlign:"center"}}><div style={{fontSize:16,marginBottom:2}}>{meta.icon}</div><div style={{fontSize:12,fontWeight:800,color:over?"#ef4444":meta.color}}>{fmt(actual)}</div><div style={{fontSize:10,color:T.subtext,marginTop:1}}>{pct(actual,totalInc)}% / {target}%</div>{over&&<div style={{fontSize:10,color:"#ef4444",fontWeight:700,marginTop:2}}>⚠️</div>}</div>);})}</div>)}
+          {myExpenses.length>0&&(<div style={{display:"grid",gridTemplateColumns:"1fr 1fr 1fr",gap:8,marginBottom:14}}>{(Object.entries(TYPE_META) as [TypeKey,typeof TYPE_META[TypeKey]][]).map(([type,meta])=>{const actual=byType[type]||0,target=budgetTargets[type],over=actual>totalInc*(target/100)&&totalInc>0;return(<div key={type} style={{background:over?"#450a0a":meta.bg,border:`1px solid ${over?"#ef4444":meta.color}40`,borderRadius:10,padding:"10px 8px",textAlign:"center"}}><div style={{fontSize:16,marginBottom:2}}>{meta.icon}</div><div style={{fontSize:12,fontWeight:800,color:over?"#ef4444":meta.color}}>{fmt(actual)}</div><div style={{fontSize:10,color:T.subtext,marginTop:1}}>{pct(actual,totalInc)}% / {target}%</div>{over&&<div style={{fontSize:10,color:"#ef4444",fontWeight:700,marginTop:2}}>⚠️</div>}</div>);})}</div>)}
           <div style={S.card}>
-            {myExpenses.length===0&&<div style={{color:T.subtext,fontSize:13,textAlign:"center",padding:"24px 0"}}>{t[lang].noExpensesPeriod}</div>}
-            {myExpenses.map(e=>{const cat=expCats.find(c=>c.id===e.cat);return(<div key={e.id} style={{display:"flex",alignItems:"center",gap:10,padding:"11px 0",borderBottom:`1px solid ${T.cardBorder}`}}><span style={{fontSize:20,minWidth:28,textAlign:"center"}}>{cat?.icon||"📦"}</span><div style={{flex:1,minWidth:0}}><div style={{fontSize:13,fontWeight:600,color:"#e2e8f0",whiteSpace:"nowrap",overflow:"hidden",textOverflow:"ellipsis"}}>{e.descricao}{e.subcat?<span style={{color:T.subtext}}> · {e.subcat}</span>:""}</div><div style={{display:"flex",alignItems:"center",gap:5,marginTop:3}}><span style={{fontSize:10,color:T.subtext}}>{new Date(e.data+"T12:00:00").toLocaleDateString(lang==="pt"?"pt-PT":"en-GB")}</span><Tag type={e.tipo}/></div></div><span style={{fontSize:14,fontWeight:700,color:T.negative,minWidth:68,textAlign:"right"}}>{fmt(Number(e.valor))}</span><button onClick={()=>{setEditingExp(e.id);setExpForm({descricao:e.descricao,valor:String(e.valor),cat:e.cat,subcat:e.subcat,data:e.data,tipo:e.tipo});window.scrollTo({top:0,behavior:"smooth"});}} style={{background:"none",border:"none",cursor:"pointer",color:T.accent,fontSize:15,padding:"0 2px"}}>✏️</button>
+            {myExpenses.length===0&&<div style={{color:T.subtext,fontSize:13,textAlign:"center",padding:"24px 0"}}>Sem despesas para este período.</div>}
+            {myExpenses.map(e=>{const cat=expCats.find(c=>c.id===e.cat);return(<div key={e.id} style={{display:"flex",alignItems:"center",gap:10,padding:"11px 0",borderBottom:`1px solid ${T.cardBorder}`}}><span style={{fontSize:20,minWidth:28,textAlign:"center"}}>{cat?.icon||"📦"}</span><div style={{flex:1,minWidth:0}}><div style={{fontSize:13,fontWeight:600,color:"#e2e8f0",whiteSpace:"nowrap",overflow:"hidden",textOverflow:"ellipsis"}}>{e.descricao}{e.subcat?<span style={{color:T.subtext}}> · {e.subcat}</span>:""}</div><div style={{display:"flex",alignItems:"center",gap:5,marginTop:3}}><span style={{fontSize:10,color:T.subtext}}>{new Date(e.data+"T12:00:00").toLocaleDateString("pt-PT")}</span><Tag type={e.tipo}/></div></div><span style={{fontSize:14,fontWeight:700,color:T.negative,minWidth:68,textAlign:"right"}}>{fmt(Number(e.valor))}</span><button onClick={()=>{setEditingExp(e.id);setExpForm({descricao:e.descricao,valor:String(e.valor),cat:e.cat,subcat:e.subcat,data:e.data,tipo:e.tipo});window.scrollTo({top:0,behavior:"smooth"});}} style={{background:"none",border:"none",cursor:"pointer",color:T.accent,fontSize:15,padding:"0 2px"}}>✏️</button>
                 <button onClick={()=>deleteExpense(e.id)} style={{background:"none",border:"none",cursor:"pointer",color:T.subtext,fontSize:15,padding:"0 2px"}}>✕</button></div>);})}
           </div>
         </>}
@@ -1227,7 +1205,6 @@ async function handleCoupleSettlement(valor: number) {
             accent={T.accent} accentDark={T.accentDark} cardBg={T.cardBg}
             cardBorder={T.cardBorder} subtext={T.subtext} positive={T.positive} negative={T.negative}
             recurring={recurring} setRecurring={setRecurring} onApplyDue={applyRecurring}
-            lang={lang}
           />
         )}
 
@@ -1239,7 +1216,6 @@ async function handleCoupleSettlement(valor: number) {
             positive={T.positive} negative={T.negative}
             goals={goals} setGoals={setGoals}
             monthlyIncome={totalInc}
-            lang={lang}
           />
         )}
 
@@ -1252,15 +1228,14 @@ async function handleCoupleSettlement(valor: number) {
               cardBg={T.cardBg} cardBorder={T.cardBorder} subtext={T.subtext}
               positive={T.positive} negative={T.negative}
               onSettlement={handleCoupleSettlement}
-              lang={lang}
             />
           ) : (
             <div style={{textAlign:"center",padding:"60px 24px",fontFamily:"'Sora',sans-serif"}}>
               <div style={{fontSize:48,marginBottom:16}}>💑</div>
-              <div style={{fontSize:20,fontWeight:800,color:"#f1f5f9",marginBottom:8,letterSpacing:"-0.5px"}}>{t[lang].coupleMode}</div>
-              <div style={{fontSize:14,color:"#667085",marginBottom:28,lineHeight:1.7}}>{t[lang].coupleModeDesc.split("\n").map((line,i)=><span key={i}>{line}{i===0&&<br/>}</span>)}</div>
+              <div style={{fontSize:20,fontWeight:800,color:"#f1f5f9",marginBottom:8,letterSpacing:"-0.5px"}}>Modo casal</div>
+              <div style={{fontSize:14,color:"#667085",marginBottom:28,lineHeight:1.7}}>Gere despesas partilhadas com o teu parceiro/a.<br/>Disponível no plano Premium.</div>
               <button onClick={()=>setShowPricing(true)} style={{padding:"14px 32px",background:"linear-gradient(135deg,#5DA9FF,#8B6DFF)",border:"none",borderRadius:12,color:"white",fontWeight:700,fontSize:15,cursor:"pointer",fontFamily:"'Sora',sans-serif",boxShadow:"0 4px 20px rgba(93,169,255,0.3)"}}>
-                {t[lang].seePlans}
+                Ver planos →
               </button>
             </div>
           )
@@ -1283,33 +1258,32 @@ async function handleCoupleSettlement(valor: number) {
             expenses={expenses} incomes={incomes} expCats={expCats} world={world}
             accent={T.accent} cardBg={T.cardBg} cardBorder={T.cardBorder}
             subtext={T.subtext} positive={T.positive} negative={T.negative}
-            lang={lang}
           />
         )}
 
      {tab==="rendimentos"&&<>
   <div style={S.card}>
-    <SectionTitle>{editingInc?t[lang].editIncome:t[lang].addIncome}</SectionTitle>
+    <SectionTitle>{editingInc?"Editar Rendimento":"Adicionar Rendimento"}</SectionTitle>
     <div style={S.row2}>
-      <div><label style={S.lbl}>{t[lang].description}</label><input style={S.inp} placeholder="Ex: Salário" value={incForm.descricao} onChange={e=>setIncForm(f=>({...f,descricao:e.target.value}))}/></div>
-      <div><label style={S.lbl}>{t[lang].value}</label><input style={S.inp} type="number" placeholder="0,00" value={incForm.valor} onChange={e=>setIncForm(f=>({...f,valor:e.target.value}))}/></div>
+      <div><label style={S.lbl}>Descrição</label><input style={S.inp} placeholder="Ex: Salário" value={incForm.descricao} onChange={e=>setIncForm(f=>({...f,descricao:e.target.value}))}/></div>
+      <div><label style={S.lbl}>Valor (€)</label><input style={S.inp} type="number" placeholder="0,00" value={incForm.valor} onChange={e=>setIncForm(f=>({...f,valor:e.target.value}))}/></div>
     </div>
     <div style={S.row2}>
-      <div><label style={S.lbl}>{t[lang].source}</label><select style={S.sel} value={incForm.cat} onChange={e=>setIncForm(f=>({...f,cat:e.target.value}))}><option value="">{t[lang].selectCategory}</option>{incCats.map(c=><option key={c.id} value={c.id}>{c.icon} {c.label}</option>)}</select></div>
-      <div><label style={S.lbl}>{t[lang].date}</label><input style={S.inp} type="date" value={incForm.data} onChange={e=>setIncForm(f=>({...f,data:e.target.value}))}/></div>
+      <div><label style={S.lbl}>Fonte</label><select style={S.sel} value={incForm.cat} onChange={e=>setIncForm(f=>({...f,cat:e.target.value}))}><option value="">Selecionar...</option>{incCats.map(c=><option key={c.id} value={c.id}>{c.icon} {c.label}</option>)}</select></div>
+      <div><label style={S.lbl}>Data</label><input style={S.inp} type="date" value={incForm.data} onChange={e=>setIncForm(f=>({...f,data:e.target.value}))}/></div>
     </div>
-    <button style={btnAdd} onClick={()=>editingInc?updateIncome(editingInc):addIncome()}>{editingInc?t[lang].saveChanges:`+ ${t[lang].addIncome}`}</button>
-    {editingInc&&<button onClick={()=>{setEditingInc(null);setIncForm(f=>({...f,descricao:"",valor:""}));}} style={{width:"100%",marginTop:8,padding:"10px 0",background:"rgba(255,255,255,0.05)",border:`1px solid ${T.cardBorder}`,borderRadius:9,color:T.subtext,fontSize:13,fontWeight:600,cursor:"pointer",fontFamily:"'Sora',sans-serif"}}>{t[lang].cancelEdit}</button>}
+    <button style={btnAdd} onClick={()=>editingInc?updateIncome(editingInc):addIncome()}>{editingInc?"✓ Guardar alterações":"+ Adicionar Rendimento"}</button>
+    {editingInc&&<button onClick={()=>{setEditingInc(null);setIncForm(f=>({...f,descricao:"",valor:""}));}} style={{width:"100%",marginTop:8,padding:"10px 0",background:"rgba(255,255,255,0.05)",border:`1px solid ${T.cardBorder}`,borderRadius:9,color:T.subtext,fontSize:13,fontWeight:600,cursor:"pointer",fontFamily:"'Sora',sans-serif"}}>✕ Cancelar edição</button>}
   </div>
   <div style={{...S.card,display:"flex",justifyContent:"space-between",alignItems:"center",padding:"12px 16px"}}>
-    <span style={{fontSize:12,color:T.subtext}}>{myIncomes.length} {myIncomes.length!==1?t[lang].entriesPlural:t[lang].entries}</span>
+    <span style={{fontSize:12,color:T.subtext}}>{myIncomes.length} entrada(s)</span>
     <span style={{fontSize:17,fontWeight:800,color:T.positive}}>{fmt(totalInc)}</span>
   </div>
   <div style={S.card}>
-    {myIncomes.length===0&&<div style={{color:T.subtext,fontSize:13,textAlign:"center",padding:"24px 0"}}>{t[lang].noIncomes}</div>}
-    {myIncomes.map(i=>{const cat=incCats.find(c=>c.id===i.cat);return(<div key={i.id} style={{display:"flex",alignItems:"center",gap:10,padding:"11px 0",borderBottom:`1px solid ${T.cardBorder}`}}><span style={{fontSize:20,minWidth:28,textAlign:"center"}}>{cat?.icon||"📦"}</span><div style={{flex:1,minWidth:0}}><div style={{fontSize:13,fontWeight:600,color:"#e2e8f0",whiteSpace:"nowrap",overflow:"hidden",textOverflow:"ellipsis"}}>{i.descricao}</div><div style={{fontSize:11,color:T.subtext,marginTop:2}}>{new Date(i.data+"T12:00:00").toLocaleDateString(lang==="pt"?"pt-PT":"en-GB")} · {cat?.label}</div></div><span style={{fontSize:14,fontWeight:700,color:T.positive,minWidth:68,textAlign:"right"}}>{fmt(Number(i.valor))}</span><button onClick={()=>{setEditingInc(i.id);setIncForm({descricao:i.descricao,valor:String(i.valor),cat:i.cat,data:i.data});window.scrollTo({top:0,behavior:"smooth"});}} style={{background:"none",border:"none",cursor:"pointer",color:T.accent,fontSize:15,padding:"0 2px"}}>✏️</button><button onClick={()=>deleteIncome(i.id)} style={{background:"none",border:"none",cursor:"pointer",color:T.subtext,fontSize:15,padding:"0 2px"}}>✕</button></div>);})}
+    {myIncomes.length===0&&<div style={{color:T.subtext,fontSize:13,textAlign:"center",padding:"24px 0"}}>Sem rendimentos registados.</div>}
+    {myIncomes.map(i=>{const cat=incCats.find(c=>c.id===i.cat);return(<div key={i.id} style={{display:"flex",alignItems:"center",gap:10,padding:"11px 0",borderBottom:`1px solid ${T.cardBorder}`}}><span style={{fontSize:20,minWidth:28,textAlign:"center"}}>{cat?.icon||"📦"}</span><div style={{flex:1,minWidth:0}}><div style={{fontSize:13,fontWeight:600,color:"#e2e8f0",whiteSpace:"nowrap",overflow:"hidden",textOverflow:"ellipsis"}}>{i.descricao}</div><div style={{fontSize:11,color:T.subtext,marginTop:2}}>{new Date(i.data+"T12:00:00").toLocaleDateString("pt-PT")} · {cat?.label}</div></div><span style={{fontSize:14,fontWeight:700,color:T.positive,minWidth:68,textAlign:"right"}}>{fmt(Number(i.valor))}</span><button onClick={()=>{setEditingInc(i.id);setIncForm({descricao:i.descricao,valor:String(i.valor),cat:i.cat,data:i.data});window.scrollTo({top:0,behavior:"smooth"});}} style={{background:"none",border:"none",cursor:"pointer",color:T.accent,fontSize:15,padding:"0 2px"}}>✏️</button><button onClick={()=>deleteIncome(i.id)} style={{background:"none",border:"none",cursor:"pointer",color:T.subtext,fontSize:15,padding:"0 2px"}}>✕</button></div>);})}
   </div>
-  {myIncomes.length>0&&(<div style={S.card}><SectionTitle>{t[lang].bySource}</SectionTitle>{byIncCat.filter(c=>c.total>0).map(c=>(<div key={c.id} style={{marginBottom:10}}><div style={{display:"flex",justifyContent:"space-between",marginBottom:4}}><span style={{fontSize:13}}>{c.icon} {c.label}</span><span style={{fontSize:13,fontWeight:700,color:T.positive}}>{fmt(c.total)} <span style={{fontSize:11,color:T.subtext,fontWeight:400}}>({pct(c.total,totalInc)}%)</span></span></div><ProgressBar value={c.total} max={maxInc} color={T.positive} height={4}/></div>))}</div>)}
+  {myIncomes.length>0&&(<div style={S.card}><SectionTitle>Por fonte</SectionTitle>{byIncCat.filter(c=>c.total>0).map(c=>(<div key={c.id} style={{marginBottom:10}}><div style={{display:"flex",justifyContent:"space-between",marginBottom:4}}><span style={{fontSize:13}}>{c.icon} {c.label}</span><span style={{fontSize:13,fontWeight:700,color:T.positive}}>{fmt(c.total)} <span style={{fontSize:11,color:T.subtext,fontWeight:400}}>({pct(c.total,totalInc)}%)</span></span></div><ProgressBar value={c.total} max={maxInc} color={T.positive} height={4}/></div>))}</div>)}
 </>}
 
         {/* PROGRESSÃO */}
@@ -1322,7 +1296,7 @@ async function handleCoupleSettlement(valor: number) {
           <div style={S.card}>
             <SectionTitle>Receita mensal — {revYear} (toca para editar)</SectionTitle>
             <div style={{display:"grid",gridTemplateColumns:"repeat(3,1fr)",gap:8}}>
-              {t[lang].months.map((m,i)=>{
+              {MONTHS.map((m,i)=>{
                 const v=revArr[i]||0,expM=expenses.filter(e=>e.world===world&&new Date(e.data).getMonth()===i&&String(new Date(e.data).getFullYear())===revYear).reduce((s,e)=>s+Number(e.valor),0),net=v-expM;
                 return(<div key={i} onClick={()=>{setRevEdit(i);setRevVal(String(v));}} style={{background:T.cardBg,border:`1px solid ${revEdit===i?T.accent:T.cardBorder}`,borderRadius:10,padding:"10px 12px",cursor:"pointer",transition:"border .2s"}}>
                   <div style={{fontSize:11,color:T.subtext,marginBottom:4,fontWeight:600}}>{m}</div>
@@ -1335,7 +1309,7 @@ async function handleCoupleSettlement(valor: number) {
           <div style={S.card}>
             <SectionTitle>Receita vs Despesas — {revYear}</SectionTitle>
             <div style={{display:"flex",alignItems:"flex-end",gap:4,height:90,marginBottom:8}}>
-              {t[lang].months.map((m,i)=>{
+              {MONTHS.map((m,i)=>{
                 const rev=revArr[i]||0,exp=expenses.filter(e=>e.world===world&&new Date(e.data).getMonth()===i&&String(new Date(e.data).getFullYear())===revYear).reduce((s,e)=>s+Number(e.valor),0),rH=Math.round((rev/maxBar)*78)||2,eH=Math.round((exp/maxBar)*78)||2;
                 return(<div key={i} style={{flex:1,display:"flex",flexDirection:"column",alignItems:"center",gap:2}}><div style={{display:"flex",alignItems:"flex-end",gap:1,height:78}}><div style={{width:"45%",height:rH,background:T.positive,borderRadius:"3px 3px 0 0",transition:"height .4s"}}/><div style={{width:"45%",height:eH,background:T.negative,borderRadius:"3px 3px 0 0",transition:"height .4s"}}/></div><span style={{fontSize:8,color:T.subtext}}>{m}</span></div>);
               })}
@@ -1351,20 +1325,23 @@ async function handleCoupleSettlement(valor: number) {
       {/* ── BOTTOM NAV ── */}
       <div style={{position:"fixed",bottom:16,left:"50%",transform:"translateX(-50%)",zIndex:60,width:"calc(100% - 32px)",maxWidth:420}}>
         <div style={{background:"rgba(15,18,30,0.85)",backdropFilter:"blur(20px)",WebkitBackdropFilter:"blur(20px)",border:"1px solid rgba(255,255,255,0.08)",borderRadius:24,padding:"10px 8px",display:"flex",alignItems:"center",justifyContent:"space-around",boxShadow:"0 8px 32px rgba(0,0,0,0.5)",paddingBottom:"env(safe-area-inset-bottom, 10px)"}}>
+
           {/* Dashboard */}
           <button onClick={()=>setTab("resumo")} style={{display:"flex",flexDirection:"column" as const,alignItems:"center",gap:4,padding:"8px 16px",borderRadius:16,border:"none",background:tab==="resumo"?`${T.accent}20`:"transparent",cursor:"pointer",transition:"all .2s",minWidth:60}}>
             <svg width="22" height="22" viewBox="0 0 24 24" fill={tab==="resumo"?T.accent:"rgba(255,255,255,0.4)"}>
               <path d="M3 13h8V3H3v10zm0 8h8v-6H3v6zm10 0h8V11h-8v10zm0-18v6h8V3h-8z"/>
             </svg>
-            <span style={{fontSize:10,fontWeight:tab==="resumo"?700:500,color:tab==="resumo"?T.accent:"rgba(255,255,255,0.4)"}}>{t[lang].dashboard}</span>
+            <span style={{fontSize:10,fontWeight:tab==="resumo"?700:500,color:tab==="resumo"?T.accent:"rgba(255,255,255,0.4)"}}>Dashboard</span>
           </button>
+
           {/* Modo Casal */}
           <button onClick={()=>setTab("casal")} style={{display:"flex",flexDirection:"column" as const,alignItems:"center",gap:4,padding:"8px 16px",borderRadius:16,border:"none",background:tab==="casal"?`${T.accent}20`:"transparent",cursor:"pointer",transition:"all .2s",minWidth:60}}>
             <svg width="22" height="22" viewBox="0 0 24 24" fill={tab==="casal"?T.accent:"rgba(255,255,255,0.4)"}>
               <path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z"/>
             </svg>
-            <span style={{fontSize:10,fontWeight:tab==="casal"?700:500,color:tab==="casal"?T.accent:"rgba(255,255,255,0.4)"}}>{t[lang].couple}</span>
+            <span style={{fontSize:10,fontWeight:tab==="casal"?700:500,color:tab==="casal"?T.accent:"rgba(255,255,255,0.4)"}}>Casal</span>
           </button>
+
           {/* Botão + central */}
           <button onClick={()=>setShowAddModal(true)} style={{width:52,height:52,borderRadius:"50%",background:`linear-gradient(135deg,${T.accent},${T.accentDark})`,border:"none",display:"flex",alignItems:"center",justifyContent:"center",cursor:"pointer",boxShadow:`0 4px 20px ${T.accent}50`,flexShrink:0,transition:"transform .2s"}}
             onMouseDown={e=>(e.currentTarget.style.transform="scale(0.92)")}
@@ -1374,20 +1351,23 @@ async function handleCoupleSettlement(valor: number) {
               <path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/>
             </svg>
           </button>
+
           {/* Metas */}
           <button onClick={()=>setTab("objetivos")} style={{display:"flex",flexDirection:"column" as const,alignItems:"center",gap:4,padding:"8px 16px",borderRadius:16,border:"none",background:tab==="objetivos"?`${T.accent}20`:"transparent",cursor:"pointer",transition:"all .2s",minWidth:60}}>
             <svg width="22" height="22" viewBox="0 0 24 24" fill={tab==="objetivos"?T.accent:"rgba(255,255,255,0.4)"}>
               <path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-7 14l-5-5 1.41-1.41L12 14.17l7.59-7.59L21 8l-9 9z"/>
             </svg>
-            <span style={{fontSize:10,fontWeight:tab==="objetivos"?700:500,color:tab==="objetivos"?T.accent:"rgba(255,255,255,0.4)"}}>{t[lang].goals}</span>
+            <span style={{fontSize:10,fontWeight:tab==="objetivos"?700:500,color:tab==="objetivos"?T.accent:"rgba(255,255,255,0.4)"}}>Metas</span>
           </button>
+
           {/* Definições */}
           <button onClick={()=>setSidebarOpen(true)} style={{display:"flex",flexDirection:"column" as const,alignItems:"center",gap:4,padding:"8px 16px",borderRadius:16,border:"none",background:"transparent",cursor:"pointer",transition:"all .2s",minWidth:60}}>
             <svg width="22" height="22" viewBox="0 0 24 24" fill="rgba(255,255,255,0.4)">
               <path d="M19.14,12.94c0.04-0.3,0.06-0.61,0.06-0.94c0-0.32-0.02-0.64-0.07-0.94l2.03-1.58c0.18-0.14,0.23-0.41,0.12-0.61 l-1.92-3.32c-0.12-0.22-0.37-0.29-0.59-0.22l-2.39,0.96c-0.5-0.38-1.03-0.7-1.62-0.94L14.4,2.81c-0.04-0.24-0.24-0.41-0.48-0.41 h-3.84c-0.24,0-0.43,0.17-0.47,0.41L9.25,5.35C8.66,5.59,8.12,5.92,7.63,6.29L5.24,5.33c-0.22-0.08-0.47,0-0.59,0.22L2.74,8.87 C2.62,9.08,2.66,9.34,2.86,9.48l2.03,1.58C4.84,11.36,4.8,11.69,4.8,12s0.02,0.64,0.07,0.94l-2.03,1.58 c-0.18,0.14-0.23,0.41-0.12,0.61l1.92,3.32c0.12,0.22,0.37,0.29,0.59,0.22l2.39-0.96c0.5,0.38,1.03,0.7,1.62,0.94l0.36,2.54 c0.05,0.24,0.24,0.41,0.48,0.41h3.84c0.24,0,0.44-0.17,0.47-0.41l0.36-2.54c0.59-0.24,1.13-0.56,1.62-0.94l2.39,0.96 c0.22,0.08,0.47,0,0.59-0.22l1.92-3.32c0.12-0.22,0.07-0.47-0.12-0.61L19.14,12.94z M12,15.6c-1.98,0-3.6-1.62-3.6-3.6 s1.62-3.6,3.6-3.6s3.6,1.62,3.6,3.6S13.98,15.6,12,15.6z"/>
             </svg>
-            <span style={{fontSize:10,fontWeight:500,color:"rgba(255,255,255,0.4)"}}>{t[lang].settings}</span>
+            <span style={{fontSize:10,fontWeight:500,color:"rgba(255,255,255,0.4)"}}>Definições</span>
           </button>
+
         </div>
       </div>
 
@@ -1397,20 +1377,20 @@ async function handleCoupleSettlement(valor: number) {
           <div onClick={()=>setShowAddModal(false)} style={{position:"fixed",inset:0,background:"rgba(0,0,0,0.6)",zIndex:70,backdropFilter:"blur(4px)"}}/>
           <div style={{position:"fixed",bottom:100,left:"50%",transform:"translateX(-50%)",zIndex:80,width:"calc(100% - 32px)",maxWidth:420}}>
             <div style={{background:"rgba(15,18,30,0.95)",border:"1px solid rgba(255,255,255,0.1)",borderRadius:24,padding:"20px",boxShadow:"0 -8px 40px rgba(0,0,0,0.5)"}}>
-              <div style={{fontSize:12,fontWeight:700,color:"rgba(255,255,255,0.4)",textTransform:"uppercase" as const,letterSpacing:"0.1em",marginBottom:16,textAlign:"center" as const}}>{t[lang].whatToAdd}</div>
+              <div style={{fontSize:12,fontWeight:700,color:"rgba(255,255,255,0.4)",textTransform:"uppercase" as const,letterSpacing:"0.1em",marginBottom:16,textAlign:"center" as const}}>O que queres adicionar?</div>
               <div style={{display:"flex",flexDirection:"column" as const,gap:10}}>
                 <button onClick={()=>{setTab("despesas");setShowAddModal(false);}} style={{width:"100%",padding:"14px 20px",background:`linear-gradient(135deg,${T.accent},${T.accentDark})`,border:"none",borderRadius:14,color:"#fff",fontWeight:700,fontSize:14,cursor:"pointer",fontFamily:"'Sora',sans-serif",display:"flex",alignItems:"center",gap:12}}>
                   <span style={{fontSize:20}}>📥</span>
                   <div style={{textAlign:"left" as const}}>
-                    <div>{t[lang].expensesLabel}</div>
-                    <div style={{fontSize:11,fontWeight:400,opacity:0.8}}>{t[lang].registerExpense}</div>
+                    <div>Despesa</div>
+                    <div style={{fontSize:11,fontWeight:400,opacity:0.8}}>Regista uma nova despesa</div>
                   </div>
                 </button>
                 <button onClick={()=>{setTab("rendimentos");setShowAddModal(false);}} style={{width:"100%",padding:"14px 20px",background:"rgba(52,211,153,0.15)",border:"1px solid rgba(52,211,153,0.3)",borderRadius:14,color:"#34d399",fontWeight:700,fontSize:14,cursor:"pointer",fontFamily:"'Sora',sans-serif",display:"flex",alignItems:"center",gap:12}}>
                   <span style={{fontSize:20}}>💶</span>
                   <div style={{textAlign:"left" as const}}>
-                    <div>{t[lang].incomes}</div>
-                    <div style={{fontSize:11,fontWeight:400,opacity:0.8}}>{t[lang].registerIncomeSub}</div>
+                    <div>Rendimento</div>
+                    <div style={{fontSize:11,fontWeight:400,opacity:0.8}}>Regista um novo rendimento</div>
                   </div>
                 </button>
              </div>
