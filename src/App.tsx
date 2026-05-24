@@ -878,7 +878,8 @@ async function handleCoupleSettlement(valor: number) {
   >
     ☰
   </button>
- <button onClick={()=>setHideValues(v=>!v)} style={{background:"rgba(255,255,255,0.05)",border:"1px solid rgba(255,255,255,0.1)",borderRadius:99,padding:"7px 10px",cursor:"pointer",display:"flex",alignItems:"center",justifyContent:"center",width:38,height:38}}>
+  <div style={{position:"absolute",left:"50%",transform:"translateX(-50%)"}}>
+    <button onClick={()=>setHideValues(v=>!v)} style={{background:"rgba(255,255,255,0.05)",border:"1px solid rgba(255,255,255,0.1)",borderRadius:99,padding:"7px 10px",cursor:"pointer",display:"flex",alignItems:"center",justifyContent:"center"}}>
   {hideValues?(
     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.5)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
       <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94"/>
@@ -892,6 +893,7 @@ async function handleCoupleSettlement(valor: number) {
     </svg>
   )}
 </button>
+</div>
   {/* FILTRO inline */}
   <div style={{position:"relative"}}>
     <button
