@@ -48,6 +48,8 @@ export default function CoupleMode({ userId, userEmail, userName, expCats, accen
   const [myContrib,  setMyContrib]  = useState("");
   const [partnerContrib,setPartnerContrib]=useState("");
   const [recurringItems, setRecurringItems] = useState<CoupleRecurringExpense[]>([]);
+  const [editOrcamento, setEditOrcamento] = useState(false);
+  const [orcamentoInput, setOrcamentoInput] = useState("");
 
   useEffect(()=>{ loadCouple(); },[userId,userEmail]);
 
@@ -178,6 +180,14 @@ async function syncToPersonal(e: CoupleExpense) {
   // Apaga despesa conjunta
   await supabase.from("couple_expenses").delete().eq("id", e.id);
   setExpenses(p => p.filter(x => x.id !== e.id));
+}
+
+async function saveOrcamento() {
+  if(!account) return;
+  const val = Number(orcamentoInput);
+  await supabase.from("couple_account").update({ orcamento_mensal: val }).eq("id", account.id);
+  setAccount(a => a ? {...a, orcamento_mensal: val} : a);
+  setEditOrcamento(false);
 }
 
  async function saveContrib() {
@@ -379,6 +389,58 @@ const jointBalance = totalContributions - totalSettledExpenses;
   <div style={{fontSize:12,color:jointBalance>=0?"rgba(0,195,122,0.8)":"rgba(255,125,125,0.8)",fontWeight:600,marginBottom:16}}>
     {totalSettledExpenses>0?`${fmt(totalContributions)} contribuições − ${fmt(totalSettledExpenses)} despesas`:`${fmt(totalContributions)} em contribuições`}
   </div>
+
+  {/* ── Orçamento mensal ── */}
+  {(()=>{
+    const orcamento = Number((account as any)?.orcamento_mensal) || 0;
+    const usado = totalSettledExpenses;
+    const pct = orcamento > 0 ? Math.min(100, Math.round((usado / orcamento) * 100)) : 0;
+    const restante = orcamento - usado;
+    const overBudget = orcamento > 0 && usado > orcamento;
+    return orcamento > 0 ? (
+      <div style={{marginBottom:16}}>
+        <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:8}}>
+          <span style={{fontSize:12,color:subtext}}>Orçamento mensal</span>
+          <div style={{display:"flex",alignItems:"center",gap:8}}>
+            <span style={{fontSize:12,fontWeight:700,color:overBudget?"#ff7d7d":"#34d399"}}>{pct}%</span>
+            <button onClick={()=>{setEditOrcamento(true);setOrcamentoInput(String(orcamento));}} style={{background:"rgba(255,255,255,0.06)",border:"1px solid rgba(255,255,255,0.1)",borderRadius:6,padding:"3px 8px",color:subtext,fontSize:11,cursor:"pointer",fontFamily:"'Sora',sans-serif"}}>✏️</button>
+          </div>
+        </div>
+        <div style={{height:8,borderRadius:99,background:"rgba(255,255,255,0.07)",overflow:"hidden",marginBottom:8}}>
+          <div style={{width:`${pct}%`,height:"100%",borderRadius:99,background:overBudget?"linear-gradient(90deg,#ff7d7d,#ef4444)":"linear-gradient(90deg,#34d399,#00c37a)",transition:"width 0.5s ease"}}/>
+        </div>
+        <div style={{display:"flex",justifyContent:"space-between"}}>
+          <span style={{fontSize:11,color:overBudget?"#ff7d7d":subtext}}>{overBudget?`⚠️ Excedido em ${fmt(Math.abs(restante))}`:`Restam ${fmt(restante)}`}</span>
+          <span style={{fontSize:11,color:subtext}}>{fmt(usado)} / {fmt(orcamento)}</span>
+        </div>
+      </div>
+    ) : (
+      <button onClick={()=>{setEditOrcamento(true);setOrcamentoInput("");}} style={{width:"100%",padding:"10px 0",background:"rgba(255,255,255,0.04)",border:"1px dashed rgba(255,255,255,0.15)",borderRadius:10,color:subtext,fontSize:12,fontWeight:600,cursor:"pointer",fontFamily:"'Sora',sans-serif",marginBottom:16}}>
+        + Definir orçamento mensal conjunto
+      </button>
+    );
+  })()}
+
+  {/* Modal editar orçamento */}
+  {editOrcamento&&(
+    <div style={{background:"rgba(255,255,255,0.04)",border:"1px solid rgba(255,255,255,0.1)",borderRadius:12,padding:"14px",marginBottom:16}}>
+      <div style={{fontSize:12,color:subtext,marginBottom:8}}>Orçamento mensal conjunto (€)</div>
+      <div style={{display:"flex",gap:8}}>
+        <input
+          style={{...inp,flex:1}}
+          type="number"
+          placeholder="Ex: 2000"
+          value={orcamentoInput}
+          onChange={e=>setOrcamentoInput(e.target.value)}
+          onKeyDown={e=>e.key==="Enter"&&saveOrcamento()}
+          autoFocus
+        />
+        <button onClick={saveOrcamento} style={{padding:"10px 16px",background:`linear-gradient(135deg,${accent},${accentDark})`,border:"none",borderRadius:8,color:"#fff",fontSize:13,fontWeight:700,cursor:"pointer",fontFamily:"'Sora',sans-serif"}}>✓</button>
+        <button onClick={()=>setEditOrcamento(false)} style={{padding:"10px 12px",background:"rgba(255,255,255,0.05)",border:"1px solid rgba(255,255,255,0.1)",borderRadius:8,color:subtext,fontSize:13,cursor:"pointer"}}>✕</button>
+      </div>
+    </div>
+  )}
+
   <div style={{background:"rgba(255,255,255,0.04)",borderRadius:10,padding:"10px 14px",display:"flex",justifyContent:"space-between",alignItems:"center"}}>
     <span style={{fontSize:12,color:subtext}}>Contribuições este mês</span>
     <span style={{fontSize:13,fontWeight:700,color:"rgba(0,195,122,0.9)"}}>{fmt(totalContributions)}</span>
