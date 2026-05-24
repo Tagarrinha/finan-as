@@ -50,6 +50,8 @@ export default function CoupleMode({ userId, userEmail, userName, expCats, accen
   const [recurringItems, setRecurringItems] = useState<CoupleRecurringExpense[]>([]);
   const [editOrcamento, setEditOrcamento] = useState(false);
   const [orcamentoInput, setOrcamentoInput] = useState("");
+  const [notifications, setNotifications] = useState<{id:string;mensagem:string;lida:boolean;created_at:string}[]>([]);
+  const [showNotifications, setShowNotifications] = useState(false);
 
   useEffect(()=>{ loadCouple(); },[userId,userEmail]);
 
@@ -65,16 +67,18 @@ export default function CoupleMode({ userId, userEmail, userName, expCats, accen
       }
       setCouple(c as Couple);
       if(c.status==="active"){
-        const [expR,accR,setR,recR]=await Promise.all([
-          supabase.from("couple_expenses").select("*").eq("couple_id",c.id).order("data",{ascending:false}),
-          supabase.from("couple_account").select("*").eq("couple_id",c.id).maybeSingle(),
-          supabase.from("couple_settlements").select("*").eq("couple_id",c.id).order("created_at",{ascending:false}),
-          supabase.from("couple_recurring_expenses").select("*").eq("couple_id",c.id).order("proxima_data"),
-        ]);
-        if(expR.data) setExpenses(expR.data as CoupleExpense[]);
-        if(accR.data) setAccount(accR.data as CoupleAccount);
-        if(setR.data) setSettlements(setR.data as Settlement[]);
-        if(recR.data) setRecurringItems(recR.data as CoupleRecurringExpense[]);
+        const [expR,accR,setR,recR,notifR]=await Promise.all([
+        supabase.from("couple_expenses").select("*").eq("couple_id",c.id).order("data",{ascending:false}),
+        supabase.from("couple_account").select("*").eq("couple_id",c.id).maybeSingle(),
+        supabase.from("couple_settlements").select("*").eq("couple_id",c.id).order("created_at",{ascending:false}),
+        supabase.from("couple_recurring_expenses").select("*").eq("couple_id",c.id).order("proxima_data"),
+        supabase.from("notifications").select("*").eq("user_id",userId).eq("lida",false).order("created_at",{ascending:false}).limit(20),
+      ]);
+      if(expR.data) setExpenses(expR.data as CoupleExpense[]);
+      if(accR.data) setAccount(accR.data as CoupleAccount);
+      if(setR.data) setSettlements(setR.data as Settlement[]);
+      if(recR.data) setRecurringItems(recR.data as CoupleRecurringExpense[]);
+      if(notifR.data) setNotifications(notifR.data);
       }
     }
     setLoading(false);
@@ -155,7 +159,10 @@ async function syncToPersonal(e: CoupleExpense) {
       data:form.data,split_user1:s1,split_user2:s2,pago_por: form.pagoPor==="me" ? userId : (isUser1 ? couple.user2_id : couple.user1_id),liquidado:form.liquidado,
     }).select().single();
     if(!error&&data){
-      setExpenses(p=>[data as CoupleExpense,...p]);
+    setExpenses(p=>[data as CoupleExpense,...p]);
+      // Notifica o parceiro
+      const partnerId = isUser1 ? couple.user2_id : couple.user1_id;
+      if(partnerId) await createNotification(partnerId, "nova_despesa", `${userName} adicionou uma despesa conjunta: ${form.descricao.trim()} — ${fmt(Number(form.valor))}`);
       // Se liquidado — sync imediato para contas pessoais
       if(form.liquidado) await syncToPersonal(data as CoupleExpense);
       setForm(f=>({...f,descricao:"",valor:"",subcat:""}));
@@ -164,10 +171,12 @@ async function syncToPersonal(e: CoupleExpense) {
     setSaving(false);
   }
 
-  // Marcar despesa como liquidada e sync para pessoal
   async function marcarLiquidado(e: CoupleExpense) {
   await supabase.from("couple_expenses").update({liquidado:true}).eq("id",e.id);
   setExpenses(p=>p.map(x=>x.id===e.id?{...x,liquidado:true}:x));
+  // Notifica o parceiro
+  const partnerId = isUser1 ? couple!.user2_id : couple!.user1_id;
+  if(partnerId) await createNotification(partnerId, "liquidado", `${userName} liquidou a despesa: ${e.descricao} — ${fmt(Number(e.valor))}`);
   await syncToPersonal(e);
   // Deduz a parte do utilizador actual da conta pessoal
   const myShare = isUser1 ? e.split_user1 : e.split_user2;
@@ -180,6 +189,17 @@ async function syncToPersonal(e: CoupleExpense) {
   // Apaga despesa conjunta
   await supabase.from("couple_expenses").delete().eq("id", e.id);
   setExpenses(p => p.filter(x => x.id !== e.id));
+}
+
+async function createNotification(partnerId: string, tipo: string, mensagem: string) {
+  if(!couple) return;
+  await supabase.from("notifications").insert({
+    user_id: partnerId,
+    couple_id: couple.id,
+    tipo,
+    mensagem,
+    lida: false,
+  });
 }
 
 async function saveOrcamento() {
@@ -354,7 +374,53 @@ const jointBalance = totalContributions - totalSettledExpenses;
           <div style={{fontSize:14,fontWeight:800,color:"#f1f5f9"}}>{userName} & {partnerName}</div>
           <div style={{fontSize:11,color:subtext,marginTop:2}}>{partnerEmail} · modo casal ativo</div>
         </div>
-        <button onClick={dissolveCouple} style={{padding:"5px 10px",background:"rgba(239,68,68,0.08)",border:"1px solid rgba(239,68,68,0.15)",borderRadius:8,color:"#f87171",fontSize:10,fontWeight:600,cursor:"pointer",fontFamily:"'Sora',sans-serif"}}>✕ Terminar</button>
+        <div style={{display:"flex",gap:8,alignItems:"center"}}>
+  {/* Notificações */}
+  <div style={{position:"relative"}}>
+    <button
+      onClick={()=>setShowNotifications(v=>!v)}
+      style={{width:36,height:36,borderRadius:10,background:"rgba(255,255,255,0.05)",border:"1px solid rgba(255,255,255,0.1)",display:"flex",alignItems:"center",justifyContent:"center",cursor:"pointer",fontSize:18,position:"relative"}}
+    >
+      🔔
+      {notifications.length>0&&(
+        <span style={{position:"absolute",top:-4,right:-4,width:18,height:18,borderRadius:"50%",background:"#ef4444",color:"white",fontSize:10,fontWeight:800,display:"flex",alignItems:"center",justifyContent:"center"}}>
+          {notifications.length}
+        </span>
+      )}
+    </button>
+    {showNotifications&&(
+      <>
+        <div onClick={()=>setShowNotifications(false)} style={{position:"fixed",inset:0,zIndex:10}}/>
+        <div style={{position:"absolute",top:"calc(100% + 8px)",right:0,zIndex:20,background:"#0f1117",border:"1px solid rgba(255,255,255,0.1)",borderRadius:16,padding:"12px",minWidth:280,maxWidth:320,boxShadow:"0 8px 32px rgba(0,0,0,0.5)"}}>
+          <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:10}}>
+            <div style={{fontSize:12,fontWeight:700,color:"#f1f5f9"}}>Notificações</div>
+            {notifications.length>0&&(
+              <button
+                onClick={async()=>{
+                  await supabase.from("notifications").update({lida:true}).eq("user_id",userId);
+                  setNotifications([]);
+                  setShowNotifications(false);
+                }}
+                style={{fontSize:11,color:accent,background:"none",border:"none",cursor:"pointer",fontFamily:"'Sora',sans-serif",fontWeight:600}}
+              >
+                Marcar todas como lidas
+              </button>
+            )}
+          </div>
+          {notifications.length===0?(
+            <div style={{textAlign:"center" as const,padding:"16px 0",color:subtext,fontSize:13}}>Sem notificações</div>
+          ):notifications.map(n=>(
+            <div key={n.id} style={{padding:"10px 0",borderBottom:"1px solid rgba(255,255,255,0.06)"}}>
+              <div style={{fontSize:13,color:"#e2e8f0",lineHeight:1.5}}>{n.mensagem}</div>
+              <div style={{fontSize:10,color:subtext,marginTop:4}}>{new Date(n.created_at).toLocaleDateString("pt-PT",{day:"2-digit",month:"short",hour:"2-digit",minute:"2-digit"})}</div>
+            </div>
+          ))}
+        </div>
+      </>
+    )}
+  </div>
+  <button onClick={dissolveCouple} style={{padding:"5px 10px",background:"rgba(239,68,68,0.08)",border:"1px solid rgba(239,68,68,0.15)",borderRadius:8,color:"#f87171",fontSize:10,fontWeight:600,cursor:"pointer",fontFamily:"'Sora',sans-serif"}}>✕ Terminar</button>
+</div>
       </div>
 
       {/* Sync message */}
