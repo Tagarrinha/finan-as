@@ -518,6 +518,102 @@ const jointBalance = totalContributions - totalSettledExpenses;
             <div style={{fontSize:12,color:subtext}}>A tua parte pendente: <span style={{color:"#f59e0b",fontWeight:700}}>{fmt(myDebt)}</span></div>
           </div>
         )}
+
+        {/* ── Top categorias conjuntas ── */}
+        {liquidadas.length>0&&(()=>{
+          // Mês actual
+          const now = new Date();
+          const thisMonth = now.getMonth();
+          const thisYear = now.getFullYear();
+          const prevMonth = thisMonth===0?11:thisMonth-1;
+          const prevYear = thisMonth===0?thisYear-1:thisYear;
+
+          const thisMonthExp = liquidadas.filter(e=>{
+            const d=new Date(e.data+"T12:00:00");
+            return d.getMonth()===thisMonth&&d.getFullYear()===thisYear;
+          });
+          const prevMonthExp = liquidadas.filter(e=>{
+            const d=new Date(e.data+"T12:00:00");
+            return d.getMonth()===prevMonth&&d.getFullYear()===prevYear;
+          });
+
+          // Agrupa por categoria
+          const catMap:Record<string,{total:number;prev:number;icon:string;label:string}> = {};
+          thisMonthExp.forEach(e=>{
+            const cat=expCats.find(c=>c.id===e.cat);
+            if(!catMap[e.cat]) catMap[e.cat]={total:0,prev:0,icon:cat?.icon||"📦",label:cat?.label||e.cat};
+            catMap[e.cat].total+=Number(e.valor);
+          });
+          prevMonthExp.forEach(e=>{
+            if(!catMap[e.cat]) catMap[e.cat]={total:0,prev:0,icon:expCats.find(c=>c.id===e.cat)?.icon||"📦",label:expCats.find(c=>c.id===e.cat)?.label||e.cat};
+            catMap[e.cat].prev+=Number(e.valor);
+          });
+
+          const topCats = Object.values(catMap).sort((a,b)=>b.total-a.total).slice(0,5);
+          const maxVal = Math.max(...topCats.map(c=>c.total),1);
+
+          // Totais mensais para comparação
+          const totalThisMonth = thisMonthExp.reduce((s,e)=>s+Number(e.valor),0);
+          const totalPrevMonth = prevMonthExp.reduce((s,e)=>s+Number(e.valor),0);
+          const monthDiff = totalThisMonth - totalPrevMonth;
+
+          const MONTHS_PT = ["Jan","Fev","Mar","Abr","Mai","Jun","Jul","Ago","Set","Out","Nov","Dez"];
+
+          return(
+            <>
+              {/* Comparação mensal */}
+              {totalPrevMonth>0&&(
+                <div style={{background:monthDiff<=0?"rgba(52,211,153,0.06)":"rgba(255,125,125,0.06)",border:`1px solid ${monthDiff<=0?"rgba(52,211,153,0.2)":"rgba(255,125,125,0.2)"}`,borderRadius:14,padding:"14px 16px",marginBottom:14}}>
+                  <div style={{fontSize:10,fontWeight:700,color:subtext,textTransform:"uppercase" as const,letterSpacing:"0.08em",marginBottom:10}}>Comparação mensal</div>
+                  <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:10,marginBottom:10}}>
+                    <div style={{textAlign:"center" as const}}>
+                      <div style={{fontSize:10,color:subtext,marginBottom:4}}>{MONTHS_PT[prevMonth]}</div>
+                      <div style={{fontSize:18,fontWeight:800,color:"#94a3b8"}}>{fmt(totalPrevMonth)}</div>
+                    </div>
+                    <div style={{textAlign:"center" as const}}>
+                      <div style={{fontSize:10,color:subtext,marginBottom:4}}>{MONTHS_PT[thisMonth]} (atual)</div>
+                      <div style={{fontSize:18,fontWeight:800,color:"#f1f5f9"}}>{fmt(totalThisMonth)}</div>
+                    </div>
+                  </div>
+                  <div style={{textAlign:"center" as const,padding:"8px 12px",background:monthDiff<=0?"rgba(52,211,153,0.1)":"rgba(255,125,125,0.1)",borderRadius:10}}>
+                    <span style={{fontSize:13,fontWeight:700,color:monthDiff<=0?"#34d399":"#ff7d7d"}}>
+                      {monthDiff<=0?"↓":"↑"} {fmt(Math.abs(monthDiff))} {monthDiff<=0?"menos":"mais"} que o mês anterior
+                    </span>
+                  </div>
+                </div>
+              )}
+
+              {/* Top categorias */}
+              <div style={{background:cardBg,border:`1px solid ${cardBorder}`,borderRadius:14,padding:"16px",marginBottom:14}}>
+                <div style={{fontSize:10,fontWeight:700,color:subtext,textTransform:"uppercase" as const,letterSpacing:"0.08em",marginBottom:14}}>Top categorias conjuntas</div>
+                {topCats.map((c,i)=>{
+                  const diff = c.total - c.prev;
+                  const hasPrev = c.prev > 0;
+                  return(
+                    <div key={i} style={{marginBottom:14}}>
+                      <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:6}}>
+                        <span style={{fontSize:13,color:"#e2e8f0"}}>{c.icon} {c.label}</span>
+                        <div style={{display:"flex",alignItems:"center",gap:8}}>
+                          {hasPrev&&(
+                            <span style={{fontSize:10,fontWeight:700,color:diff>0?"#ff7d7d":"#34d399"}}>
+                              {diff>0?"↑":"↓"}{fmt(Math.abs(diff))}
+                            </span>
+                          )}
+                          <span style={{fontSize:13,fontWeight:700,color:"#f1f5f9"}}>{fmt(c.total)}</span>
+                        </div>
+                      </div>
+                      <div style={{height:6,borderRadius:99,background:"rgba(255,255,255,0.07)",overflow:"hidden"}}>
+                        <div style={{width:`${Math.round((c.total/maxVal)*100)}%`,height:"100%",borderRadius:99,background:`linear-gradient(90deg,${accent},${accentDark})`}}/>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </>
+          );
+        })()}
+
+        {/* Despesas liquidadas recentes */}
         <div style={{background:cardBg,border:`1px solid ${cardBorder}`,borderRadius:12,padding:"14px 16px"}}>
           <div style={{fontSize:10,fontWeight:700,color:subtext,textTransform:"uppercase" as const,letterSpacing:"0.08em",marginBottom:12}}>Despesas liquidadas recentes</div>
           {liquidadas.length===0?<div style={{textAlign:"center" as const,color:subtext,fontSize:13,padding:"12px 0"}}>Sem despesas liquidadas.</div>
