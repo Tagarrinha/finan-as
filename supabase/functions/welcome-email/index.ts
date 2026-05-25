@@ -27,7 +27,7 @@ serve(async (req) => {
 <head>
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Bem-vindo ao ${APP_NAME}</title>
+  <title>Bem-vindo ao ${APP_NAME} — 14 dias grátis</title>
 </head>
 <body style="margin:0;padding:0;background:#0A0D14;font-family:'Helvetica Neue',Arial,sans-serif;">
 <table width="100%" cellpadding="0" cellspacing="0" style="background:#0A0D14;padding:40px 20px;">
@@ -57,7 +57,7 @@ serve(async (req) => {
               Olá, ${userName}! 👋
             </h1>
             <p style="margin:0 0 28px;font-size:15px;color:#667085;line-height:1.7;">
-              Bem-vindo ao único lugar onde consegues gerir as tuas finanças pessoais <strong style="color:#f1f5f9;">e as do casal</strong> — tudo numa só app.
+              Bem-vindo ao único lugar onde consegues gerir as tuas finanças pessoais <strong style="color:#f1f5f9;">e as do casal</strong> — tudo numa só app.<br/><br/>Tens <strong style="color:#5DA9FF;">14 dias de trial Premium grátis</strong> para experimentares tudo sem compromisso.
             </p>
 
             <!-- Divider -->
@@ -67,7 +67,7 @@ serve(async (req) => {
             <div style="background:linear-gradient(135deg,rgba(236,72,153,0.12),rgba(249,115,22,0.08));border:1.5px solid rgba(236,72,153,0.3);border-radius:16px;padding:24px;margin-bottom:28px;">
               <div style="text-align:center;margin-bottom:16px;">
                 <div style="font-size:40px;margin-bottom:8px;">💑</div>
-                <div style="font-size:18px;font-weight:800;color:#f1f5f9;margin-bottom:6px;">Modo Casal — o teu diferenciador</div>
+                <div style="font-size:18px;font-weight:800;color:#f1f5f9;margin-bottom:6px;">Modo Casal</div>
                 <div style="font-size:13px;color:#667085;line-height:1.6;">Gere as finanças a dois de forma transparente, justa e sem conflitos.</div>
               </div>
               <table width="100%" cellpadding="0" cellspacing="0">
@@ -276,7 +276,7 @@ serve(async (req) => {
       body: JSON.stringify({
         from: `${APP_NAME} <${FROM_EMAIL}>`,
         to: [userEmail],
-        subject: `Bem-vindo ao ${APP_NAME} — finanças pessoais e de casal numa só app 💑`,
+        subject: `Bem-vindo ao ${APP_NAME} — 14 dias Premium grátis 🎉`,
         html,
       }),
     });
