@@ -84,14 +84,15 @@ const TIPO_ACC: Record<BankAccount["tipo"],{label:string;icon:string;cor:string}
   outro:       {label:"Outra Conta",       icon:"📂",cor:"#f59e0b"},
 };
 const TOUR_STEPS = [
-  { title:"Olá! 👋",                    desc:"Bem-vindo! Faz este tour rápido para perceberes como tudo funciona.", anchor:"middle", pwa:false },
-  { title:"Os teus mundos 🌍",           desc:"Alterna entre finanças pessoais e negócio. Cada um tem dados completamente separados.", anchor:"top", pwa:false },
-  { title:"Resumo 📊",                   desc:"Vês o teu balanço em tempo real — rendimento, despesas, resultado e contas bancárias.", anchor:"middle", pwa:false },
-  { title:"Metas orçamentais 🎯",         desc:"Controla se estás dentro dos limites: 75% necessidades, 10% desejos, 15% investimentos.", anchor:"middle", pwa:false },
-  { title:"Despesas recorrentes 🔄",      desc:"Regista despesas fixas como renda ou ginásio uma vez — a app avisa quando é altura de as registar.", anchor:"middle", pwa:false },
-  { title:"Menu ⚙️",                     desc:"Personaliza contas bancárias, categorias, tema e nome dos mundos.", anchor:"top", pwa:false },
+  { title:"Olá! 👋",                    desc:"Bem-vindo ao MyOwnFintrack! Faz este tour rápido para perceberes como tudo funciona.", anchor:"middle", pwa:false },
+  { title:"Dashboard 📊",               desc:"Vês o teu balanço em tempo real — receitas, despesas, resultado do mês e evolução do Net Worth.", anchor:"middle", pwa:false },
+  { title:"Modo Casal 💑",              desc:"O teu diferenciador. Gere despesas partilhadas, acertos automáticos e metas conjuntas com o teu parceiro/a. Disponível no plano Premium.", anchor:"middle", pwa:false },
+  { title:"Metas de poupança 🎯",        desc:"Cria objetivos pessoais ou partilhados — férias, casa, carro. Acompanha o progresso de ambos em tempo real.", anchor:"middle", pwa:false },
+  { title:"Despesas recorrentes 🔄",     desc:"Regista renda, ginásio ou subscrições uma vez — a app avisa quando é altura de as registar.", anchor:"middle", pwa:false },
+  { title:"Menu lateral ☰",             desc:"Acede a todas as secções pelo menu no canto superior esquerdo — despesas, rendimentos, comparação mensal e exportação.", anchor:"top", pwa:false },
+  { title:"Definições ⚙️",              desc:"Personaliza contas bancárias, categorias, tema visual e os nomes dos teus mundos (pessoal e clínica).", anchor:"top", pwa:false },
   { title:"Instala a app 📱",            desc:"", anchor:"middle", pwa:true },
-  { title:"Tudo pronto! 🎉",             desc:"Os dados ficam na cloud — acedes de qualquer dispositivo. Vai ao ⚙️ para personalizar tudo.", anchor:"middle", pwa:false },
+  { title:"Tudo pronto! 🎉",             desc:"Os teus dados estão seguros na cloud — acedes de qualquer dispositivo. Tens 14 dias Premium grátis para experimentares tudo!", anchor:"middle", pwa:false },
 ];
 
 const fmt = (n:number) => new Intl.NumberFormat("pt-PT",{style:"currency",currency:"EUR"}).format(n||0);
