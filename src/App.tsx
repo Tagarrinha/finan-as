@@ -545,7 +545,7 @@ function MainApp({user,userName,onLogout}:{user:SBUser;userName:string;onLogout:
   const [showAddModal,setShowAddModal]=useState(false);
   const [themeKey,setThemeKey]=useState<ThemeKey>("premium");
   const T=THEMES[themeKey];
-  const { plan, isBeta, isPremium, hasFullAccess, setPlan } = usePlan(user.id);
+  const { plan, isBeta, isPremium, hasFullAccess, setPlan, isTrial, trialDaysLeft } = usePlan(user.id);
   const [showPricing, setShowPricing] = useState(false);
   const [showTour,setShowTour]=useState(false);
   const [expenses,setExpenses]=useState<Expense[]>([]);
@@ -1426,6 +1426,8 @@ async function handleCoupleSettlement(valor: number) {
           userEmail={user.email||""}
           currentPlan={plan}
           isBeta={isBeta}
+          isTrial={isTrial}
+          trialDaysLeft={trialDaysLeft}
           accent={T.accent}
           accent2={T.accent2}
           cardBg={T.cardBg}

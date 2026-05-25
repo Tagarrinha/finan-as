@@ -1,6 +1,5 @@
 // ============================================================
 // supabase/functions/welcome-email/index.ts
-// Substitui o ficheiro existente
 // ============================================================
 
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
@@ -58,114 +57,113 @@ serve(async (req) => {
               Olá, ${userName}! 👋
             </h1>
             <p style="margin:0 0 28px;font-size:15px;color:#667085;line-height:1.7;">
-              A tua conta está criada. Bem-vindo ao lugar onde as tuas finanças finalmente fazem sentido.
+              Bem-vindo ao único lugar onde consegues gerir as tuas finanças pessoais <strong style="color:#f1f5f9;">e as do casal</strong> — tudo numa só app.
             </p>
 
             <!-- Divider -->
             <div style="height:1px;background:rgba(255,255,255,0.07);margin-bottom:28px;"></div>
 
-            <!-- Features -->
-            <p style="margin:0 0 16px;font-size:11px;font-weight:700;color:#667085;text-transform:uppercase;letter-spacing:0.12em;">O que tens à disposição</p>
+            <!-- HERO — Modo Casal -->
+            <div style="background:linear-gradient(135deg,rgba(236,72,153,0.12),rgba(249,115,22,0.08));border:1.5px solid rgba(236,72,153,0.3);border-radius:16px;padding:24px;margin-bottom:28px;">
+              <div style="text-align:center;margin-bottom:16px;">
+                <div style="font-size:40px;margin-bottom:8px;">💑</div>
+                <div style="font-size:18px;font-weight:800;color:#f1f5f9;margin-bottom:6px;">Modo Casal — o teu diferenciador</div>
+                <div style="font-size:13px;color:#667085;line-height:1.6;">Gere as finanças a dois de forma transparente, justa e sem conflitos.</div>
+              </div>
+              <table width="100%" cellpadding="0" cellspacing="0">
+                <tr>
+                  <td style="padding:10px 0;border-bottom:1px solid rgba(255,255,255,0.06);">
+                    <table cellpadding="0" cellspacing="0">
+                      <tr>
+                        <td style="width:32px;font-size:18px;">⚖️</td>
+                        <td style="padding-left:10px;">
+                          <div style="font-size:13px;font-weight:700;color:#f1f5f9;">Divide despesas automaticamente</div>
+                          <div style="font-size:12px;color:#667085;margin-top:2px;">50/50 ou personalizado — tu decides</div>
+                        </td>
+                      </tr>
+                    </table>
+                  </td>
+                </tr>
+                <tr>
+                  <td style="padding:10px 0;border-bottom:1px solid rgba(255,255,255,0.06);">
+                    <table cellpadding="0" cellspacing="0">
+                      <tr>
+                        <td style="width:32px;font-size:18px;">🔄</td>
+                        <td style="padding-left:10px;">
+                          <div style="font-size:13px;font-weight:700;color:#f1f5f9;">Acertos automáticos</div>
+                          <div style="font-size:12px;color:#667085;margin-top:2px;">Quem pagou o quê — sempre claro e justo</div>
+                        </td>
+                      </tr>
+                    </table>
+                  </td>
+                </tr>
+                <tr>
+                  <td style="padding:10px 0;border-bottom:1px solid rgba(255,255,255,0.06);">
+                    <table cellpadding="0" cellspacing="0">
+                      <tr>
+                        <td style="width:32px;font-size:18px;">🎯</td>
+                        <td style="padding-left:10px;">
+                          <div style="font-size:13px;font-weight:700;color:#f1f5f9;">Metas partilhadas</div>
+                          <div style="font-size:12px;color:#667085;margin-top:2px;">Poupem juntos para férias, casa, carro...</div>
+                        </td>
+                      </tr>
+                    </table>
+                  </td>
+                </tr>
+                <tr>
+                  <td style="padding:10px 0;border-bottom:1px solid rgba(255,255,255,0.06);">
+                    <table cellpadding="0" cellspacing="0">
+                      <tr>
+                        <td style="width:32px;font-size:18px;">📊</td>
+                        <td style="padding-left:10px;">
+                          <div style="font-size:13px;font-weight:700;color:#f1f5f9;">Relatório mensal de casal</div>
+                          <div style="font-size:12px;color:#667085;margin-top:2px;">Resumo conjunto dia 2 de cada mês</div>
+                        </td>
+                      </tr>
+                    </table>
+                  </td>
+                </tr>
+                <tr>
+                  <td style="padding:10px 0;">
+                    <table cellpadding="0" cellspacing="0">
+                      <tr>
+                        <td style="width:32px;font-size:18px;">🔔</td>
+                        <td style="padding-left:10px;">
+                          <div style="font-size:13px;font-weight:700;color:#f1f5f9;">Notificações em tempo real</div>
+                          <div style="font-size:12px;color:#667085;margin-top:2px;">Sabes sempre quando o teu parceiro/a adiciona ou liquida uma despesa</div>
+                        </td>
+                      </tr>
+                    </table>
+                  </td>
+                </tr>
+              </table>
+            </div>
 
-            <table width="100%" cellpadding="0" cellspacing="0">
-              <tr>
-                <td style="padding:12px 0;border-bottom:1px solid rgba(255,255,255,0.05);">
-                  <table cellpadding="0" cellspacing="0">
-                    <tr>
-                      <td style="width:36px;height:36px;background:rgba(93,169,255,0.12);border-radius:10px;text-align:center;vertical-align:middle;font-size:18px;">📊</td>
-                      <td style="padding-left:14px;vertical-align:middle;">
-                        <div style="font-size:14px;font-weight:700;color:#f1f5f9;">Dashboard em tempo real</div>
-                        <div style="font-size:12px;color:#667085;margin-top:2px;">Receitas, despesas e saldo sempre visíveis</div>
-                      </td>
-                    </tr>
-                  </table>
-                </td>
-              </tr>
-              <tr>
-                <td style="padding:12px 0;border-bottom:1px solid rgba(255,255,255,0.05);">
-                  <table cellpadding="0" cellspacing="0">
-                    <tr>
-                      <td style="width:36px;height:36px;background:rgba(93,169,255,0.12);border-radius:10px;text-align:center;vertical-align:middle;font-size:18px;">🎯</td>
-                      <td style="padding-left:14px;vertical-align:middle;">
-                        <div style="font-size:14px;font-weight:700;color:#f1f5f9;">Metas financeiras</div>
-                        <div style="font-size:12px;color:#667085;margin-top:2px;">Define objetivos e acompanha o progresso</div>
-                      </td>
-                    </tr>
-                  </table>
-                </td>
-              </tr>
-              <tr>
-                <td style="padding:12px 0;border-bottom:1px solid rgba(255,255,255,0.05);">
-                  <table cellpadding="0" cellspacing="0">
-                    <tr>
-                      <td style="width:36px;height:36px;background:rgba(93,169,255,0.12);border-radius:10px;text-align:center;vertical-align:middle;font-size:18px;">🔄</td>
-                      <td style="padding-left:14px;vertical-align:middle;">
-                        <div style="font-size:14px;font-weight:700;color:#f1f5f9;">Despesas recorrentes</div>
-                        <div style="font-size:12px;color:#667085;margin-top:2px;">Renda, ginásio, subscrições — tudo controlado</div>
-                      </td>
-                    </tr>
-                  </table>
-                </td>
-              </tr>
-              <tr>
-                <td style="padding:12px 0;border-bottom:1px solid rgba(255,255,255,0.05);">
-                  <table cellpadding="0" cellspacing="0">
-                    <tr>
-                      <td style="width:36px;height:36px;background:rgba(93,169,255,0.12);border-radius:10px;text-align:center;vertical-align:middle;font-size:18px;">🏦</td>
-                      <td style="padding-left:14px;vertical-align:middle;">
-                        <div style="font-size:14px;font-weight:700;color:#f1f5f9;">Contas bancárias & Net Worth</div>
-                        <div style="font-size:12px;color:#667085;margin-top:2px;">Centraliza tudo e vê o teu património</div>
-                      </td>
-                    </tr>
-                  </table>
-                </td>
-              </tr>
-              <tr>
-                <td style="padding:12px 0;">
-                  <table cellpadding="0" cellspacing="0">
-                    <tr>
-                      <td style="width:36px;height:36px;background:rgba(93,169,255,0.12);border-radius:10px;text-align:center;vertical-align:middle;font-size:18px;">📈</td>
-                      <td style="padding-left:14px;vertical-align:middle;">
-                        <div style="font-size:14px;font-weight:700;color:#f1f5f9;">Comparação mensal</div>
-                        <div style="font-size:12px;color:#667085;margin-top:2px;">Evolução mês a mês sempre visível</div>
-                      </td>
-                    </tr>
-                  </table>
-                </td>
-              </tr>
-            </table>
+            <!-- Tudo no mesmo sítio -->
+            <div style="margin-bottom:28px;">
+              <p style="margin:0 0 14px;font-size:11px;font-weight:700;color:#667085;text-transform:uppercase;letter-spacing:0.12em;">Tudo num só lugar</p>
+              <table width="100%" cellpadding="0" cellspacing="0">
+                <tr>
+                  <td width="50%" style="padding-right:6px;">
+                    <div style="background:#0A0D14;border:1px solid rgba(93,169,255,0.2);border-radius:12px;padding:16px;text-align:center;">
+                      <div style="font-size:24px;margin-bottom:8px;">👤</div>
+                      <div style="font-size:13px;font-weight:700;color:#5DA9FF;margin-bottom:4px;">Conta Pessoal</div>
+                      <div style="font-size:11px;color:#667085;line-height:1.5;">Despesas, rendimentos, metas e Net Worth pessoal</div>
+                    </div>
+                  </td>
+                  <td width="50%" style="padding-left:6px;">
+                    <div style="background:#0A0D14;border:1px solid rgba(236,72,153,0.2);border-radius:12px;padding:16px;text-align:center;">
+                      <div style="font-size:24px;margin-bottom:8px;">💑</div>
+                      <div style="font-size:13px;font-weight:700;color:#ec4899;margin-bottom:4px;">Conta Casal</div>
+                      <div style="font-size:11px;color:#667085;line-height:1.5;">Despesas conjuntas, acertos e metas partilhadas</div>
+                    </div>
+                  </td>
+                </tr>
+              </table>
+            </div>
 
             <!-- Divider -->
-            <div style="height:1px;background:rgba(255,255,255,0.07);margin:28px 0;"></div>
-
-            <!-- Exemplo fictício de dashboard -->
-            <p style="margin:0 0 16px;font-size:11px;font-weight:700;color:#667085;text-transform:uppercase;letter-spacing:0.12em;">Exemplo do teu dashboard</p>
-
-            <table width="100%" cellpadding="0" cellspacing="0" style="margin-bottom:16px;">
-              <tr>
-                <td width="33%" style="padding-right:6px;">
-                  <div style="background:#0A0D14;border:1px solid rgba(255,255,255,0.08);border-radius:12px;padding:14px;text-align:center;">
-                    <div style="font-size:10px;color:#667085;text-transform:uppercase;letter-spacing:0.08em;margin-bottom:6px;">Receitas</div>
-                    <div style="font-size:18px;font-weight:800;color:#57E3A0;">2.800€</div>
-                  </div>
-                </td>
-                <td width="33%" style="padding:0 3px;">
-                  <div style="background:#0A0D14;border:1px solid rgba(255,255,255,0.08);border-radius:12px;padding:14px;text-align:center;">
-                    <div style="font-size:10px;color:#667085;text-transform:uppercase;letter-spacing:0.08em;margin-bottom:6px;">Despesas</div>
-                    <div style="font-size:18px;font-weight:800;color:#FF7D7D;">1.240€</div>
-                  </div>
-                </td>
-                <td width="33%" style="padding-left:6px;">
-                  <div style="background:#0A0D14;border:1px solid rgba(255,255,255,0.08);border-radius:12px;padding:14px;text-align:center;">
-                    <div style="font-size:10px;color:#667085;text-transform:uppercase;letter-spacing:0.08em;margin-bottom:6px;">Resultado</div>
-                    <div style="font-size:18px;font-weight:800;color:#5DA9FF;">+1.560€</div>
-                  </div>
-                </td>
-              </tr>
-            </table>
-
-            <!-- Divider -->
-            <div style="height:1px;background:rgba(255,255,255,0.07);margin:28px 0;"></div>
+            <div style="height:1px;background:rgba(255,255,255,0.07);margin-bottom:28px;"></div>
 
             <!-- Planos -->
             <p style="margin:0 0 16px;font-size:11px;font-weight:700;color:#667085;text-transform:uppercase;letter-spacing:0.12em;">Planos disponíveis</p>
@@ -173,7 +171,7 @@ serve(async (req) => {
             <!-- Free -->
             <table width="100%" cellpadding="0" cellspacing="0" style="margin-bottom:10px;">
               <tr>
-                <td style="background:#0A0D14;border:1px solid rgba(255,255,255,0.08);border-radius:12px;padding:16px 18px;">
+                <td style="background:#0A0D14;border:1px solid rgba(255,255,255,0.08);border-radius:12px;padding:14px 18px;">
                   <table width="100%" cellpadding="0" cellspacing="0">
                     <tr>
                       <td>
@@ -192,12 +190,12 @@ serve(async (req) => {
             <!-- Individual -->
             <table width="100%" cellpadding="0" cellspacing="0" style="margin-bottom:10px;">
               <tr>
-                <td style="background:#0A0D14;border:1px solid rgba(93,169,255,0.3);border-radius:12px;padding:16px 18px;">
+                <td style="background:#0A0D14;border:1px solid rgba(93,169,255,0.25);border-radius:12px;padding:14px 18px;">
                   <table width="100%" cellpadding="0" cellspacing="0">
                     <tr>
                       <td>
                         <div style="font-size:13px;font-weight:800;color:#f1f5f9;">Individual</div>
-                        <div style="font-size:11px;color:#667085;margin-top:2px;">Tudo ilimitado · metas avançadas · recorrentes · estatísticas</div>
+                        <div style="font-size:11px;color:#667085;margin-top:2px;">Tudo ilimitado · metas · recorrentes · estatísticas</div>
                       </td>
                       <td align="right">
                         <div style="font-size:16px;font-weight:800;color:#5DA9FF;">4,99€<span style="font-size:11px;font-weight:400;color:#667085;">/mês</span></div>
@@ -209,18 +207,18 @@ serve(async (req) => {
             </table>
 
             <!-- Premium -->
-            <table width="100%" cellpadding="0" cellspacing="0" style="margin-bottom:24px;">
+            <table width="100%" cellpadding="0" cellspacing="0" style="margin-bottom:28px;">
               <tr>
-                <td style="background:linear-gradient(135deg,rgba(139,109,255,0.15),rgba(93,169,255,0.08));border:1.5px solid #5DA9FF;border-radius:12px;padding:16px 18px;">
+                <td style="background:linear-gradient(135deg,rgba(236,72,153,0.12),rgba(139,109,255,0.08));border:1.5px solid #ec4899;border-radius:12px;padding:14px 18px;">
                   <table width="100%" cellpadding="0" cellspacing="0">
                     <tr>
                       <td>
-                        <div style="font-size:11px;font-weight:700;color:#8B6DFF;margin-bottom:4px;">⭐ MAIS POPULAR</div>
+                        <div style="font-size:11px;font-weight:700;color:#ec4899;margin-bottom:4px;">💑 INCLUI MODO CASAL</div>
                         <div style="font-size:13px;font-weight:800;color:#f1f5f9;">Premium</div>
-                        <div style="font-size:11px;color:#667085;margin-top:2px;">Tudo do Individual + modo casal + acertos automáticos</div>
+                        <div style="font-size:11px;color:#667085;margin-top:2px;">Tudo do Individual + modo casal completo para ambos</div>
                       </td>
                       <td align="right">
-                        <div style="font-size:16px;font-weight:800;color:#5DA9FF;">7,99€<span style="font-size:11px;font-weight:400;color:#667085;">/mês</span></div>
+                        <div style="font-size:16px;font-weight:800;color:#ec4899;">7,99€<span style="font-size:11px;font-weight:400;color:#667085;">/mês</span></div>
                       </td>
                     </tr>
                   </table>
@@ -229,7 +227,7 @@ serve(async (req) => {
             </table>
 
             <!-- CTA -->
-            <table width="100%" cellpadding="0" cellspacing="0">
+            <table width="100%" cellpadding="0" cellspacing="0" style="margin-bottom:24px;">
               <tr>
                 <td align="center">
                   <a href="${APP_URL}" style="display:inline-block;padding:15px 40px;background:linear-gradient(135deg,#5DA9FF,#8B6DFF);border-radius:12px;color:#ffffff;font-size:15px;font-weight:800;text-decoration:none;letter-spacing:-0.2px;">
@@ -240,9 +238,9 @@ serve(async (req) => {
             </table>
 
             <!-- Tip -->
-            <div style="background:rgba(93,169,255,0.08);border:1px solid rgba(93,169,255,0.2);border-radius:12px;padding:14px 16px;margin-top:24px;">
-              <p style="margin:0;font-size:13px;color:#5DA9FF;line-height:1.6;">
-                💡 <strong>Dica:</strong> começa por adicionar as tuas contas bancárias e rendimentos mensais. O tour interativo dentro da app guia-te em tudo.
+            <div style="background:rgba(236,72,153,0.08);border:1px solid rgba(236,72,153,0.2);border-radius:12px;padding:14px 16px;">
+              <p style="margin:0;font-size:13px;color:#ec4899;line-height:1.6;">
+                💡 <strong>Dica:</strong> convida o teu parceiro/a dentro da app em <strong>Casal → Convidar</strong>. O teu parceiro/a terá acesso completo ao modo casal enquanto estiverem ligados.
               </p>
             </div>
           </td>
@@ -278,7 +276,7 @@ serve(async (req) => {
       body: JSON.stringify({
         from: `${APP_NAME} <${FROM_EMAIL}>`,
         to: [userEmail],
-        subject: `Bem-vindo ao ${APP_NAME} 👋`,
+        subject: `Bem-vindo ao ${APP_NAME} — finanças pessoais e de casal numa só app 💑`,
         html,
       }),
     });

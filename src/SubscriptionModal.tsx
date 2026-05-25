@@ -74,6 +74,8 @@ interface SubscriptionModalProps {
   cardBg: string;
   cardBorder: string;
   subtext: string;
+  isTrial: boolean;
+  trialDaysLeft: number;
   onClose: () => void;
   onPlanUpdate: (plan: string) => void;
 }
@@ -136,26 +138,38 @@ export default function SubscriptionModal({
           >✕</button>
 
           {/* Header */}
-          <div style={{ textAlign: "center", marginBottom: 28 }}>
-            {isBeta && (
-              <div style={{
-                display: "inline-flex", alignItems: "center", gap: 6,
-                background: "rgba(87,227,160,0.12)", border: "1px solid rgba(87,227,160,0.3)",
-                borderRadius: 99, padding: "4px 14px", marginBottom: 14,
-                fontSize: 12, fontWeight: 700, color: "#57E3A0",
-              }}>
-                ⭐ Conta Beta — Acesso Premium gratuito
-              </div>
-            )}
-            <div style={{ fontSize: 22, fontWeight: 800, color: "#f1f5f9", letterSpacing: "-0.5px" }}>
-              {isBeta ? "O teu plano especial" : "Escolhe o teu plano"}
-            </div>
-            <div style={{ fontSize: 13, color: subtext, marginTop: 6 }}>
-              {isBeta
-                ? "Tens acesso Premium como utilizador beta. Obrigado por testares!"
-                : "Cancela quando quiseres. Sem compromissos."}
-            </div>
-          </div>
+<div style={{ textAlign: "center", marginBottom: 28 }}>
+  {isBeta && (
+    <div style={{
+      display: "inline-flex", alignItems: "center", gap: 6,
+      background: "rgba(87,227,160,0.12)", border: "1px solid rgba(87,227,160,0.3)",
+      borderRadius: 99, padding: "4px 14px", marginBottom: 14,
+      fontSize: 12, fontWeight: 700, color: "#57E3A0",
+    }}>
+      ⭐ Conta Beta — Acesso Premium gratuito
+    </div>
+  )}
+  {!isBeta && isTrial && (
+    <div style={{
+      display: "inline-flex", alignItems: "center", gap: 6,
+      background: "rgba(93,169,255,0.12)", border: "1px solid rgba(93,169,255,0.3)",
+      borderRadius: 99, padding: "4px 14px", marginBottom: 14,
+      fontSize: 12, fontWeight: 700, color: "#5DA9FF",
+    }}>
+      ⏳ Trial Premium — {trialDaysLeft} dia{trialDaysLeft !== 1 ? "s" : ""} restante{trialDaysLeft !== 1 ? "s" : ""}
+    </div>
+  )}
+  <div style={{ fontSize: 22, fontWeight: 800, color: "#f1f5f9", letterSpacing: "-0.5px" }}>
+    {isBeta ? "O teu plano especial" : isTrial ? "O teu trial Premium" : "Escolhe o teu plano"}
+  </div>
+  <div style={{ fontSize: 13, color: subtext, marginTop: 6 }}>
+    {isBeta
+      ? "Tens acesso Premium como utilizador beta. Obrigado por testares!"
+      : isTrial
+      ? `Tens acesso completo durante o trial. Subscreve para não perderes o acesso.`
+      : "Cancela quando quiseres. Sem compromissos."}
+  </div>
+</div>
 
           {/* Plans */}
           <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>

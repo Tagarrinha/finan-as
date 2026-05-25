@@ -23,6 +23,16 @@ function fmt(n: number): string {
   return new Intl.NumberFormat("pt-PT", { style: "currency", currency: "EUR" }).format(n || 0);
 }
 
+const CAT_ICONS: Record<string, string> = {
+  casa:"🏠", supermercado:"🛒", restaurantes:"🍽️", combustivel:"⛽",
+  carro:"🚗", barbeiro:"✂️", ginasio:"🏋️", saude:"🏥",
+  compras:"🛍️", prendas:"🎁", viagens:"✈️", educacao:"📚", outros_p:"📦",
+  renda:"🏢", equipamento:"🩺", consumiveis:"🧴", marketing:"📣",
+  contabilidade:"📋", seguros_c:"🛡️", formacao_c:"📚", software:"💻", outros_c:"📦",
+  salario:"💼", refeicao:"🍱", clinica:"🏥", prendas_r:"🎁", outros_r:"📦",
+  consultas:"🧑‍⚕️", seguradoras:"🛡️", workshops:"📣", outros_ci:"📦",
+};
+
 serve(async (req) => {
   try {
     // Calcula o mês anterior
@@ -225,7 +235,7 @@ serve(async (req) => {
                 <td style="padding:8px 0;border-bottom:1px solid rgba(255,255,255,0.05);">
                   <table width="100%" cellpadding="0" cellspacing="0">
                     <tr>
-                      <td style="font-size:13px;color:#cbd5e1;">${i + 1}. ${cat}</td>
+                      <td style="font-size:13px;color:#cbd5e1;">${CAT_ICONS[cat] || "📦"} ${cat}</td>
                       <td align="right" style="font-size:13px;font-weight:700;color:#f1f5f9;">${fmt(val)}</td>
                     </tr>
                   </table>
