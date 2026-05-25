@@ -85,6 +85,8 @@ export default function SubscriptionModal({
   userEmail,
   currentPlan,
   isBeta,
+  isTrial,
+  trialDaysLeft,
   accent,
   accent2,
   cardBg,
