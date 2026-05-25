@@ -630,10 +630,10 @@ function MainApp({user,userName,onLogout}:{user:SBUser;userName:string;onLogout:
     setDataLoading(false);
   }
 
-  async function saveSettings(patch:Record<string,any>){await supabase.from("user_settings").upsert({user_id:user.id,...patch});}
+  async function saveSettings(patch:Record<string,any>){await supabase.from("user_settings").upsert({user_id:user.id,theme:"premium",...patch});}
   async function changeTheme(k:ThemeKey){setThemeKey(k);await saveSettings({theme:k});}
   async function saveWorlds(){await saveSettings({world1_name:world1Name,world1_icon:world1Icon,world2_name:world2Name,world2_icon:world2Icon});setEditingWorlds(false);}
-  async function finishTour(){setShowTour(false);await saveSettings({tour_done:true});}
+  async function finishTour(){setShowTour(false);await saveSettings({tour_done:true,theme:"premium"});}
 
   const enabledExpCats=world==="pessoal"?enabledPExp:enabledCExp;
   const enabledIncCats=world==="pessoal"?enabledPInc:enabledCInc;
