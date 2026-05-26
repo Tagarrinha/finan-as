@@ -536,17 +536,7 @@ const jointBalance = totalContributions - totalSettledExpenses;
     </div>
   )}
 </div>
-{/* Por liquidar alerta */}
-{porLiquidar.length>0&&(
-  <div style={{background:"rgba(245,158,11,0.08)",border:"1px solid rgba(245,158,11,0.25)",borderRadius:12,padding:"10px 14px",marginBottom:12,display:"flex",justifyContent:"space-between",alignItems:"center"}}>
-    <div>
-      <div style={{fontSize:12,fontWeight:700,color:"#f59e0b",marginBottom:2}}>⏳ {porLiquidar.length} despesa{porLiquidar.length>1?"s":""} por liquidar</div>
-      <div style={{fontSize:11,color:subtext}}>A tua parte: <span style={{color:"#f59e0b",fontWeight:700}}>{fmt(myDebt)}</span></div>
-    </div>
-    <button onClick={()=>setTab("despesas")} style={{padding:"6px 12px",background:"rgba(245,158,11,0.15)",border:"1px solid rgba(245,158,11,0.3)",borderRadius:8,color:"#f59e0b",fontSize:11,fontWeight:700,cursor:"pointer",fontFamily:"'Sora',sans-serif"}}>Ver →</button>
-  </div>
-)}
-        {/* ── Top categorias conjuntas ── */}
+{/* ── Top categorias conjuntas ── */}
         {liquidadas.length>0&&(()=>{
           // Mês actual
           const now = new Date();
@@ -632,6 +622,16 @@ const jointBalance = totalContributions - totalSettledExpenses;
             </>
           );
         })()}
+        {/* Por liquidar alerta */}
+        {porLiquidar.length>0&&(
+          <div style={{background:"rgba(245,158,11,0.08)",border:"1px solid rgba(245,158,11,0.25)",borderRadius:12,padding:"10px 14px",marginBottom:12,display:"flex",justifyContent:"space-between",alignItems:"center"}}>
+            <div>
+              <div style={{fontSize:12,fontWeight:700,color:"#f59e0b",marginBottom:2}}>⏳ {porLiquidar.length} despesa{porLiquidar.length>1?"s":""} por liquidar</div>
+              <div style={{fontSize:11,color:subtext}}>A tua parte: <span style={{color:"#f59e0b",fontWeight:700}}>{fmt(myDebt)}</span></div>
+            </div>
+            <button onClick={()=>setTab("despesas")} style={{padding:"6px 12px",background:"rgba(245,158,11,0.15)",border:"1px solid rgba(245,158,11,0.3)",borderRadius:8,color:"#f59e0b",fontSize:11,fontWeight:700,cursor:"pointer",fontFamily:"'Sora',sans-serif"}}>Ver →</button>
+          </div>
+        )}
         {/* Despesas liquidadas recentes */}
         <div style={{background:cardBg,border:`1px solid ${cardBorder}`,borderRadius:12,padding:"14px 16px"}}>
           <div style={{fontSize:10,fontWeight:700,color:subtext,textTransform:"uppercase" as const,letterSpacing:"0.08em",marginBottom:12}}>Despesas liquidadas recentes</div>
