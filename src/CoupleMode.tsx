@@ -52,6 +52,7 @@ export default function CoupleMode({ userId, userEmail, userName, expCats, accen
   const [orcamentoInput, setOrcamentoInput] = useState("");
   const [notifications, setNotifications] = useState<{id:string;mensagem:string;lida:boolean;created_at:string}[]>([]);
   const [showNotifications, setShowNotifications] = useState(false);
+  const [successMsg, setSuccessMsg] = useState("");
 
   useEffect(()=>{ loadCouple(); },[userId,userEmail]);
 
@@ -167,6 +168,8 @@ async function syncToPersonal(e: CoupleExpense) {
       if(form.liquidado) await syncToPersonal(data as CoupleExpense);
       setForm(f=>({...f,descricao:"",valor:"",subcat:""}));
       setShowForm(false);
+      setSuccessMsg("✓ Despesa adicionada!");
+      setTimeout(()=>setSuccessMsg(""),3000);
     }
     setSaving(false);
   }
@@ -273,6 +276,8 @@ async function saveOrcamento() {
   setForm(f => ({...f, descricao:"", valor:"", subcat:""}));
   setShowForm(false);
   setSaving(false);
+  setSuccessMsg("✓ Despesa atualizada!");
+  setTimeout(()=>setSuccessMsg(""),3000);
 }
   async function dissolveCouple() {
     if(!couple||!window.confirm("Tens a certeza? Todos os dados conjuntos serão apagados.")) return;
@@ -703,6 +708,12 @@ const jointBalance = totalContributions - totalSettledExpenses;
 
       {/* ── DESPESAS ── */}
       {tab==="despesas"&&<>
+  {successMsg&&(
+    <div style={{background:"rgba(52,211,153,0.12)",border:"1px solid rgba(52,211,153,0.3)",borderRadius:12,padding:"12px 16px",marginBottom:14,display:"flex",alignItems:"center",gap:10}}>
+      <span style={{fontSize:18}}>✅</span>
+      <span style={{fontSize:13,fontWeight:700,color:"#34d399"}}>{successMsg}</span>
+    </div>
+  )}
   {/* ── Resumo do acerto (quando há pendentes) ── */}
   {porLiquidar.length>0&&(()=>{
     const totalOwedByPartner = porLiquidar.filter(e=>e.pago_por===userId).reduce((s,e)=>s+(isUser1?e.split_user2:e.split_user1),0);
