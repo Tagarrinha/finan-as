@@ -1175,7 +1175,7 @@ async function handleCoupleSettlement(valor: number) {
 
         {/* DESPESAS */}
         {tab==="despesas"&&<>
-          {overBudget.length>0&&(<div style={{background:"#450a0a",border:"1px solid #ef4444",borderRadius:12,padding:"12px 14px",marginBottom:14}}><div style={{fontSize:12,fontWeight:700,color:"#fca5a5",marginBottom:5}}>⚠️ Orçamento excedido</div>{overBudget.map(([type])=>{const actual=byType[type]||0,target=budgetTargets[type],targetAmt=totalInc*(target/100),meta=TYPE_META[type];return<div key={type} style={{fontSize:11,color:"#f87171",marginBottom:2}}>{meta.icon} {meta.label}: {pct(actual,totalInc)}% (meta {target}%) · excesso {fmt(actual-targetAmt)}</div>;})}</div>)}
+          
           <div style={S.card}>
             <SectionTitle>Adicionar Despesa</SectionTitle>
             <div style={S.row2}>
