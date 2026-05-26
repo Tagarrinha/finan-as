@@ -425,21 +425,20 @@ const jointBalance = totalContributions - totalSettledExpenses;
             <button onClick={dissolveCouple} style={{width:34,height:34,borderRadius:10,background:"rgba(239,68,68,0.08)",border:"1px solid rgba(239,68,68,0.15)",display:"flex",alignItems:"center",justifyContent:"center",color:"#f87171",fontSize:14,cursor:"pointer"}}>✕</button>
           </div>
         </div>
-        {/* Nomes + stat */}
-        <div style={{position:"relative"}}>
-          <div style={{display:"flex",alignItems:"center",gap:6,marginBottom:16}}>
-            <div style={{width:6,height:6,borderRadius:"50%",background:"#34d399",boxShadow:"0 0 6px #34d399"}}/>
-            <span style={{fontSize:11,color:subtext}}>modo casal ativo</span>
+        {/* Status + stats inline */}
+        <div style={{position:"relative",paddingTop:10,borderTop:"1px solid rgba(255,255,255,0.08)",display:"flex",alignItems:"center",justifyContent:"space-between"}}>
+          <div style={{display:"flex",alignItems:"center",gap:5}}>
+            <div style={{width:5,height:5,borderRadius:"50%",background:"#34d399",boxShadow:"0 0 5px #34d399"}}/>
+            <span style={{fontSize:10,color:subtext}}>modo casal ativo</span>
           </div>
-          {/* Stats */}
-          <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:8}}>
-            <div style={{background:"rgba(255,255,255,0.05)",border:"1px solid rgba(255,255,255,0.08)",borderRadius:12,padding:"10px 12px"}}>
-              <div style={{fontSize:10,color:subtext,textTransform:"uppercase" as const,letterSpacing:"0.08em",marginBottom:4}}>Geridos juntos</div>
-              <div style={{fontSize:18,fontWeight:800,color:"#f1f5f9"}}>{fmt(liquidadas.reduce((s,e)=>s+Number(e.valor),0))}</div>
+          <div style={{display:"flex",gap:14}}>
+            <div style={{textAlign:"right" as const}}>
+              <div style={{fontSize:9,color:subtext,textTransform:"uppercase" as const,letterSpacing:"0.06em"}}>Geridos</div>
+              <div style={{fontSize:13,fontWeight:800,color:"#f1f5f9"}}>{fmt(liquidadas.reduce((s,e)=>s+Number(e.valor),0))}</div>
             </div>
-            <div style={{background:"rgba(255,255,255,0.05)",border:"1px solid rgba(255,255,255,0.08)",borderRadius:12,padding:"10px 12px"}}>
-              <div style={{fontSize:10,color:subtext,textTransform:"uppercase" as const,letterSpacing:"0.08em",marginBottom:4}}>Por liquidar</div>
-              <div style={{fontSize:18,fontWeight:800,color:porLiquidar.length>0?"#f59e0b":"#34d399"}}>{fmt(myDebt)}</div>
+            <div style={{textAlign:"right" as const}}>
+              <div style={{fontSize:9,color:subtext,textTransform:"uppercase" as const,letterSpacing:"0.06em"}}>Pendente</div>
+              <div style={{fontSize:13,fontWeight:800,color:porLiquidar.length>0?"#f59e0b":"#34d399"}}>{fmt(myDebt)}</div>
             </div>
           </div>
         </div>
@@ -467,16 +466,40 @@ const jointBalance = totalContributions - totalSettledExpenses;
       {/* ── CONTA ── */}
       {tab==="conta"&&<>
 {/* ── Saldo conjunto hero ── */}
-<div style={{background:"linear-gradient(135deg,rgba(0,195,122,0.08),rgba(124,58,237,0.06))",border:"1px solid rgba(0,195,122,0.2)",borderRadius:20,padding:"24px 20px",marginBottom:16}}>
-  <div style={{fontSize:10,fontWeight:700,color:subtext,textTransform:"uppercase" as const,letterSpacing:"0.12em",marginBottom:8}}>Saldo Conjunto</div>
-  <div style={{display:"flex",justifyContent:"space-between",alignItems:"flex-start",marginBottom:8}}>
-    <div style={{fontSize:36,fontWeight:800,color:jointBalance>=0?"#f1f5f9":"#ff7d7d",letterSpacing:"-1px",lineHeight:1}}>{fmt(jointBalance)}</div>
-    <div style={{width:44,height:44,borderRadius:"50%",background:"rgba(0,195,122,0.15)",border:"1px solid rgba(0,195,122,0.3)",display:"flex",alignItems:"center",justifyContent:"center",fontSize:22}}>💚</div>
-  </div>
-  <div style={{fontSize:12,color:jointBalance>=0?"rgba(0,195,122,0.8)":"rgba(255,125,125,0.8)",fontWeight:600,marginBottom:16}}>
+<div style={{background:"linear-gradient(135deg,rgba(0,195,122,0.08),rgba(124,58,237,0.06))",border:"1px solid rgba(0,195,122,0.2)",borderRadius:16,padding:"14px 16px",marginBottom:12}}>
+  {/* Saldo */}
+  <div style={{fontSize:10,fontWeight:700,color:subtext,textTransform:"uppercase" as const,letterSpacing:"0.12em",marginBottom:4}}>Saldo Conjunto</div>
+  <div style={{fontSize:26,fontWeight:800,color:jointBalance>=0?"#f1f5f9":"#ff7d7d",letterSpacing:"-1px",lineHeight:1,marginBottom:4}}>{fmt(jointBalance)}</div>
+  <div style={{fontSize:11,color:jointBalance>=0?"rgba(0,195,122,0.8)":"rgba(255,125,125,0.8)",fontWeight:600,marginBottom:12}}>
     {totalSettledExpenses>0?`${fmt(totalContributions)} contribuições − ${fmt(totalSettledExpenses)} despesas`:`${fmt(totalContributions)} em contribuições`}
   </div>
-  {/* ── Orçamento mensal ── */}
+  {/* Contribuições compactas */}
+  <div style={{display:"flex",alignItems:"center",gap:8,marginBottom:12}}>
+    <div style={{flex:1,display:"flex",alignItems:"center",gap:6,padding:"7px 10px",background:"rgba(255,255,255,0.04)",border:"1px solid rgba(255,255,255,0.06)",borderRadius:9}}>
+      <span style={{fontSize:11,fontWeight:700,color:MY_COLOR}}>{userName.slice(0,2).toUpperCase()}</span>
+      <span style={{fontSize:12,fontWeight:700,color:"#f1f5f9"}}>{fmt(isUser1?account?.contribuicao_user1||0:account?.contribuicao_user2||0)}</span>
+      <span style={{fontSize:10,color:subtext,marginLeft:"auto"}}>{isUser1?Math.round(((account?.contribuicao_user1||0)/Math.max(totalContributions,1))*100):Math.round(((account?.contribuicao_user2||0)/Math.max(totalContributions,1))*100)}%</span>
+    </div>
+    <div style={{flex:1,display:"flex",alignItems:"center",gap:6,padding:"7px 10px",background:"rgba(255,255,255,0.04)",border:"1px solid rgba(255,255,255,0.06)",borderRadius:9}}>
+      <span style={{fontSize:11,fontWeight:700,color:PARTNER_COLOR}}>{partnerName.slice(0,2).toUpperCase()}</span>
+      <span style={{fontSize:12,fontWeight:700,color:"#f1f5f9"}}>{fmt(isUser1?account?.contribuicao_user2||0:account?.contribuicao_user1||0)}</span>
+      <span style={{fontSize:10,color:subtext,marginLeft:"auto"}}>{isUser1?Math.round(((account?.contribuicao_user2||0)/Math.max(totalContributions,1))*100):Math.round(((account?.contribuicao_user1||0)/Math.max(totalContributions,1))*100)}%</span>
+    </div>
+    <button onClick={()=>{setEditContrib(v=>!v);setMyContrib(String(isUser1?account?.contribuicao_user1||0:account?.contribuicao_user2||0));setPartnerContrib(String(isUser1?account?.contribuicao_user2||0:account?.contribuicao_user1||0));}} style={{width:30,height:30,background:"rgba(255,255,255,0.06)",border:"1px solid rgba(255,255,255,0.1)",borderRadius:8,color:subtext,fontSize:12,cursor:"pointer",display:"flex",alignItems:"center",justifyContent:"center"}}>✏️</button>
+  </div>
+  {editContrib&&(
+    <div style={{background:"rgba(255,255,255,0.04)",border:"1px solid rgba(255,255,255,0.1)",borderRadius:9,padding:"10px",marginBottom:12}}>
+      <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:8,marginBottom:8}}>
+        <div><div style={{fontSize:10,color:MY_COLOR,marginBottom:3}}>{userName} (€)</div><input style={inp} type="number" value={myContrib} onChange={e=>setMyContrib(e.target.value)}/></div>
+        <div><div style={{fontSize:10,color:PARTNER_COLOR,marginBottom:3}}>{partnerName} (€)</div><input style={inp} type="number" value={partnerContrib} onChange={e=>setPartnerContrib(e.target.value)}/></div>
+      </div>
+      <div style={{display:"flex",gap:8}}>
+        <button onClick={saveContrib} style={{flex:1,padding:"8px 0",background:`linear-gradient(135deg,${accent},${accentDark})`,border:"none",borderRadius:8,color:"#fff",fontSize:12,fontWeight:700,cursor:"pointer",fontFamily:"'Sora',sans-serif"}}>Guardar</button>
+        <button onClick={()=>setEditContrib(false)} style={{padding:"8px 10px",background:"rgba(255,255,255,0.05)",border:`1px solid ${cardBorder}`,borderRadius:8,color:subtext,fontSize:12,cursor:"pointer"}}>✕</button>
+      </div>
+    </div>
+  )}
+  {/* Orçamento mensal */}
   {(()=>{
     const orcamento = Number((account as any)?.orcamento_mensal) || 0;
     const usado = totalSettledExpenses;
@@ -484,121 +507,45 @@ const jointBalance = totalContributions - totalSettledExpenses;
     const restante = orcamento - usado;
     const overBudget = orcamento > 0 && usado > orcamento;
     return orcamento > 0 ? (
-      <div style={{marginBottom:16}}>
-        <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:8}}>
-          <span style={{fontSize:12,color:subtext}}>Orçamento mensal</span>
-          <div style={{display:"flex",alignItems:"center",gap:8}}>
-            <span style={{fontSize:12,fontWeight:700,color:overBudget?"#ff7d7d":"#34d399"}}>{pct}%</span>
-            <button onClick={()=>{setEditOrcamento(true);setOrcamentoInput(String(orcamento));}} style={{background:"rgba(255,255,255,0.06)",border:"1px solid rgba(255,255,255,0.1)",borderRadius:6,padding:"3px 8px",color:subtext,fontSize:11,cursor:"pointer",fontFamily:"'Sora',sans-serif"}}>✏️</button>
+      <div>
+        <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:5}}>
+          <span style={{fontSize:11,color:subtext}}>Orçamento mensal</span>
+          <div style={{display:"flex",alignItems:"center",gap:6}}>
+            <span style={{fontSize:11,fontWeight:700,color:overBudget?"#ff7d7d":"#34d399"}}>{pct}% · {overBudget?`⚠️ +${fmt(Math.abs(restante))}`:`restam ${fmt(restante)}`}</span>
+            <button onClick={()=>{setEditOrcamento(true);setOrcamentoInput(String(orcamento));}} style={{background:"rgba(255,255,255,0.06)",border:"1px solid rgba(255,255,255,0.1)",borderRadius:6,padding:"2px 7px",color:subtext,fontSize:10,cursor:"pointer",fontFamily:"'Sora',sans-serif"}}>✏️</button>
           </div>
         </div>
-        <div style={{height:8,borderRadius:99,background:"rgba(255,255,255,0.07)",overflow:"hidden",marginBottom:8}}>
+        <div style={{height:5,borderRadius:99,background:"rgba(255,255,255,0.07)",overflow:"hidden"}}>
           <div style={{width:`${pct}%`,height:"100%",borderRadius:99,background:overBudget?"linear-gradient(90deg,#ff7d7d,#ef4444)":"linear-gradient(90deg,#34d399,#00c37a)",transition:"width 0.5s ease"}}/>
-        </div>
-        <div style={{display:"flex",justifyContent:"space-between"}}>
-          <span style={{fontSize:11,color:overBudget?"#ff7d7d":subtext}}>{overBudget?`⚠️ Excedido em ${fmt(Math.abs(restante))}`:`Restam ${fmt(restante)}`}</span>
-          <span style={{fontSize:11,color:subtext}}>{fmt(usado)} / {fmt(orcamento)}</span>
         </div>
       </div>
     ) : (
-      <button onClick={()=>{setEditOrcamento(true);setOrcamentoInput("");}} style={{width:"100%",padding:"10px 0",background:"rgba(255,255,255,0.04)",border:"1px dashed rgba(255,255,255,0.15)",borderRadius:10,color:subtext,fontSize:12,fontWeight:600,cursor:"pointer",fontFamily:"'Sora',sans-serif",marginBottom:16}}>
+      <button onClick={()=>{setEditOrcamento(true);setOrcamentoInput("");}} style={{width:"100%",padding:"8px 0",background:"rgba(255,255,255,0.04)",border:"1px dashed rgba(255,255,255,0.12)",borderRadius:9,color:subtext,fontSize:11,fontWeight:600,cursor:"pointer",fontFamily:"'Sora',sans-serif"}}>
         + Definir orçamento mensal conjunto
       </button>
     );
   })()}
-  {/* Modal editar orçamento */}
   {editOrcamento&&(
-    <div style={{background:"rgba(255,255,255,0.04)",border:"1px solid rgba(255,255,255,0.1)",borderRadius:12,padding:"14px",marginBottom:16}}>
-      <div style={{fontSize:12,color:subtext,marginBottom:8}}>Orçamento mensal conjunto (€)</div>
+    <div style={{background:"rgba(255,255,255,0.04)",border:"1px solid rgba(255,255,255,0.1)",borderRadius:9,padding:"10px",marginTop:10}}>
+      <div style={{fontSize:11,color:subtext,marginBottom:6}}>Orçamento mensal conjunto (€)</div>
       <div style={{display:"flex",gap:8}}>
-        <input
-          style={{...inp,flex:1}}
-          type="number"
-          placeholder="Ex: 2000"
-          value={orcamentoInput}
-          onChange={e=>setOrcamentoInput(e.target.value)}
-          onKeyDown={e=>e.key==="Enter"&&saveOrcamento()}
-          autoFocus
-        />
-        <button onClick={saveOrcamento} style={{padding:"10px 16px",background:`linear-gradient(135deg,${accent},${accentDark})`,border:"none",borderRadius:8,color:"#fff",fontSize:13,fontWeight:700,cursor:"pointer",fontFamily:"'Sora',sans-serif"}}>✓</button>
-        <button onClick={()=>setEditOrcamento(false)} style={{padding:"10px 12px",background:"rgba(255,255,255,0.05)",border:"1px solid rgba(255,255,255,0.1)",borderRadius:8,color:subtext,fontSize:13,cursor:"pointer"}}>✕</button>
+        <input style={{...inp,flex:1}} type="number" placeholder="Ex: 2000" value={orcamentoInput} onChange={e=>setOrcamentoInput(e.target.value)} onKeyDown={e=>e.key==="Enter"&&saveOrcamento()} autoFocus/>
+        <button onClick={saveOrcamento} style={{padding:"8px 12px",background:`linear-gradient(135deg,${accent},${accentDark})`,border:"none",borderRadius:8,color:"#fff",fontSize:12,fontWeight:700,cursor:"pointer",fontFamily:"'Sora',sans-serif"}}>✓</button>
+        <button onClick={()=>setEditOrcamento(false)} style={{padding:"8px 10px",background:"rgba(255,255,255,0.05)",border:`1px solid ${cardBorder}`,borderRadius:8,color:subtext,fontSize:12,cursor:"pointer"}}>✕</button>
       </div>
     </div>
   )}
-  <div style={{background:"rgba(255,255,255,0.04)",borderRadius:10,padding:"10px 14px",display:"flex",justifyContent:"space-between",alignItems:"center"}}>
-    <span style={{fontSize:12,color:subtext}}>Contribuições este mês</span>
-    <span style={{fontSize:13,fontWeight:700,color:"rgba(0,195,122,0.9)"}}>{fmt(totalContributions)}</span>
-  </div>
 </div>
-  {/* ── Contribuições ── */}
-  {!editContrib?(
-    <>
-      <div style={{fontSize:14,fontWeight:700,color:"#f1f5f9",marginBottom:12}}>Contribuições do mês</div>
-      <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:10,marginBottom:14}}>
-        {[
-          {nome:userName,cor:MY_COLOR,contrib:isUser1?account?.contribuicao_user1:account?.contribuicao_user2,initials:userName.slice(0,2).toUpperCase()},
-          {nome:partnerName,cor:PARTNER_COLOR,contrib:isUser1?account?.contribuicao_user2:account?.contribuicao_user1,initials:partnerName.slice(0,2).toUpperCase()}
-        ].map((p,i)=>{
-          const total=(account?.contribuicao_user1||0)+(account?.contribuicao_user2||0);
-          const pct=total>0?Math.round(((p.contrib||0)/total)*100):50;
-          return(
-            <div key={i} style={{background:"rgba(255,255,255,0.04)",border:`1px solid rgba(255,255,255,0.08)`,borderRadius:16,padding:"16px 14px"}}>
-              <div style={{display:"flex",alignItems:"center",gap:8,marginBottom:12}}>
-                <div style={{width:36,height:36,borderRadius:"50%",background:`${p.cor}25`,border:`2px solid ${p.cor}`,display:"flex",alignItems:"center",justifyContent:"center",fontSize:13,fontWeight:700,color:p.cor,flexShrink:0}}>{p.initials}</div>
-                <span style={{fontSize:13,fontWeight:600,color:"#f1f5f9"}}>{p.nome}</span>
-              </div>
-              <div style={{fontSize:22,fontWeight:800,color:p.cor,marginBottom:4}}>{fmt(p.contrib||0)}</div>
-              <div style={{fontSize:11,color:subtext,marginBottom:10}}>{pct}% do total</div>
-              <div style={{height:3,borderRadius:99,background:"rgba(255,255,255,0.07)",overflow:"hidden"}}>
-                <div style={{width:`${pct}%`,height:"100%",background:p.cor,borderRadius:99}}/>
-              </div>
-            </div>
-          );
-        })}
-      </div>
-      {/* ── Status ── */}
-      {(()=>{
-        const c1=account?.contribuicao_user1||0;
-        const c2=account?.contribuicao_user2||0;
-        const balanced=Math.abs(c1-c2)<1;
-        return(
-          <div style={{background:balanced?"rgba(0,195,122,0.08)":"rgba(245,158,11,0.08)",border:`1px solid ${balanced?"rgba(0,195,122,0.2)":"rgba(245,158,11,0.2)"}`,borderRadius:14,padding:"14px 16px",marginBottom:14,display:"flex",alignItems:"center",gap:12}}>
-            <div style={{width:36,height:36,borderRadius:"50%",background:balanced?"rgba(0,195,122,0.15)":"rgba(245,158,11,0.15)",display:"flex",alignItems:"center",justifyContent:"center",fontSize:18,flexShrink:0}}>{balanced?"⚖️":"⚠️"}</div>
-            <div>
-              <div style={{fontSize:13,fontWeight:700,color:balanced?"#34d399":"#f59e0b",marginBottom:2}}>{balanced?"Tudo certo! 🎉":"Contribuições desequilibradas"}</div>
-              <div style={{fontSize:12,color:subtext}}>{balanced?"As contribuições estão equilibradas. Mantenham o bom trabalho!":"Considera ajustar as contribuições mensais."}</div>
-            </div>
-          </div>
-        );
-      })()}
-      <div style={{display:"flex",flexDirection:"column" as const,gap:10,marginBottom:14}}>
-        <button onClick={()=>setTab("acerto")} style={{width:"100%",padding:"14px 0",background:"linear-gradient(135deg,#00c37a,#00a86b)",border:"none",borderRadius:14,color:"#fff",fontWeight:700,fontSize:14,cursor:"pointer",fontFamily:"'Sora',sans-serif",display:"flex",alignItems:"center",justifyContent:"center",gap:8}}>
-          ⇄ Acertar contas
-        </button>
-        <button onClick={()=>{setEditContrib(true);setMyContrib(String(isUser1?account?.contribuicao_user1||0:account?.contribuicao_user2||0));setPartnerContrib(String(isUser1?account?.contribuicao_user2||0:account?.contribuicao_user1||0));}} style={{width:"100%",padding:"13px 0",background:"rgba(255,255,255,0.05)",border:"1px solid rgba(255,255,255,0.1)",borderRadius:14,color:"#e2e8f0",fontWeight:600,fontSize:13,cursor:"pointer",fontFamily:"'Sora',sans-serif",display:"flex",alignItems:"center",justifyContent:"center",gap:8}}>
-          ✏️ Editar contribuições
-        </button>
-      </div>
-    </>
-        ):(
-          <div style={{background:cardBg,border:`1px solid ${cardBorder}`,borderRadius:12,padding:"14px",marginBottom:14}}>
-            <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:8,marginBottom:10}}>
-              <div><div style={{fontSize:11,color:MY_COLOR,marginBottom:4}}>{userName} (€/mês)</div><input style={inp} type="number" value={myContrib} onChange={e=>setMyContrib(e.target.value)}/></div>
-              <div><div style={{fontSize:11,color:PARTNER_COLOR,marginBottom:4}}>{partnerName} (€/mês)</div><input style={inp} type="number" value={partnerContrib} onChange={e=>setPartnerContrib(e.target.value)}/></div>
-            </div>
-            <div style={{display:"flex",gap:8}}>
-              <button onClick={saveContrib} style={{flex:1,padding:"9px 0",background:`linear-gradient(135deg,${accent},${accentDark})`,border:"none",borderRadius:8,color:"#fff",fontSize:13,fontWeight:700,cursor:"pointer",fontFamily:"'Sora',sans-serif"}}>Guardar</button>
-              <button onClick={()=>setEditContrib(false)} style={{padding:"9px 14px",background:"rgba(255,255,255,0.05)",border:`1px solid ${cardBorder}`,borderRadius:8,color:subtext,fontSize:13,cursor:"pointer",fontFamily:"'Sora',sans-serif"}}>Cancelar</button>
-            </div>
-          </div>
-        )}
-        {/* Resumo rápido */}
-        {porLiquidar.length>0&&(
-          <div style={{background:"rgba(245,158,11,0.08)",border:"1px solid rgba(245,158,11,0.25)",borderRadius:12,padding:"12px 16px",marginBottom:10}}>
-            <div style={{fontSize:12,fontWeight:700,color:"#f59e0b",marginBottom:4}}>⏳ {porLiquidar.length} despesa{porLiquidar.length>1?"s":""} por liquidar</div>
-            <div style={{fontSize:12,color:subtext}}>A tua parte pendente: <span style={{color:"#f59e0b",fontWeight:700}}>{fmt(myDebt)}</span></div>
-          </div>
-        )}
+{/* Por liquidar alerta */}
+{porLiquidar.length>0&&(
+  <div style={{background:"rgba(245,158,11,0.08)",border:"1px solid rgba(245,158,11,0.25)",borderRadius:12,padding:"10px 14px",marginBottom:12,display:"flex",justifyContent:"space-between",alignItems:"center"}}>
+    <div>
+      <div style={{fontSize:12,fontWeight:700,color:"#f59e0b",marginBottom:2}}>⏳ {porLiquidar.length} despesa{porLiquidar.length>1?"s":""} por liquidar</div>
+      <div style={{fontSize:11,color:subtext}}>A tua parte: <span style={{color:"#f59e0b",fontWeight:700}}>{fmt(myDebt)}</span></div>
+    </div>
+    <button onClick={()=>setTab("despesas")} style={{padding:"6px 12px",background:"rgba(245,158,11,0.15)",border:"1px solid rgba(245,158,11,0.3)",borderRadius:8,color:"#f59e0b",fontSize:11,fontWeight:700,cursor:"pointer",fontFamily:"'Sora',sans-serif"}}>Ver →</button>
+  </div>
+)}
         {/* ── Top categorias conjuntas ── */}
         {liquidadas.length>0&&(()=>{
           // Mês actual
