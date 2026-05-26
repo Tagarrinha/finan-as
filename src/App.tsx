@@ -1209,17 +1209,7 @@ async function handleCoupleSettlement(valor: number) {
 </div>
 
 
-  {/* ── CONTAS ── */}
-  {accounts.length>0&&(
-    <div style={{display:"flex",gap:8,overflowX:"auto",marginBottom:14,paddingBottom:4}}>
-      {accounts.map(a=>(
-        <div key={a.id} style={{background:T.cardBg,border:`1px solid ${T.accent}25`,borderRadius:12,padding:"10px 14px",flexShrink:0,minWidth:130}}>
-          <div style={{fontSize:12,fontWeight:600,color:T.subtext,marginBottom:2}}>{a.icon} {a.nome}</div>
-          <div style={{fontSize:16,fontWeight:800,color:Number(a.saldo)>=0?T.positive:T.negative}}>{hv(fmt(Number(a.saldo)))}</div>
-        </div>
-      ))}
-    </div>
-  )}
+  
 </>}
 
        {tab==="despesas"&&<>
