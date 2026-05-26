@@ -1116,14 +1116,14 @@ async function handleCoupleSettlement(valor: number) {
                 const rev=monthlyRev[world]?.[String(new Date().getFullYear())]?.[i]||0;
                 const exp=expenses.filter(e=>e.world===world&&new Date(e.data).getMonth()===i&&new Date(e.data).getFullYear()===new Date().getFullYear()).reduce((s,e)=>s+Number(e.valor),0);
                 const maxVal=Math.max(...MONTHS.map((_,j)=>{const r=monthlyRev[world]?.[String(new Date().getFullYear())]?.[j]||0;const ex=expenses.filter(e=>e.world===world&&new Date(e.data).getMonth()===j&&new Date(e.data).getFullYear()===new Date().getFullYear()).reduce((s,e)=>s+Number(e.valor),0);return Math.max(r,ex);}),1);
-                const rH=Math.round((rev/maxVal)*88)||2;
-                const eH=Math.round((exp/maxVal)*88)||2;
+                const rH=Math.max(3,Math.round((rev/maxVal)*88))||2;
+                const eH=Math.max(3,Math.round((exp/maxVal)*88))||2;
                 const isCurrent=i===new Date().getMonth();
                 return(
                   <div key={i} style={{flex:1,display:"flex",flexDirection:"column",alignItems:"center",gap:3}}>
-                    <div style={{display:"flex",alignItems:"flex-end",gap:1,height:88}}>
-                      <div style={{width:"45%",height:rH,background:isCurrent?T.positive:`${T.positive}55`,borderRadius:"3px 3px 0 0",transition:"height .4s"}}/>
-                      <div style={{width:"45%",height:eH,background:isCurrent?T.negative:`${T.negative}55`,borderRadius:"3px 3px 0 0",transition:"height .4s"}}/>
+                    <div style={{display:"flex",alignItems:"flex-end",gap:1,height:88,width:"100%"}}>
+                      <div style={{width:"45%",height:rH,minHeight:rH,background:isCurrent?T.positive:`${T.positive}55`,borderRadius:"3px 3px 0 0",transition:"height .4s"}}/>
+                      <div style={{width:"45%",height:eH,minHeight:eH,background:isCurrent?T.negative:`${T.negative}55`,borderRadius:"3px 3px 0 0",transition:"height .4s"}}/>
                     </div>
                     <span style={{fontSize:7,color:isCurrent?T.accent:T.subtext,fontWeight:isCurrent?700:400}}>{m}</span>
                   </div>
