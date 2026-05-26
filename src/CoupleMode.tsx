@@ -917,8 +917,8 @@ const jointBalance = totalContributions - totalSettledExpenses;
     setItems={setRecurringItems}
     onApplyDue={async (r) => {
       const total = Number(r.valor);
-      const s1 = total / 2;
-      const s2 = total / 2;
+      const s1 = r.split_user1 || total / 2;
+      const s2 = r.split_user2 || total / 2;
       const {data, error} = await supabase.from("couple_expenses").insert({
         couple_id: couple.id,
         created_by: userId,

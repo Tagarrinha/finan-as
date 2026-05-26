@@ -8,6 +8,7 @@ export interface CoupleRecurringExpense {
   id:number; couple_id:number; descricao:string; valor:number;
   cat:string; tipo:TypeKey; frequencia:FreqKey;
   proxima_data:string; ativa:boolean; liquidado_auto:boolean;
+  split_user1:number; split_user2:number;
 }
 
 interface ExpCat { id:string; label:string; icon:string; type:TypeKey; }
@@ -68,7 +69,10 @@ export default function CoupleRecurring({ coupleId, isUser1, userName, partnerNa
   async function saveItem() {
     if(!form.descricao.trim()||!form.valor||!form.cat) return;
     setSaving(true);
-    const payload = { descricao:form.descricao.trim(), valor:Number(form.valor), cat:form.cat, tipo:form.tipo, frequencia:form.frequencia, proxima_data:form.proxima_data, liquidado_auto:form.liquidado_auto };
+    const total = Number(form.valor);
+const s1 = form.split==="50/50" ? total/2 : (isUser1 ? Number(form.splitUser1)||0 : Number(form.splitUser2)||0);
+const s2 = form.split==="50/50" ? total/2 : (isUser1 ? Number(form.splitUser2)||0 : Number(form.splitUser1)||0);
+const payload = { descricao:form.descricao.trim(), valor:total, cat:form.cat, tipo:form.tipo, frequencia:form.frequencia, proxima_data:form.proxima_data, liquidado_auto:form.liquidado_auto, split_user1:s1, split_user2:s2 };
     if(editingId) {
       await supabase.from("couple_recurring_expenses").update(payload).eq("id",editingId);
       setItems(items.map(r=>r.id===editingId?{...r,...payload}:r));
@@ -106,7 +110,7 @@ export default function CoupleRecurring({ coupleId, isUser1, userName, partnerNa
           <div style={{fontSize:12,fontWeight:700,color:"#f59e0b",marginBottom:8}}>🔔 {dueNow.length} recorrente{dueNow.length>1?"s":""} conjunta{dueNow.length>1?"s":""} a vencer!</div>
           {dueNow.map(r=>{
             const cat=expCats.find(c=>c.id===r.cat);
-            const myShare=Number(r.valor)/2;
+            const myShare=isUser1?Number(r.split_user1||r.valor/2):Number(r.split_user2||r.valor/2);
             return(
               <div key={r.id} style={{display:"flex",alignItems:"center",gap:10,padding:"8px 0",borderBottom:"1px solid rgba(245,158,11,0.15)"}}>
                 <span style={{fontSize:18}}>{cat?.icon||"📦"}</span>
@@ -169,6 +173,24 @@ export default function CoupleRecurring({ coupleId, isUser1, userName, partnerNa
             </div>
           </div>
 
+          {/* Split */}
+          <div style={{marginBottom:14}}>
+            <label style={lbl}>Divisão</label>
+            <div style={{display:"flex",gap:6,marginBottom:form.split==="custom"?10:0}}>
+              {["50/50","custom"].map(s=>(
+                <button key={s} onClick={()=>setForm(f=>({...f,split:s}))} style={{flex:1,padding:"8px 0",border:`1px solid ${form.split===s?accent:"rgba(255,255,255,0.1)"}`,borderRadius:8,background:form.split===s?`${accent}20`:"transparent",color:form.split===s?accent:"#64748b",fontSize:12,fontWeight:700,cursor:"pointer",fontFamily:"'Sora',sans-serif"}}>
+                  {s==="50/50"?"⚖️ 50/50":"✏️ Personalizado"}
+                </button>
+              ))}
+            </div>
+            {form.split==="custom"&&(
+              <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:8,marginTop:10}}>
+                <div><div style={{fontSize:11,color:"#f97316",marginBottom:4}}>{userName} (€)</div><input style={inp} type="number" value={form.splitUser1} onChange={e=>setForm(f=>({...f,splitUser1:e.target.value}))}/></div>
+                <div><div style={{fontSize:11,color:"#ec4899",marginBottom:4}}>{partnerName} (€)</div><input style={inp} type="number" value={form.splitUser2} onChange={e=>setForm(f=>({...f,splitUser2:e.target.value}))}/></div>
+              </div>
+            )}
+          </div>
+
           {/* Estado auto */}
           <div onClick={()=>setForm(f=>({...f,liquidado_auto:!f.liquidado_auto}))} style={{display:"flex",alignItems:"center",gap:12,background:form.liquidado_auto?"rgba(52,211,153,0.08)":"rgba(255,255,255,0.04)",border:`1px solid ${form.liquidado_auto?"rgba(52,211,153,0.25)":"rgba(255,255,255,0.08)"}`,borderRadius:12,padding:"12px 14px",cursor:"pointer",marginBottom:14}}>
             <div style={{width:38,height:22,borderRadius:99,background:form.liquidado_auto?"#34d399":"rgba(255,255,255,0.12)",position:"relative",transition:"background .2s",flexShrink:0}}>
@@ -203,7 +225,7 @@ export default function CoupleRecurring({ coupleId, isUser1, userName, partnerNa
         const cat=expCats.find(c=>c.id===r.cat);
         const freq=FREQ_META[r.frequencia];
         const isDue=r.proxima_data<=today&&r.ativa;
-        const myShare=Number(r.valor)/2;
+        const myShare=isUser1?Number(r.split_user1||r.valor/2):Number(r.split_user2||r.valor/2);
         return(
           <div key={r.id} style={{background:cardBg,border:`1px solid ${isDue?"rgba(245,158,11,0.4)":r.ativa?cardBorder:"rgba(255,255,255,0.04)"}`,borderRadius:14,padding:"14px 16px",marginBottom:10,opacity:r.ativa?1:0.5}}>
             <div style={{display:"flex",alignItems:"center",gap:10,marginBottom:10}}>
