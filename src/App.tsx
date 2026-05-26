@@ -1139,26 +1139,61 @@ async function handleCoupleSettlement(valor: number) {
         )}
       {chartView==="networth"&&(
           <>
-            <div style={{textAlign:"center" as const,marginBottom:10}}>
-              <div style={{fontSize:10,fontWeight:700,color:T.subtext,textTransform:"uppercase" as const,letterSpacing:"0.08em",marginBottom:4}}>Net Worth actual</div>
-              <div style={{fontSize:28,fontWeight:800,color:totalSaldo>=0?T.positive:T.negative}}>{hv(fmt(totalSaldo))}</div>
+            <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:12}}>
+              <div>
+                <div style={{fontSize:10,fontWeight:700,color:T.subtext,textTransform:"uppercase" as const,letterSpacing:"0.08em",marginBottom:2}}>Net Worth actual</div>
+                <div style={{fontSize:18,fontWeight:800,color:totalSaldo>=0?T.positive:T.negative}}>{hv(fmt(totalSaldo))}</div>
+              </div>
+              <div style={{fontSize:11,color:T.subtext}}>{new Date().getFullYear()}</div>
             </div>
-            <div style={{display:"flex",alignItems:"flex-end",gap:4,height:100,marginTop:16,marginBottom:10}}>
-              {MONTHS.map((m,i)=>{
+            {(()=>{
+              const H=80;
+              const W=300;
+              const hasSnaps=nwSnapshots.length>0;
+              if(!hasSnaps) return <div style={{height:H,display:"flex",alignItems:"center",justifyContent:"center",color:T.subtext,fontSize:12}}>Sem dados ainda</div>;
+              const maxVal=Math.max(...nwSnapshots.map(s=>s.valor),1);
+              const minVal=Math.min(...nwSnapshots.map(s=>s.valor),0);
+              const range=maxVal-minVal||1;
+              const currentMonth=new Date().getMonth();
+              const points=MONTHS.map((_,i)=>{
                 const snap=nwSnapshots.find(s=>s.mes===i);
-                const maxVal=Math.max(...nwSnapshots.map(s=>s.valor),1);
-                const h=snap?Math.max(6,Math.round((snap.valor/maxVal)*88)):2;
-                const isCurrent=i===new Date().getMonth();
-                return(
-                  <div key={i} style={{flex:1,display:"flex",flexDirection:"column",alignItems:"center",gap:3}}>
-                    <div style={{height:88,display:"flex",alignItems:"flex-end",width:"100%"}}>
-                      <div style={{width:"70%",height:snap?h:4,minHeight:snap?h:4,background:isCurrent?T.accent:snap?`${T.accent}55`:"rgba(255,255,255,0.05)",borderRadius:"3px 3px 0 0",transition:"height .4s"}}/>
-                    </div>
-                    <span style={{fontSize:7,color:isCurrent?T.accent:T.subtext,fontWeight:isCurrent?700:400}}>{m}</span>
+                const x=Math.round((i/11)*W);
+                const y=snap?Math.round(H-((snap.valor-minVal)/range)*(H-8)):null;
+                return{x,y,snap,i};
+              }).filter(p=>p.y!==null) as {x:number;y:number;snap:any;i:number}[];
+              if(points.length===0) return null;
+              const pathD=points.map((p,idx)=>`${idx===0?"M":"L"}${p.x},${p.y}`).join(" ");
+              const areaD=`${pathD} L${points[points.length-1].x},${H} L${points[0].x},${H} Z`;
+              return(
+                <div style={{marginBottom:8}}>
+                  <svg viewBox={`0 0 ${W} ${H}`} style={{width:"100%",height:H,overflow:"visible"}}>
+                    <defs>
+                      <linearGradient id="nwGrad" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="0%" stopColor={T.accent} stopOpacity="0.25"/>
+                        <stop offset="100%" stopColor={T.accent} stopOpacity="0"/>
+                      </linearGradient>
+                    </defs>
+                    <path d={areaD} fill="url(#nwGrad)"/>
+                    <path d={pathD} fill="none" stroke={T.accent} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                    {points.map((p,idx)=>{
+                      const isCurrent=p.i===currentMonth;
+                      return(
+                        <g key={idx}>
+                          {isCurrent&&<circle cx={p.x} cy={p.y} r={8} fill={T.accent} fillOpacity="0.15"/>}
+                          <circle cx={p.x} cy={p.y} r={isCurrent?4:2.5} fill={isCurrent?T.accent:T.cardBg} stroke={T.accent} strokeWidth="1.5"/>
+                        </g>
+                      );
+                    })}
+                  </svg>
+                  <div style={{display:"flex",justifyContent:"space-between",marginTop:4}}>
+                    {MONTHS.map((m,i)=>{
+                      const isCurrent=i===currentMonth;
+                      return <span key={i} style={{fontSize:7,color:isCurrent?T.accent:T.subtext,fontWeight:isCurrent?700:400,flex:1,textAlign:"center"}}>{m}</span>;
+                    })}
                   </div>
-                );
-              })}
-            </div>
+                </div>
+              );
+            })()}
             <div style={{paddingTop:8,borderTop:`1px solid ${T.cardBorder}`,fontSize:11,color:T.subtext,textAlign:"center" as const}}>
               Evolução do Net Worth em {new Date().getFullYear()}
             </div>
