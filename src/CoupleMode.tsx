@@ -623,61 +623,7 @@ const jointBalance = totalContributions - totalSettledExpenses;
           );
         })()}
         
-              const d = new Date(e.data+"T12:00:00");
-              return d.getMonth()===i && d.getFullYear()===thisYear;
-            }).reduce((s,e)=>s+Number(e.valor),0)
-          }));
-          const maxVal = Math.max(...monthlyData.map(m=>m.total),1);
-          const hasData = monthlyData.some(m=>m.total>0);
-          if(!hasData) return null;
-          return(
-            <div style={{background:cardBg,border:`1px solid ${cardBorder}`,borderRadius:14,padding:"14px 16px",marginBottom:12}}>
-              <div style={{fontSize:10,fontWeight:700,color:subtext,textTransform:"uppercase" as const,letterSpacing:"0.08em",marginBottom:12}}>Evolução de gastos {thisYear}</div>
-              <div style={{display:"flex",alignItems:"flex-end",gap:3,height:60,marginBottom:8}}>
-                {monthlyData.map((m,i)=>{
-                  const h = m.total>0 ? Math.max(4, Math.round((m.total/maxVal)*52)) : 2;
-                  const isCurrent = i===thisMonth;
-                  const hasFuture = i>thisMonth;
-                  return(
-                    <div key={i} style={{flex:1,display:"flex",flexDirection:"column" as const,alignItems:"center",gap:2}}>
-                      {isCurrent&&m.total>0&&(
-                        <div style={{fontSize:8,fontWeight:700,color:"#5DA9FF",marginBottom:2,whiteSpace:"nowrap" as const}}>{fmt(m.total)}</div>
-                      )}
-                      <div style={{height:52,display:"flex",alignItems:"flex-end"}}>
-                        <div style={{
-                          width:"100%",
-                          height:m.total>0?h:2,
-                          borderRadius:"3px 3px 0 0",
-                          background:isCurrent
-                            ?"linear-gradient(180deg,#5DA9FF,#3d8fd9)"
-                            :hasFuture
-                            ?"rgba(255,255,255,0.04)"
-                            :`linear-gradient(180deg,${MY_COLOR}90,${MY_COLOR}40)`,
-                          transition:"height .4s"
-                        }}/>
-                      </div>
-                      <span style={{fontSize:7,color:isCurrent?"#5DA9FF":subtext,fontWeight:isCurrent?700:400}}>{m.label}</span>
-                    </div>
-                  );
-                })}
-              </div>
-              {(()=>{
-                const prevMonth = thisMonth===0?11:thisMonth-1;
-                const curr = monthlyData[thisMonth].total;
-                const prev = monthlyData[prevMonth].total;
-                if(!prev||!curr) return null;
-                const diff = curr - prev;
-                return(
-                  <div style={{paddingTop:8,borderTop:`1px solid ${cardBorder}`,display:"flex",justifyContent:"space-between",alignItems:"center"}}>
-                    <span style={{fontSize:11,color:subtext}}>vs mês anterior</span>
-                    <span style={{fontSize:12,fontWeight:700,color:diff<=0?"#34d399":"#ff7d7d"}}>{diff<=0?"↓":"↑"} {fmt(Math.abs(diff))}</span>
-                  </div>
-                );
-              })()}
-            </div>
-          );
-        })()}
-        {/* ── Gráfico evolução mensal ── */}
+              {/* ── Gráfico evolução mensal ── */}
         {(()=>{
           const now = new Date();
           const thisYear = now.getFullYear();
