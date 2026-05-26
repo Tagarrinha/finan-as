@@ -1175,12 +1175,9 @@ async function handleCoupleSettlement(valor: number) {
        {tab==="despesas"&&<>
   <div style={{background:T.cardBg,border:`1px solid ${T.cardBorder}`,borderRadius:16,padding:"20px",marginBottom:14,boxShadow:"0 1px 3px rgba(0,0,0,0.3),0 4px 16px rgba(0,0,0,0.2)"}}>
     {/* Header do formulário */}
-    <div style={{display:"flex",alignItems:"center",gap:10,marginBottom:20,paddingBottom:16,borderBottom:`1px solid ${T.cardBorder}`}}>
-      <div style={{width:36,height:36,borderRadius:10,background:`linear-gradient(135deg,${T.accent},${T.accentDark})`,display:"flex",alignItems:"center",justifyContent:"center",fontSize:18}}>📥</div>
-      <div>
-        <div style={{fontSize:14,fontWeight:800,color:"#f1f5f9"}}>{editingExp?"Editar despesa":"Nova despesa"}</div>
-        <div style={{fontSize:11,color:T.subtext,marginTop:1}}>Preenche os dados abaixo</div>
-      </div>
+    <div style={{display:"flex",alignItems:"center",gap:8,marginBottom:14,paddingBottom:12,borderBottom:`1px solid ${T.cardBorder}`}}>
+      <div style={{width:28,height:28,borderRadius:8,background:`linear-gradient(135deg,${T.accent},${T.accentDark})`,display:"flex",alignItems:"center",justifyContent:"center",fontSize:14}}>📥</div>
+      <div style={{fontSize:13,fontWeight:800,color:"#f1f5f9"}}>{editingExp?"Editar despesa":"Nova despesa"}</div>
     </div>
     {/* Descrição + Valor */}
     <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:10,marginBottom:14}}>
@@ -1210,14 +1207,11 @@ async function handleCoupleSettlement(valor: number) {
     </div>
     {/* Recorrente */}
     {!editingExp&&(
-      <div onClick={()=>setExpIsRecurring(v=>!v)} style={{display:"flex",alignItems:"center",gap:10,padding:"12px 14px",background:expIsRecurring?`${T.accent}15`:"rgba(255,255,255,0.03)",border:`1px solid ${expIsRecurring?T.accent:"rgba(255,255,255,0.08)"}`,borderRadius:10,cursor:"pointer",marginBottom:16,userSelect:"none"}}>
-        <div style={{width:36,height:20,borderRadius:99,background:expIsRecurring?T.accent:"rgba(255,255,255,0.12)",transition:"background .2s",position:"relative",flexShrink:0}}>
-          <div style={{position:"absolute",top:3,left:expIsRecurring?18:3,width:14,height:14,borderRadius:"50%",background:"#fff",transition:"left .2s"}}/>
+      <div onClick={()=>setExpIsRecurring(v=>!v)} style={{display:"flex",alignItems:"center",gap:8,padding:"8px 12px",background:expIsRecurring?`${T.accent}15`:"rgba(255,255,255,0.03)",border:`1px solid ${expIsRecurring?T.accent:"rgba(255,255,255,0.08)"}`,borderRadius:9,cursor:"pointer",marginBottom:12,userSelect:"none"}}>
+        <div style={{width:32,height:18,borderRadius:99,background:expIsRecurring?T.accent:"rgba(255,255,255,0.12)",transition:"background .2s",position:"relative",flexShrink:0}}>
+          <div style={{position:"absolute",top:2,left:expIsRecurring?16:2,width:14,height:14,borderRadius:"50%",background:"#fff",transition:"left .2s"}}/>
         </div>
-        <div>
-          <div style={{fontSize:13,fontWeight:600,color:expIsRecurring?"#f1f5f9":"#94a3b8"}}>🔄 Despesa recorrente</div>
-          <div style={{fontSize:11,color:"#475569",marginTop:1}}>{expIsRecurring?"Será guardada como mensal":"Toca para activar"}</div>
-        </div>
+        <span style={{fontSize:12,fontWeight:600,color:expIsRecurring?"#f1f5f9":"#94a3b8"}}>🔄 {expIsRecurring?"Despesa recorrente (mensal)":"Marcar como recorrente"}</span>
       </div>
     )}
     {/* Botão */}
