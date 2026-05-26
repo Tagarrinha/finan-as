@@ -622,16 +622,7 @@ const jointBalance = totalContributions - totalSettledExpenses;
             </>
           );
         })()}
-        {/* ── Gráfico evolução mensal ── */}
-        {(()=>{
-          const now = new Date();
-          const thisYear = now.getFullYear();
-          const thisMonth = now.getMonth();
-          const MONTHS_PT = ["Jan","Fev","Mar","Abr","Mai","Jun","Jul","Ago","Set","Out","Nov","Dez"];
-          const monthlyData = MONTHS_PT.map((_,i)=>({
-            mes: i,
-            label: MONTHS_PT[i],
-            total: liquidadas.filter(e=>{
+        
               const d = new Date(e.data+"T12:00:00");
               return d.getMonth()===i && d.getFullYear()===thisYear;
             }).reduce((s,e)=>s+Number(e.valor),0)
@@ -695,9 +686,9 @@ const jointBalance = totalContributions - totalSettledExpenses;
           const monthlyData = MONTHS_PT.map((_,i)=>({
             mes: i,
             label: MONTHS_PT[i],
-            total: liquidadas.filter(e=>{
+            total: expenses.filter(e=>{
               const d = new Date(e.data+"T12:00:00");
-              return d.getMonth()===i && d.getFullYear()===thisYear;
+              return e.liquidado && d.getMonth()===i && d.getFullYear()===thisYear;
             }).reduce((s,e)=>s+Number(e.valor),0)
           }));
           const maxVal = Math.max(...monthlyData.map(m=>m.total),1);
