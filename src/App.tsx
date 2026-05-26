@@ -1193,7 +1193,28 @@ async function handleCoupleSettlement(valor: number) {
             <span style={{fontSize:12,color:T.subtext}}>{myExpenses.length} despesa(s)</span>
             <span style={{fontSize:17,fontWeight:800,color:T.negative}}>{fmt(totalExp)}</span>
           </div>
-          {myExpenses.length>0&&(<div style={{display:"grid",gridTemplateColumns:"1fr 1fr 1fr",gap:8,marginBottom:14}}>{(Object.entries(TYPE_META) as [TypeKey,typeof TYPE_META[TypeKey]][]).map(([type,meta])=>{const actual=byType[type]||0,target=budgetTargets[type],over=actual>totalInc*(target/100)&&totalInc>0;return(<div key={type} style={{background:over?"#450a0a":meta.bg,border:`1px solid ${over?"#ef4444":meta.color}40`,borderRadius:10,padding:"10px 8px",textAlign:"center"}}><div style={{fontSize:16,marginBottom:2}}>{meta.icon}</div><div style={{fontSize:12,fontWeight:800,color:over?"#ef4444":meta.color}}>{fmt(actual)}</div><div style={{fontSize:10,color:T.subtext,marginTop:1}}>{pct(actual,totalInc)}% / {target}%</div>{over&&<div style={{fontSize:10,color:"#ef4444",fontWeight:700,marginTop:2}}>⚠️</div>}</div>);})}</div>)}
+          {myExpenses.length>0&&(
+  <div style={{marginBottom:14}}>
+    {(Object.entries(TYPE_META) as [TypeKey,typeof TYPE_META[TypeKey]][]).map(([type,meta])=>{
+      const actual=byType[type]||0,target=budgetTargets[type],targetAmt=totalInc*(target/100),over=actual>targetAmt&&totalInc>0;
+      return(
+        <div key={type} style={{marginBottom:10}}>
+          <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:5}}>
+            <span style={{fontSize:13,color:over?"#ef4444":"#e2e8f0"}}>{meta.icon} {meta.label}</span>
+            <div style={{display:"flex",alignItems:"center",gap:8}}>
+              <span style={{fontSize:12,color:over?"#ef4444":T.subtext}}>{pct(actual,totalInc)}% / {target}%</span>
+              <span style={{fontSize:13,fontWeight:700,color:over?"#ef4444":meta.color}}>{fmt(actual)}</span>
+            </div>
+          </div>
+          <div style={{position:"relative",height:6,borderRadius:99,background:"rgba(255,255,255,0.07)"}}>
+            <div style={{position:"absolute",left:0,top:0,bottom:0,width:`${Math.min(100,pct(actual,totalInc))}%`,background:over?"#ef4444":meta.color,borderRadius:99,transition:"width .5s ease"}}/>
+            <div style={{position:"absolute",top:-3,bottom:-3,left:`${target}%`,width:2,background:"rgba(255,255,255,0.25)",borderRadius:1}}/>
+          </div>
+        </div>
+      );
+    })}
+  </div>
+)}
           <div style={S.card}>
             {myExpenses.length===0&&<div style={{color:T.subtext,fontSize:13,textAlign:"center",padding:"24px 0"}}>Sem despesas para este período.</div>}
             {myExpenses.map(e=>{const cat=expCats.find(c=>c.id===e.cat);return(<div key={e.id} style={{display:"flex",alignItems:"center",gap:10,padding:"11px 0",borderBottom:`1px solid ${T.cardBorder}`}}><span style={{fontSize:20,minWidth:28,textAlign:"center"}}>{cat?.icon||"📦"}</span><div style={{flex:1,minWidth:0}}><div style={{fontSize:13,fontWeight:600,color:"#e2e8f0",whiteSpace:"nowrap",overflow:"hidden",textOverflow:"ellipsis"}}>{e.descricao}{e.subcat?<span style={{color:T.subtext}}> · {e.subcat}</span>:""}</div><div style={{display:"flex",alignItems:"center",gap:5,marginTop:3}}><span style={{fontSize:10,color:T.subtext}}>{new Date(e.data+"T12:00:00").toLocaleDateString("pt-PT")}</span><Tag type={e.tipo}/></div></div><span style={{fontSize:14,fontWeight:700,color:T.negative,minWidth:68,textAlign:"right"}}>{fmt(Number(e.valor))}</span><button onClick={()=>{setEditingExp(e.id);setExpForm({descricao:e.descricao,valor:String(e.valor),cat:e.cat,subcat:e.subcat,data:e.data,tipo:e.tipo});window.scrollTo({top:0,behavior:"smooth"});}} style={{background:"none",border:"none",cursor:"pointer",color:T.accent,fontSize:15,padding:"0 2px"}}>✏️</button>
