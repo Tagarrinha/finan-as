@@ -607,6 +607,7 @@ const [expRecurringDays,setExpRecurringDays]=useState("30");
   const [editingExp,setEditingExp]=useState<number|null>(null);
   const [editingInc,setEditingInc]=useState<number|null>(null);
   const [hideValues, setHideValues] = useState(false);
+const [successMsg, setSuccessMsg] = useState("");
   const [chartView, setChartView] = useState<"networth"|"fluxo">("fluxo");
   const [nwSnapshots, setNwSnapshots] = useState<{mes:number;ano:number;valor:number}[]>([]);
 
@@ -698,6 +699,8 @@ const [expRecurringDays,setExpRecurringDays]=useState("30");
     }
     setExpForm(f=>({...f,descricao:"",valor:"",subcat:""}));
     setExpIsRecurring(false);
+    setSuccessMsg("✓ Despesa adicionada!");
+    setTimeout(()=>setSuccessMsg(""),3000);
     setExpRecurringFreq("mensal");
     setExpRecurringDays("30");
   }
@@ -1179,6 +1182,12 @@ async function handleCoupleSettlement(valor: number) {
 </>}
 
        {tab==="despesas"&&<>
+  {successMsg&&(
+    <div style={{background:"rgba(52,211,153,0.12)",border:"1px solid rgba(52,211,153,0.3)",borderRadius:12,padding:"12px 16px",marginBottom:14,display:"flex",alignItems:"center",gap:10,animation:"fadeUp .3s ease"}}>
+      <span style={{fontSize:18}}>✅</span>
+      <span style={{fontSize:13,fontWeight:700,color:"#34d399"}}>{successMsg}</span>
+    </div>
+  )}
   <div style={{background:T.cardBg,border:`1px solid ${T.cardBorder}`,borderRadius:16,padding:"20px",marginBottom:14,boxShadow:"0 1px 3px rgba(0,0,0,0.3),0 4px 16px rgba(0,0,0,0.2)"}}>
     {/* Header do formulário */}
     <div style={{display:"flex",alignItems:"center",gap:8,marginBottom:14,paddingBottom:12,borderBottom:`1px solid ${T.cardBorder}`}}>
