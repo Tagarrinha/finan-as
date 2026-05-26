@@ -371,64 +371,67 @@ const jointBalance = totalContributions - totalSettledExpenses;
   return(
     <div style={{fontFamily:"'Sora',sans-serif"}}>
       {/* Header */}
-      <div style={{background:`linear-gradient(135deg,${MY_COLOR}15,${PARTNER_COLOR}10)`,border:`1px solid ${MY_COLOR}25`,borderRadius:16,padding:"16px 18px",marginBottom:14,display:"flex",alignItems:"center",gap:12}}>
-        <div style={{display:"flex"}}>
-          <div style={{width:40,height:40,borderRadius:"50%",background:`${MY_COLOR}25`,border:`2px solid ${MY_COLOR}`,display:"flex",alignItems:"center",justifyContent:"center",fontSize:18,zIndex:1}}>👤</div>
-          <div style={{width:40,height:40,borderRadius:"50%",background:`${PARTNER_COLOR}25`,border:`2px solid ${PARTNER_COLOR}`,display:"flex",alignItems:"center",justifyContent:"center",fontSize:18,marginLeft:-12}}>👤</div>
-        </div>
-        <div style={{flex:1}}>
-          <div style={{fontSize:14,fontWeight:800,color:"#f1f5f9"}}>{userName} & {partnerName}</div>
-          <div style={{fontSize:11,color:subtext,marginTop:2}}>{partnerEmail} · modo casal ativo</div>
-        </div>
-        <div style={{display:"flex",gap:8,alignItems:"center"}}>
-  {/* Notificações */}
-  <div style={{position:"relative"}}>
-    <button
-      onClick={()=>setShowNotifications(v=>!v)}
-      style={{width:36,height:36,borderRadius:10,background:"rgba(255,255,255,0.05)",border:"1px solid rgba(255,255,255,0.1)",display:"flex",alignItems:"center",justifyContent:"center",cursor:"pointer",fontSize:18,position:"relative"}}
-    >
-      🔔
-      {notifications.length>0&&(
-        <span style={{position:"absolute",top:-4,right:-4,width:18,height:18,borderRadius:"50%",background:"#ef4444",color:"white",fontSize:10,fontWeight:800,display:"flex",alignItems:"center",justifyContent:"center"}}>
-          {notifications.length}
-        </span>
-      )}
-    </button>
-    {showNotifications&&(
-      <>
-        <div onClick={()=>setShowNotifications(false)} style={{position:"fixed",inset:0,zIndex:10}}/>
-        <div style={{position:"absolute",top:"calc(100% + 8px)",right:0,zIndex:20,background:"#0f1117",border:"1px solid rgba(255,255,255,0.1)",borderRadius:16,padding:"12px",minWidth:280,maxWidth:320,boxShadow:"0 8px 32px rgba(0,0,0,0.5)"}}>
-          <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:10}}>
-            <div style={{fontSize:12,fontWeight:700,color:"#f1f5f9"}}>Notificações</div>
-            {notifications.length>0&&(
-              <button
-                onClick={async()=>{
-                  await supabase.from("notifications").update({lida:true}).eq("user_id",userId);
-                  setNotifications([]);
-                  setShowNotifications(false);
-                }}
-                style={{fontSize:11,color:accent,background:"none",border:"none",cursor:"pointer",fontFamily:"'Sora',sans-serif",fontWeight:600}}
-              >
-                Marcar todas como lidas
-              </button>
-            )}
-          </div>
-          {notifications.length===0?(
-            <div style={{textAlign:"center" as const,padding:"16px 0",color:subtext,fontSize:13}}>Sem notificações</div>
-          ):notifications.map(n=>(
-            <div key={n.id} style={{padding:"10px 0",borderBottom:"1px solid rgba(255,255,255,0.06)"}}>
-              <div style={{fontSize:13,color:"#e2e8f0",lineHeight:1.5}}>{n.mensagem}</div>
-              <div style={{fontSize:10,color:subtext,marginTop:4}}>{new Date(n.created_at).toLocaleDateString("pt-PT",{day:"2-digit",month:"short",hour:"2-digit",minute:"2-digit"})}</div>
+      <div style={{background:`linear-gradient(135deg,${MY_COLOR}15,${PARTNER_COLOR}10)`,border:`1px solid ${MY_COLOR}25`,borderRadius:20,padding:"20px",marginBottom:14}}>
+        {/* Linha superior: avatares + botões */}
+        <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",marginBottom:14}}>
+          <div style={{display:"flex",alignItems:"center",gap:10}}>
+            <div style={{display:"flex"}}>
+              <div style={{width:44,height:44,borderRadius:"50%",background:`${MY_COLOR}25`,border:`2px solid ${MY_COLOR}`,display:"flex",alignItems:"center",justifyContent:"center",fontSize:20,zIndex:1}}>👤</div>
+              <div style={{width:44,height:44,borderRadius:"50%",background:`${PARTNER_COLOR}25`,border:`2px solid ${PARTNER_COLOR}`,display:"flex",alignItems:"center",justifyContent:"center",fontSize:20,marginLeft:-14}}>👤</div>
             </div>
-          ))}
+            <div style={{width:24,height:24,borderRadius:"50%",background:"rgba(255,255,255,0.08)",border:"1px solid rgba(255,255,255,0.12)",display:"flex",alignItems:"center",justifyContent:"center",fontSize:11,color:"#94a3b8",fontWeight:700}}>💑</div>
+          </div>
+          <div style={{display:"flex",gap:8,alignItems:"center"}}>
+            {/* Notificações */}
+            <div style={{position:"relative"}}>
+              <button onClick={()=>setShowNotifications(v=>!v)} style={{width:36,height:36,borderRadius:10,background:"rgba(255,255,255,0.05)",border:"1px solid rgba(255,255,255,0.1)",display:"flex",alignItems:"center",justifyContent:"center",cursor:"pointer",fontSize:16,position:"relative"}}>
+                🔔
+                {notifications.length>0&&(
+                  <span style={{position:"absolute",top:-4,right:-4,width:18,height:18,borderRadius:"50%",background:"#ef4444",color:"white",fontSize:10,fontWeight:800,display:"flex",alignItems:"center",justifyContent:"center"}}>
+                    {notifications.length}
+                  </span>
+                )}
+              </button>
+              {showNotifications&&(
+                <>
+                  <div onClick={()=>setShowNotifications(false)} style={{position:"fixed",inset:0,zIndex:10}}/>
+                  <div style={{position:"absolute",top:"calc(100% + 8px)",right:0,zIndex:20,background:"#0f1117",border:"1px solid rgba(255,255,255,0.1)",borderRadius:16,padding:"12px",minWidth:280,maxWidth:320,boxShadow:"0 8px 32px rgba(0,0,0,0.5)"}}>
+                    <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:10}}>
+                      <div style={{fontSize:12,fontWeight:700,color:"#f1f5f9"}}>Notificações</div>
+                      {notifications.length>0&&(
+                        <button onClick={async()=>{await supabase.from("notifications").update({lida:true}).eq("user_id",userId);setNotifications([]);setShowNotifications(false);}} style={{fontSize:11,color:accent,background:"none",border:"none",cursor:"pointer",fontFamily:"'Sora',sans-serif",fontWeight:600}}>
+                          Marcar todas como lidas
+                        </button>
+                      )}
+                    </div>
+                    {notifications.length===0?(
+                      <div style={{textAlign:"center" as const,padding:"16px 0",color:subtext,fontSize:13}}>Sem notificações</div>
+                    ):notifications.map(n=>(
+                      <div key={n.id} style={{padding:"10px 0",borderBottom:"1px solid rgba(255,255,255,0.06)"}}>
+                        <div style={{fontSize:13,color:"#e2e8f0",lineHeight:1.5}}>{n.mensagem}</div>
+                        <div style={{fontSize:10,color:subtext,marginTop:4}}>{new Date(n.created_at).toLocaleDateString("pt-PT",{day:"2-digit",month:"short",hour:"2-digit",minute:"2-digit"})}</div>
+                      </div>
+                    ))}
+                  </div>
+                </>
+              )}
+            </div>
+            <button onClick={dissolveCouple} style={{padding:"5px 8px",background:"rgba(239,68,68,0.08)",border:"1px solid rgba(239,68,68,0.15)",borderRadius:8,color:"#f87171",fontSize:10,fontWeight:600,cursor:"pointer",fontFamily:"'Sora',sans-serif"}}>✕</button>
+          </div>
         </div>
-      </>
-    )}
-  </div>
-  <button onClick={dissolveCouple} style={{padding:"5px 8px",background:"rgba(239,68,68,0.08)",border:"1px solid rgba(239,68,68,0.15)",borderRadius:8,color:"#f87171",fontSize:10,fontWeight:600,cursor:"pointer",fontFamily:"'Sora',sans-serif"}}>✕</button>
-</div>
+        {/* Linha inferior: nomes */}
+        <div style={{paddingTop:14,borderTop:"1px solid rgba(255,255,255,0.06)"}}>
+          <div style={{fontSize:16,fontWeight:800,color:"#f1f5f9",marginBottom:4,letterSpacing:"-0.3px"}}>
+            <span style={{color:MY_COLOR}}>{userName}</span>
+            <span style={{color:"rgba(255,255,255,0.3)",margin:"0 8px"}}>&</span>
+            <span style={{color:PARTNER_COLOR}}>{partnerName}</span>
+          </div>
+          <div style={{display:"flex",alignItems:"center",gap:6}}>
+            <div style={{width:6,height:6,borderRadius:"50%",background:"#34d399"}}/>
+            <span style={{fontSize:11,color:subtext}}>modo casal ativo · {partnerEmail}</span>
+          </div>
+        </div>
       </div>
-
       {/* Sync message */}
       {syncMsg&&(
         <div style={{background:syncMsg.includes("✓")?"rgba(52,211,153,0.1)":"rgba(245,158,11,0.1)",border:`1px solid ${syncMsg.includes("✓")?"rgba(52,211,153,0.3)":"rgba(245,158,11,0.3)"}`,borderRadius:10,padding:"10px 14px",marginBottom:12,fontSize:13,color:syncMsg.includes("✓")?"#34d399":"#f59e0b",fontWeight:600}}>
