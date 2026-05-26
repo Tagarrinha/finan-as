@@ -1111,7 +1111,7 @@ async function handleCoupleSettlement(valor: number) {
         </div>
         {chartView==="fluxo"&&(
           <>
-            <div style={{display:"flex",alignItems:"flex-end",gap:4,height:100,marginTop:16,marginBottom:10}}>
+            <div style={{display:"flex",alignItems:"flex-end",gap:4,height:100,marginTop:56,marginBottom:10}}>
               {MONTHS.map((m,i)=>{
                 const rev=incomes.filter(inc=>inc.world===world&&new Date(inc.data).getMonth()===i&&new Date(inc.data).getFullYear()===new Date().getFullYear()).reduce((s,inc)=>s+Number(inc.valor),0);
                 const exp=expenses.filter(e=>e.world===world&&new Date(e.data).getMonth()===i&&new Date(e.data).getFullYear()===new Date().getFullYear()).reduce((s,e)=>s+Number(e.valor),0);
@@ -1143,7 +1143,7 @@ async function handleCoupleSettlement(valor: number) {
               <div style={{fontSize:10,fontWeight:700,color:T.subtext,textTransform:"uppercase" as const,letterSpacing:"0.08em",marginBottom:4}}>Net Worth actual</div>
               <div style={{fontSize:28,fontWeight:800,color:totalSaldo>=0?T.positive:T.negative}}>{hv(fmt(totalSaldo))}</div>
             </div>
-            <div style={{display:"flex",alignItems:"flex-end",gap:4,height:100,marginTop:16,marginBottom:10}}>
+            <div style={{display:"flex",alignItems:"flex-end",gap:4,height:100,marginTop:56,marginBottom:10}}>
               {MONTHS.map((m,i)=>{
                 const snap=nwSnapshots.find(s=>s.mes===i);
                 const maxVal=Math.max(...nwSnapshots.map(s=>s.valor),1);
