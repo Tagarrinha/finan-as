@@ -427,11 +427,6 @@ const jointBalance = totalContributions - totalSettledExpenses;
         </div>
         {/* Nomes + stat */}
         <div style={{position:"relative"}}>
-          <div style={{fontSize:20,fontWeight:800,letterSpacing:"-0.5px",marginBottom:4,lineHeight:1.2}}>
-            <span style={{color:MY_COLOR}}>{userName}</span>
-            <span style={{color:"rgba(255,255,255,0.2)",margin:"0 8px"}}>&</span>
-            <span style={{color:PARTNER_COLOR}}>{partnerName}</span>
-          </div>
           <div style={{display:"flex",alignItems:"center",gap:6,marginBottom:16}}>
             <div style={{width:6,height:6,borderRadius:"50%",background:"#34d399",boxShadow:"0 0 6px #34d399"}}/>
             <span style={{fontSize:11,color:subtext}}>modo casal ativo</span>
