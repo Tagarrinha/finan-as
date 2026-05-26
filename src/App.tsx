@@ -1151,8 +1151,8 @@ async function handleCoupleSettlement(valor: number) {
                 const isCurrent=i===new Date().getMonth();
                 return(
                   <div key={i} style={{flex:1,display:"flex",flexDirection:"column",alignItems:"center",gap:3}}>
-                    <div style={{height:88,display:"flex",alignItems:"flex-end"}}>
-                      <div style={{width:"70%",height:snap?h:4,background:isCurrent?T.accent:snap?`${T.accent}55`:"rgba(255,255,255,0.05)",borderRadius:"3px 3px 0 0",transition:"height .4s"}}/>
+                    <div style={{height:88,display:"flex",alignItems:"flex-end",width:"100%"}}>
+                      <div style={{width:"70%",height:snap?h:4,minHeight:snap?h:4,background:isCurrent?T.accent:snap?`${T.accent}55`:"rgba(255,255,255,0.05)",borderRadius:"3px 3px 0 0",transition:"height .4s"}}/>
                     </div>
                     <span style={{fontSize:7,color:isCurrent?T.accent:T.subtext,fontWeight:isCurrent?700:400}}>{m}</span>
                   </div>
