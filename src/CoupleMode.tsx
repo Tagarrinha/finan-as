@@ -476,7 +476,6 @@ const jointBalance = totalContributions - totalSettledExpenses;
   <div style={{fontSize:12,color:jointBalance>=0?"rgba(0,195,122,0.8)":"rgba(255,125,125,0.8)",fontWeight:600,marginBottom:16}}>
     {totalSettledExpenses>0?`${fmt(totalContributions)} contribuições − ${fmt(totalSettledExpenses)} despesas`:`${fmt(totalContributions)} em contribuições`}
   </div>
-
   {/* ── Orçamento mensal ── */}
   {(()=>{
     const orcamento = Number((account as any)?.orcamento_mensal) || 0;
@@ -507,7 +506,6 @@ const jointBalance = totalContributions - totalSettledExpenses;
       </button>
     );
   })()}
-
   {/* Modal editar orçamento */}
   {editOrcamento&&(
     <div style={{background:"rgba(255,255,255,0.04)",border:"1px solid rgba(255,255,255,0.1)",borderRadius:12,padding:"14px",marginBottom:16}}>
@@ -527,13 +525,11 @@ const jointBalance = totalContributions - totalSettledExpenses;
       </div>
     </div>
   )}
-
   <div style={{background:"rgba(255,255,255,0.04)",borderRadius:10,padding:"10px 14px",display:"flex",justifyContent:"space-between",alignItems:"center"}}>
     <span style={{fontSize:12,color:subtext}}>Contribuições este mês</span>
     <span style={{fontSize:13,fontWeight:700,color:"rgba(0,195,122,0.9)"}}>{fmt(totalContributions)}</span>
   </div>
 </div>
-
   {/* ── Contribuições ── */}
   {!editContrib?(
     <>
@@ -560,7 +556,6 @@ const jointBalance = totalContributions - totalSettledExpenses;
           );
         })}
       </div>
-
       {/* ── Status ── */}
       {(()=>{
         const c1=account?.contribuicao_user1||0;
@@ -576,7 +571,6 @@ const jointBalance = totalContributions - totalSettledExpenses;
           </div>
         );
       })()}
-
       <div style={{display:"flex",flexDirection:"column" as const,gap:10,marginBottom:14}}>
         <button onClick={()=>setTab("acerto")} style={{width:"100%",padding:"14px 0",background:"linear-gradient(135deg,#00c37a,#00a86b)",border:"none",borderRadius:14,color:"#fff",fontWeight:700,fontSize:14,cursor:"pointer",fontFamily:"'Sora',sans-serif",display:"flex",alignItems:"center",justifyContent:"center",gap:8}}>
           ⇄ Acertar contas
@@ -605,7 +599,6 @@ const jointBalance = totalContributions - totalSettledExpenses;
             <div style={{fontSize:12,color:subtext}}>A tua parte pendente: <span style={{color:"#f59e0b",fontWeight:700}}>{fmt(myDebt)}</span></div>
           </div>
         )}
-
         {/* ── Top categorias conjuntas ── */}
         {liquidadas.length>0&&(()=>{
           // Mês actual
@@ -614,7 +607,6 @@ const jointBalance = totalContributions - totalSettledExpenses;
           const thisYear = now.getFullYear();
           const prevMonth = thisMonth===0?11:thisMonth-1;
           const prevYear = thisMonth===0?thisYear-1:thisYear;
-
           const thisMonthExp = liquidadas.filter(e=>{
             const d=new Date(e.data+"T12:00:00");
             return d.getMonth()===thisMonth&&d.getFullYear()===thisYear;
@@ -623,7 +615,6 @@ const jointBalance = totalContributions - totalSettledExpenses;
             const d=new Date(e.data+"T12:00:00");
             return d.getMonth()===prevMonth&&d.getFullYear()===prevYear;
           });
-
           // Agrupa por categoria
           const catMap:Record<string,{total:number;prev:number;icon:string;label:string}> = {};
           thisMonthExp.forEach(e=>{
@@ -635,17 +626,13 @@ const jointBalance = totalContributions - totalSettledExpenses;
             if(!catMap[e.cat]) catMap[e.cat]={total:0,prev:0,icon:expCats.find(c=>c.id===e.cat)?.icon||"📦",label:expCats.find(c=>c.id===e.cat)?.label||e.cat};
             catMap[e.cat].prev+=Number(e.valor);
           });
-
           const topCats = Object.values(catMap).sort((a,b)=>b.total-a.total).slice(0,5);
           const maxVal = Math.max(...topCats.map(c=>c.total),1);
-
           // Totais mensais para comparação
           const totalThisMonth = thisMonthExp.reduce((s,e)=>s+Number(e.valor),0);
           const totalPrevMonth = prevMonthExp.reduce((s,e)=>s+Number(e.valor),0);
           const monthDiff = totalThisMonth - totalPrevMonth;
-
           const MONTHS_PT = ["Jan","Fev","Mar","Abr","Mai","Jun","Jul","Ago","Set","Out","Nov","Dez"];
-
           return(
             <>
               {/* Comparação mensal */}
@@ -669,7 +656,6 @@ const jointBalance = totalContributions - totalSettledExpenses;
                   </div>
                 </div>
               )}
-
               {/* Top categorias */}
               <div style={{background:cardBg,border:`1px solid ${cardBorder}`,borderRadius:14,padding:"16px",marginBottom:14}}>
                 <div style={{fontSize:10,fontWeight:700,color:subtext,textTransform:"uppercase" as const,letterSpacing:"0.08em",marginBottom:14}}>Top categorias conjuntas</div>
@@ -699,7 +685,6 @@ const jointBalance = totalContributions - totalSettledExpenses;
             </>
           );
         })()}
-
         {/* Despesas liquidadas recentes */}
         <div style={{background:cardBg,border:`1px solid ${cardBorder}`,borderRadius:12,padding:"14px 16px"}}>
           <div style={{fontSize:10,fontWeight:700,color:subtext,textTransform:"uppercase" as const,letterSpacing:"0.08em",marginBottom:12}}>Despesas liquidadas recentes</div>
