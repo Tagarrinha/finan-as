@@ -644,7 +644,7 @@ const jointBalance = totalContributions - totalSettledExpenses;
               <div style={{fontSize:10,fontWeight:700,color:subtext,textTransform:"uppercase" as const,letterSpacing:"0.08em",marginBottom:12}}>Evolução de gastos {thisYear} · total: {monthlyData.reduce((s,m)=>s+m.total,0)}€ · maio: {monthlyData[4]?.total}€</div>
               <div style={{display:"flex",alignItems:"flex-end",gap:3,height:60,marginBottom:8}}>
                 {monthlyData.map((m,i)=>{
-                  const h = m.total>0 ? Math.max(4, Math.round((m.total/maxVal)*52)) : 2;
+                  const h = m.total>0 ? Math.max(6, Math.round((m.total/maxVal)*48)) : 2;
                   const isCurrent = i===thisMonth;
                   const hasFuture = i>thisMonth;
                   return(
@@ -652,9 +652,10 @@ const jointBalance = totalContributions - totalSettledExpenses;
                       {isCurrent&&m.total>0&&(
                         <div style={{fontSize:8,fontWeight:700,color:"#5DA9FF",marginBottom:2,whiteSpace:"nowrap" as const}}>{fmt(m.total)}</div>
                       )}
-                      <div style={{height:52,display:"flex",alignItems:"flex-end"}}>
+                      <div style={{height:48,display:"flex",alignItems:"flex-end",width:"100%"}}>
                         <div style={{
                           width:"100%",
+                          minHeight:m.total>0?h:2,
                           height:m.total>0?h:2,
                           borderRadius:"3px 3px 0 0",
                           background:isCurrent
