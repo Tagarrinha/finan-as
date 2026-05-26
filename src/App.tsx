@@ -586,7 +586,7 @@ function MainApp({user,userName,onLogout}:{user:SBUser;userName:string;onLogout:
   const [incForm,setIncForm]=useState({descricao:"",valor:"",cat:"",data:today});
   const [revEdit,setRevEdit]=useState<number|null>(null);const [revVal,setRevVal]=useState("");
   const [revYear,setRevYear]=useState(String(new Date().getFullYear()));
-  const [fMonth,setFMonth]=useState("todos");const [fYear,setFYear]=useState("todos");
+  const [fMonth,setFMonth]=useState(String(new Date().getMonth()));const [fYear,setFYear]=useState(String(new Date().getFullYear()));
   const [editingExp,setEditingExp]=useState<number|null>(null);
   const [editingInc,setEditingInc]=useState<number|null>(null);
   const [hideValues, setHideValues] = useState(false);
@@ -912,7 +912,7 @@ async function handleCoupleSettlement(valor: number) {
     {showFilterMenu&&(
       <>
         <div onClick={()=>setShowFilterMenu(false)} style={{position:"fixed",inset:0,zIndex:9}}/>
-        <div style={{position:"absolute",top:"calc(100% + 8px)",right:0,zIndex:20,background:"#0f1117",border:`1px solid ${T.cardBorder}`,borderRadius:16,padding:"16px",minWidth:240,boxShadow:"0 8px 32px rgba(0,0,0,0.5)"}}>
+        <div style={{position:"absolute",top:"calc(100% + 8px)",right:0,zIndex:20,background:"#0f1117",border:`1px solid ${T.cardBorder}`,borderRadius:16,padding:"16px",minWidth:240,boxShadow:"0 8px 32px rgba(0,0,0,0.8)",backdropFilter:"none"}}>
           <div style={{fontSize:10,fontWeight:700,color:T.subtext,textTransform:"uppercase" as const,letterSpacing:"0.1em",marginBottom:10}}>Ano</div>
           <div style={{display:"flex",gap:6,flexWrap:"wrap" as const,marginBottom:14}}>
             {["todos","2024","2025","2026"].map(y=>(
