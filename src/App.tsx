@@ -1241,8 +1241,8 @@ async function handleCoupleSettlement(valor: number) {
       </div>
     )}
     {/* Botão */}
-    <button onClick={()=>editingExp?updateExpense(editingExp):addExpense()} style={{width:"100%",padding:"14px 0",background:`linear-gradient(135deg,${editingExp?"#f59e0b":T.accent},${editingExp?"#d97706":T.accentDark})`,border:"none",borderRadius:12,color:"#fff",fontWeight:800,fontSize:14,cursor:"pointer",fontFamily:"'Sora',sans-serif",boxShadow:editingExp?"0 4px 20px rgba(245,158,11,0.3)":`0 4px 20px ${T.accent}40`,letterSpacing:"-0.2px"}}>
-      {editingExp?"✓ Guardar alterações":"+ Adicionar despesa"}
+    <button onClick={()=>editingExp?updateExpense(editingExp):addExpense()} style={{width:"100%",padding:"15px 0",background:editingExp?"linear-gradient(135deg,#f59e0b,#d97706)":`linear-gradient(135deg,${T.accent},${T.accent2})`,border:"none",borderRadius:12,color:"#fff",fontWeight:800,fontSize:15,cursor:"pointer",fontFamily:"'Sora',sans-serif",boxShadow:editingExp?"0 4px 24px rgba(245,158,11,0.4)":`0 4px 24px rgba(93,169,255,0.35), 0 0 0 1px rgba(139,109,255,0.2)`,letterSpacing:"-0.2px",position:"relative",overflow:"hidden"}}>
+      <span style={{position:"relative",zIndex:1}}>{editingExp?"✓ Guardar alterações":"+ Adicionar despesa"}</span>
     </button>
     {editingExp&&<button onClick={()=>{setEditingExp(null);setExpForm(f=>({...f,descricao:"",valor:"",subcat:""}));}} style={{width:"100%",marginTop:8,padding:"10px 0",background:"rgba(255,255,255,0.05)",border:`1px solid ${T.cardBorder}`,borderRadius:10,color:T.subtext,fontSize:13,fontWeight:600,cursor:"pointer",fontFamily:"'Sora',sans-serif"}}>✕ Cancelar edição</button>}
   </div>
