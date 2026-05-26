@@ -642,7 +642,7 @@ const jointBalance = totalContributions - totalSettledExpenses;
           return(
             <div style={{background:cardBg,border:`1px solid ${cardBorder}`,borderRadius:14,padding:"14px 16px",marginBottom:12}}>
               <div style={{fontSize:10,fontWeight:700,color:subtext,textTransform:"uppercase" as const,letterSpacing:"0.08em",marginBottom:12}}>Evolução de gastos {thisYear}</div>
-              <div style={{display:"flex",alignItems:"flex-end",gap:3,height:60,marginBottom:8}}>
+              <div style={{display:"flex",alignItems:"flex-end",gap:3,height:60,marginTop:40,marginBottom:8}}>
                 {monthlyData.map((m,i)=>{
                   const h = m.total>0 ? Math.max(6, Math.round((m.total/maxVal)*48)) : 2;
                   const isCurrent = i===thisMonth;
