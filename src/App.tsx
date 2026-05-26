@@ -706,7 +706,7 @@ const [successMsg, setSuccessMsg] = useState("");
   }
 }
   async function deleteExpense(id:number){await supabase.from("expenses").delete().eq("id",id);setExpenses(p=>p.filter(e=>e.id!==id));}
-  async function addIncome(){if(!incForm.descricao.trim()||!incForm.valor||!incForm.cat)return;const{data,error}=await supabase.from("incomes").insert({user_id:user.id,...incForm,valor:Number(incForm.valor),world}).select().single();if(!error&&data){setIncomes(p=>[data as Income,...p]);setIncForm(f=>({...f,descricao:"",valor:""}));}}
+  async function addIncome(){if(!incForm.descricao.trim()||!incForm.valor||!incForm.cat)return;const{data,error}=await supabase.from("incomes").insert({user_id:user.id,...incForm,valor:Number(incForm.valor),world}).select().single();if(!error&&data){setIncomes(p=>[data as Income,...p]);setIncForm(f=>({...f,descricao:"",valor:""}));setSuccessMsg("✓ Rendimento adicionado!");setTimeout(()=>setSuccessMsg(""),3000);}}
   async function deleteIncome(id:number){await supabase.from("incomes").delete().eq("id",id);setIncomes(p=>p.filter(i=>i.id!==id));}
   async function saveRevCell(){if(revEdit===null)return;const v=Number(revVal);if(isNaN(v))return;await supabase.from("monthly_revenue").upsert({user_id:user.id,world,year:Number(revYear),month:revEdit,valor:v},{onConflict:"user_id,world,year,month"});setMonthlyRev(prev=>{const w={...(prev[world]||{})};const arr=[...(w[revYear]||new Array(12).fill(0))];arr[revEdit]=v;w[revYear]=arr;return{...prev,[world]:w};});setRevEdit(null);}
   async function addAccount(){if(!newAccName.trim())return;const meta=TIPO_ACC[newAccTipo];const{data,error}=await supabase.from("accounts").insert({user_id:user.id,nome:newAccName.trim(),tipo:newAccTipo,saldo:Number(newAccSaldo)||0,icon:meta.icon,cor:meta.cor}).select().single();if(error){console.error("addAccount error:",error);}
@@ -1353,28 +1353,73 @@ async function handleCoupleSettlement(valor: number) {
         )}
 
      {tab==="rendimentos"&&<>
-  <div style={S.card}>
-    <SectionTitle>{editingInc?"Editar Rendimento":"Adicionar Rendimento"}</SectionTitle>
-    <div style={S.row2}>
+  {successMsg&&(
+    <div style={{background:"rgba(52,211,153,0.12)",border:"1px solid rgba(52,211,153,0.3)",borderRadius:12,padding:"12px 16px",marginBottom:14,display:"flex",alignItems:"center",gap:10}}>
+      <span style={{fontSize:18}}>✅</span>
+      <span style={{fontSize:13,fontWeight:700,color:"#34d399"}}>{successMsg}</span>
+    </div>
+  )}
+  <div style={{background:T.cardBg,border:`1px solid ${T.cardBorder}`,borderRadius:16,padding:"20px",marginBottom:14,boxShadow:"0 1px 3px rgba(0,0,0,0.3),0 4px 16px rgba(0,0,0,0.2)"}}>
+    {/* Header */}
+    <div style={{display:"flex",alignItems:"center",gap:8,marginBottom:14,paddingBottom:12,borderBottom:`1px solid ${T.cardBorder}`}}>
+      <div style={{width:28,height:28,borderRadius:8,background:"linear-gradient(135deg,#57E3A0,#00a86b)",display:"flex",alignItems:"center",justifyContent:"center",fontSize:14}}>💶</div>
+      <div style={{fontSize:13,fontWeight:800,color:"#f1f5f9"}}>{editingInc?"Editar rendimento":"Novo rendimento"}</div>
+    </div>
+    {/* Descrição + Valor */}
+    <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:10,marginBottom:14}}>
       <div><label style={S.lbl}>Descrição</label><input style={S.inp} placeholder="Ex: Salário" value={incForm.descricao} onChange={e=>setIncForm(f=>({...f,descricao:e.target.value}))}/></div>
       <div><label style={S.lbl}>Valor (€)</label><input style={S.inp} type="number" placeholder="0,00" value={incForm.valor} onChange={e=>setIncForm(f=>({...f,valor:e.target.value}))}/></div>
     </div>
-    <div style={S.row2}>
+    {/* Fonte + Data */}
+    <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:10,marginBottom:16}}>
       <div><label style={S.lbl}>Fonte</label><select style={S.sel} value={incForm.cat} onChange={e=>setIncForm(f=>({...f,cat:e.target.value}))}><option value="">Selecionar...</option>{incCats.map(c=><option key={c.id} value={c.id}>{c.icon} {c.label}</option>)}</select></div>
       <div><label style={S.lbl}>Data</label><input style={S.inp} type="date" value={incForm.data} onChange={e=>setIncForm(f=>({...f,data:e.target.value}))}/></div>
     </div>
-    <button style={btnAdd} onClick={()=>editingInc?updateIncome(editingInc):addIncome()}>{editingInc?"✓ Guardar alterações":"+ Adicionar Rendimento"}</button>
-    {editingInc&&<button onClick={()=>{setEditingInc(null);setIncForm(f=>({...f,descricao:"",valor:""}));}} style={{width:"100%",marginTop:8,padding:"10px 0",background:"rgba(255,255,255,0.05)",border:`1px solid ${T.cardBorder}`,borderRadius:9,color:T.subtext,fontSize:13,fontWeight:600,cursor:"pointer",fontFamily:"'Sora',sans-serif"}}>✕ Cancelar edição</button>}
+    {/* Botão */}
+    <button onClick={()=>editingInc?updateIncome(editingInc):addIncome()} style={{width:"100%",padding:"15px 0",background:editingInc?"linear-gradient(135deg,#f59e0b,#d97706)":"linear-gradient(135deg,#57E3A0,#00a86b)",border:"none",borderRadius:12,color:"#fff",fontWeight:800,fontSize:15,cursor:"pointer",fontFamily:"'Sora',sans-serif",boxShadow:editingInc?"0 4px 24px rgba(245,158,11,0.4)":"0 4px 24px rgba(87,227,160,0.35)",letterSpacing:"-0.2px"}}>
+      {editingInc?"✓ Guardar alterações":"+ Adicionar rendimento"}
+    </button>
+    {editingInc&&<button onClick={()=>{setEditingInc(null);setIncForm(f=>({...f,descricao:"",valor:""}));}} style={{width:"100%",marginTop:8,padding:"10px 0",background:"rgba(255,255,255,0.05)",border:`1px solid ${T.cardBorder}`,borderRadius:10,color:T.subtext,fontSize:13,fontWeight:600,cursor:"pointer",fontFamily:"'Sora',sans-serif"}}>✕ Cancelar edição</button>}
   </div>
+
+  {/* Resumo */}
   <div style={{...S.card,display:"flex",justifyContent:"space-between",alignItems:"center",padding:"12px 16px"}}>
-    <span style={{fontSize:12,color:T.subtext}}>{myIncomes.length} entrada(s)</span>
+    <span style={{fontSize:12,color:T.subtext}}>{myIncomes.length} {myIncomes.length===1?"entrada":"entradas"}</span>
     <span style={{fontSize:17,fontWeight:800,color:T.positive}}>{fmt(totalInc)}</span>
   </div>
+
+  {/* Lista */}
   <div style={S.card}>
     {myIncomes.length===0&&<div style={{color:T.subtext,fontSize:13,textAlign:"center",padding:"24px 0"}}>Sem rendimentos registados.</div>}
-    {myIncomes.map(i=>{const cat=incCats.find(c=>c.id===i.cat);return(<div key={i.id} style={{display:"flex",alignItems:"center",gap:10,padding:"11px 0",borderBottom:`1px solid ${T.cardBorder}`}}><span style={{fontSize:20,minWidth:28,textAlign:"center"}}>{cat?.icon||"📦"}</span><div style={{flex:1,minWidth:0}}><div style={{fontSize:13,fontWeight:600,color:"#e2e8f0",whiteSpace:"nowrap",overflow:"hidden",textOverflow:"ellipsis"}}>{i.descricao}</div><div style={{fontSize:11,color:T.subtext,marginTop:2}}>{new Date(i.data+"T12:00:00").toLocaleDateString("pt-PT")} · {cat?.label}</div></div><span style={{fontSize:14,fontWeight:700,color:T.positive,minWidth:68,textAlign:"right"}}>{fmt(Number(i.valor))}</span><button onClick={()=>{setEditingInc(i.id);setIncForm({descricao:i.descricao,valor:String(i.valor),cat:i.cat,data:i.data});window.scrollTo({top:0,behavior:"smooth"});}} style={{background:"none",border:"none",cursor:"pointer",color:T.accent,fontSize:15,padding:"0 2px"}}>✏️</button><button onClick={()=>deleteIncome(i.id)} style={{background:"none",border:"none",cursor:"pointer",color:T.subtext,fontSize:15,padding:"0 2px"}}>✕</button></div>);})}
+    {myIncomes.map(i=>{const cat=incCats.find(c=>c.id===i.cat);return(
+      <div key={i.id} style={{display:"flex",alignItems:"center",gap:10,padding:"11px 0",borderBottom:`1px solid ${T.cardBorder}`}}>
+        <span style={{fontSize:20,minWidth:28,textAlign:"center"}}>{cat?.icon||"📦"}</span>
+        <div style={{flex:1,minWidth:0}}>
+          <div style={{fontSize:13,fontWeight:600,color:"#e2e8f0",whiteSpace:"nowrap",overflow:"hidden",textOverflow:"ellipsis"}}>{i.descricao}</div>
+          <div style={{fontSize:11,color:T.subtext,marginTop:2}}>{new Date(i.data+"T12:00:00").toLocaleDateString("pt-PT")} · {cat?.label}</div>
+        </div>
+        <span style={{fontSize:14,fontWeight:700,color:T.positive,minWidth:68,textAlign:"right"}}>{fmt(Number(i.valor))}</span>
+        <button onClick={()=>{setEditingInc(i.id);setIncForm({descricao:i.descricao,valor:String(i.valor),cat:i.cat,data:i.data});window.scrollTo({top:0,behavior:"smooth"});}} style={{background:"none",border:"none",cursor:"pointer",color:T.accent,fontSize:15,padding:"0 2px"}}>✏️</button>
+        <button onClick={()=>deleteIncome(i.id)} style={{background:"none",border:"none",cursor:"pointer",color:T.subtext,fontSize:15,padding:"0 2px"}}>✕</button>
+      </div>
+    );})}
   </div>
-  {myIncomes.length>0&&(<div style={S.card}><SectionTitle>Por fonte</SectionTitle>{byIncCat.filter(c=>c.total>0).map(c=>(<div key={c.id} style={{marginBottom:10}}><div style={{display:"flex",justifyContent:"space-between",marginBottom:4}}><span style={{fontSize:13}}>{c.icon} {c.label}</span><span style={{fontSize:13,fontWeight:700,color:T.positive}}>{fmt(c.total)} <span style={{fontSize:11,color:T.subtext,fontWeight:400}}>({pct(c.total,totalInc)}%)</span></span></div><ProgressBar value={c.total} max={maxInc} color={T.positive} height={4}/></div>))}</div>)}
+
+  {/* Por fonte */}
+  {myIncomes.length>0&&(
+    <div style={S.card}>
+      <SectionTitle>Por fonte</SectionTitle>
+      {byIncCat.filter(c=>c.total>0).map(c=>(
+        <div key={c.id} style={{marginBottom:10}}>
+          <div style={{display:"flex",justifyContent:"space-between",marginBottom:4}}>
+            <span style={{fontSize:13}}>{c.icon} {c.label}</span>
+            <span style={{fontSize:13,fontWeight:700,color:T.positive}}>{fmt(c.total)} <span style={{fontSize:11,color:T.subtext,fontWeight:400}}>({pct(c.total,totalInc)}%)</span></span>
+          </div>
+          <ProgressBar value={c.total} max={maxInc} color={T.positive} height={4}/>
+        </div>
+      ))}
+    </div>
+  )}
 </>}
 
         {/* PROGRESSÃO */}
