@@ -635,7 +635,7 @@ const [successMsg, setSuccessMsg] = useState("");
       // Guarda snapshot do net worth do mês actual
       const valor = (accR.data as BankAccount[]).reduce((s,a)=>s+Number(a.saldo),0);
       const now = new Date();
-      supabase.from("net_worth_snapshots").upsert(
+      await supabase.from("net_worth_snapshots").upsert(
         { user_id:uid, mes:now.getMonth(), ano:now.getFullYear(), valor },
         { onConflict:"user_id,mes,ano" }
       );
