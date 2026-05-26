@@ -1515,14 +1515,14 @@ async function handleCoupleSettlement(valor: number) {
             <div style={{background:"rgba(15,18,30,0.95)",border:"1px solid rgba(255,255,255,0.1)",borderRadius:24,padding:"20px",boxShadow:"0 -8px 40px rgba(0,0,0,0.5)"}}>
               <div style={{fontSize:12,fontWeight:700,color:"rgba(255,255,255,0.4)",textTransform:"uppercase" as const,letterSpacing:"0.1em",marginBottom:16,textAlign:"center" as const}}>O que queres adicionar?</div>
               <div style={{display:"flex",flexDirection:"column" as const,gap:10}}>
-                <button onClick={()=>{setTab("despesas");setShowAddModal(false);}} style={{width:"100%",padding:"14px 20px",background:`linear-gradient(135deg,${T.accent},${T.accentDark})`,border:"none",borderRadius:14,color:"#fff",fontWeight:700,fontSize:14,cursor:"pointer",fontFamily:"'Sora',sans-serif",display:"flex",alignItems:"center",gap:12}}>
+                <button onClick={()=>{setTab("despesas");setShowAddModal(false);}} style={{width:"100%",padding:"14px 20px",background:`linear-gradient(135deg,${T.accent},${T.accent2})`,border:"none",borderRadius:14,color:"#fff",fontWeight:700,fontSize:14,cursor:"pointer",fontFamily:"'Sora',sans-serif",display:"flex",alignItems:"center",gap:12,boxShadow:`0 4px 20px rgba(93,169,255,0.3)`}}>
                   <span style={{fontSize:20}}>📥</span>
                   <div style={{textAlign:"left" as const}}>
                     <div>Despesa</div>
                     <div style={{fontSize:11,fontWeight:400,opacity:0.8}}>Regista uma nova despesa</div>
                   </div>
                 </button>
-                <button onClick={()=>{setTab("rendimentos");setShowAddModal(false);}} style={{width:"100%",padding:"14px 20px",background:"rgba(52,211,153,0.15)",border:"1px solid rgba(52,211,153,0.3)",borderRadius:14,color:"#34d399",fontWeight:700,fontSize:14,cursor:"pointer",fontFamily:"'Sora',sans-serif",display:"flex",alignItems:"center",gap:12}}>
+                <button onClick={()=>{setTab("rendimentos");setShowAddModal(false);}} style={{width:"100%",padding:"14px 20px",background:"linear-gradient(135deg,#57E3A0,#00a86b)",border:"none",borderRadius:14,color:"#fff",fontWeight:700,fontSize:14,cursor:"pointer",fontFamily:"'Sora',sans-serif",display:"flex",alignItems:"center",gap:12,boxShadow:"0 4px 20px rgba(87,227,160,0.3)"}}>
                   <span style={{fontSize:20}}>💶</span>
                   <div style={{textAlign:"left" as const}}>
                     <div>Rendimento</div>
