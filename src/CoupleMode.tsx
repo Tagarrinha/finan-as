@@ -419,7 +419,7 @@ const jointBalance = totalContributions - totalSettledExpenses;
       </>
     )}
   </div>
-  <button onClick={dissolveCouple} style={{padding:"5px 10px",background:"rgba(239,68,68,0.08)",border:"1px solid rgba(239,68,68,0.15)",borderRadius:8,color:"#f87171",fontSize:10,fontWeight:600,cursor:"pointer",fontFamily:"'Sora',sans-serif"}}>✕ Terminar</button>
+  <button onClick={dissolveCouple} style={{padding:"5px 8px",background:"rgba(239,68,68,0.08)",border:"1px solid rgba(239,68,68,0.15)",borderRadius:8,color:"#f87171",fontSize:10,fontWeight:600,cursor:"pointer",fontFamily:"'Sora',sans-serif"}}>✕</button>
 </div>
       </div>
 
