@@ -287,7 +287,7 @@ async function saveOrcamento() {
 
   const inp:CSSProperties={width:"100%",background:"rgba(255,255,255,0.06)",border:"1px solid rgba(255,255,255,0.1)",borderRadius:8,padding:"10px 12px",color:"#e2e8f0",fontSize:13,boxSizing:"border-box",outline:"none",fontFamily:"'Sora',sans-serif"};
   const sel:CSSProperties={width:"100%",background:"#111827",border:"1px solid rgba(255,255,255,0.1)",borderRadius:8,padding:"10px 12px",color:"#e2e8f0",fontSize:13,boxSizing:"border-box",outline:"none"};
-  const tBtn=(a:boolean,cor=accent):CSSProperties=>({flex:1,padding:"9px 4px",border:"none",borderRadius:"8px 8px 0 0",cursor:"pointer",fontSize:11,fontWeight:700,fontFamily:"'Sora',sans-serif",background:a?"rgba(255,255,255,0.07)":"transparent",color:a?cor:"#475569",borderBottom:a?`2px solid ${cor}`:"2px solid transparent",whiteSpace:"nowrap"});
+  const tBtn=(a:boolean,cor=accent):CSSProperties=>({flex:1,padding:"10px 4px",border:`1px solid ${a?cor:"rgba(255,255,255,0.06)"}`,borderRadius:12,cursor:"pointer",fontSize:11,fontWeight:700,fontFamily:"'Sora',sans-serif",background:a?`${cor}18`:"rgba(255,255,255,0.03)",color:a?cor:"#475569",whiteSpace:"nowrap",transition:"all .2s"});
 
   if(loading) return <div style={{textAlign:"center",padding:"48px 0",color:subtext,fontFamily:"'Sora',sans-serif"}}>A carregar...</div>;
 
@@ -437,7 +437,7 @@ const jointBalance = totalContributions - totalSettledExpenses;
       )}
 
       {/* Tabs */}
-      <div style={{display:"flex",gap:2,marginBottom:16,borderBottom:`1px solid ${cardBorder}`}}>
+      <div style={{display:"flex",gap:6,marginBottom:16}}>
         {(["conta","despesas","recorrentes"] as const).map(t=>{
           const badge=t==="despesas"&&porLiquidar.length>0;
           return(
