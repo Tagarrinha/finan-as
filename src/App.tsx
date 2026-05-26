@@ -1162,6 +1162,12 @@ async function handleCoupleSettlement(valor: number) {
                 return{x,y,snap,i};
               }).filter(p=>p.y!==null) as {x:number;y:number;snap:any;i:number}[];
               if(points.length===0) return null;
+              if(points.length===1) return(
+                <div style={{height:H,display:"flex",flexDirection:"column" as const,alignItems:"center",justifyContent:"center",gap:8}}>
+                  <div style={{width:12,height:12,borderRadius:"50%",background:T.accent,boxShadow:`0 0 12px ${T.accent}`}}/>
+                  <div style={{fontSize:11,color:T.subtext}}>Dados de maio registados — a linha cresce com os meses</div>
+                </div>
+              );
               const pathD=points.map((p,idx)=>`${idx===0?"M":"L"}${p.x},${p.y}`).join(" ");
               const areaD=`${pathD} L${points[points.length-1].x},${H} L${points[0].x},${H} Z`;
               return(
