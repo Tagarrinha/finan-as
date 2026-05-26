@@ -633,7 +633,7 @@ const jointBalance = totalContributions - totalSettledExpenses;
             mes: i,
             label: MONTHS_PT[i],
             total: expenses.filter(e=>{
-              const d = new Date(e.data+"T12:00:00");
+              const d = new Date(e.data);
               return e.liquidado && d.getMonth()===i && d.getFullYear()===thisYear;
             }).reduce((s,e)=>s+Number(e.valor),0)
           }));
