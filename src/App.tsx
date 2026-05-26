@@ -598,7 +598,8 @@ function MainApp({user,userName,onLogout}:{user:SBUser;userName:string;onLogout:
   const [newIncLabel,setNewIncLabel]=useState("");const [newIncIcon,setNewIncIcon]=useState("💰");
   const [expForm,setExpForm]=useState({descricao:"",valor:"",cat:"",subcat:"",data:today,tipo:"necessidade" as TypeKey});
   const [expIsRecurring,setExpIsRecurring]=useState(false);
-const [expRecurringFreq,setExpRecurringFreq]=useState<"mensal"|"semanal"|"anual">("mensal");
+const [expRecurringFreq,setExpRecurringFreq]=useState<"mensal"|"semanal"|"custom">("mensal");
+const [expRecurringDays,setExpRecurringDays]=useState("30");
   const [incForm,setIncForm]=useState({descricao:"",valor:"",cat:"",data:today});
   const [revEdit,setRevEdit]=useState<number|null>(null);const [revVal,setRevVal]=useState("");
   const [revYear,setRevYear]=useState(String(new Date().getFullYear()));
@@ -684,10 +685,12 @@ const [expRecurringFreq,setExpRecurringFreq]=useState<"mensal"|"semanal"|"anual"
   if(!error&&data){
     setExpenses(p=>[data as Expense,...p]);
     if(expIsRecurring){
+      const freqParaSupabase = expRecurringFreq==="custom" ? "custom" : expRecurringFreq;
+      const diasCustom = expRecurringFreq==="custom" ? Number(expRecurringDays)||30 : null;
       await supabase.from("recurring_expenses").insert({
         user_id:user.id, descricao:expForm.descricao.trim(),
         valor:Number(expForm.valor), cat:expForm.cat, subcat:expForm.subcat,
-        tipo:expForm.tipo, frequencia:expRecurringFreq, dia_do_mes:null,
+        tipo:expForm.tipo, frequencia:freqParaSupabase, dias_custom:diasCustom, dia_do_mes:null,
         proxima_data:expForm.data, world, ativa:true,
       });
       const{data:rec}=await supabase.from("recurring_expenses").select("*").eq("user_id",user.id).order("proxima_data");
@@ -696,6 +699,7 @@ const [expRecurringFreq,setExpRecurringFreq]=useState<"mensal"|"semanal"|"anual"
     setExpForm(f=>({...f,descricao:"",valor:"",subcat:""}));
     setExpIsRecurring(false);
     setExpRecurringFreq("mensal");
+    setExpRecurringDays("30");
   }
 }
   async function deleteExpense(id:number){await supabase.from("expenses").delete().eq("id",id);setExpenses(p=>p.filter(e=>e.id!==id));}
@@ -1217,12 +1221,21 @@ async function handleCoupleSettlement(valor: number) {
           <span style={{fontSize:12,fontWeight:600,color:expIsRecurring?"#f1f5f9":"#94a3b8"}}>🔄 Marcar como recorrente</span>
         </div>
         {expIsRecurring&&(
-          <div style={{display:"flex",gap:6,marginTop:8}}>
-            {([["mensal","📅 Mensal"],["semanal","📆 Semanal"],["anual","🗓️ Anual"]] as const).map(([freq,label])=>(
-              <button key={freq} onClick={()=>setExpRecurringFreq(freq)} style={{flex:1,padding:"7px 0",border:`1px solid ${expRecurringFreq===freq?T.accent:"rgba(255,255,255,0.1)"}`,borderRadius:8,background:expRecurringFreq===freq?`${T.accent}20`:"transparent",color:expRecurringFreq===freq?T.accent:"#64748b",fontSize:11,fontWeight:700,cursor:"pointer",fontFamily:"'Sora',sans-serif"}}>
-                {label}
-              </button>
-            ))}
+          <div style={{marginTop:8}}>
+            <div style={{display:"flex",gap:6,marginBottom:expRecurringFreq==="custom"?8:0}}>
+              {([["mensal","📅 Mensal"],["semanal","📆 Semanal"],["custom","✏️ Custom"]] as const).map(([freq,label])=>(
+                <button key={freq} onClick={()=>setExpRecurringFreq(freq)} style={{flex:1,padding:"7px 0",border:`1px solid ${expRecurringFreq===freq?T.accent:"rgba(255,255,255,0.1)"}`,borderRadius:8,background:expRecurringFreq===freq?`${T.accent}20`:"transparent",color:expRecurringFreq===freq?T.accent:"#64748b",fontSize:11,fontWeight:700,cursor:"pointer",fontFamily:"'Sora',sans-serif"}}>
+                  {label}
+                </button>
+              ))}
+            </div>
+            {expRecurringFreq==="custom"&&(
+              <div style={{display:"flex",alignItems:"center",gap:8,padding:"8px 12px",background:"rgba(255,255,255,0.04)",border:"1px solid rgba(255,255,255,0.08)",borderRadius:8}}>
+                <span style={{fontSize:12,color:"#94a3b8",whiteSpace:"nowrap"}}>Repetir a cada</span>
+                <input style={{width:60,background:"rgba(255,255,255,0.06)",border:`1px solid ${T.accent}50`,borderRadius:6,padding:"5px 8px",color:"#e2e8f0",fontSize:13,outline:"none",fontFamily:"'Sora',sans-serif",textAlign:"center"}} type="number" min="1" value={expRecurringDays} onChange={e=>setExpRecurringDays(e.target.value)}/>
+                <span style={{fontSize:12,color:"#94a3b8"}}>dias</span>
+              </div>
+            )}
           </div>
         )}
       </div>
