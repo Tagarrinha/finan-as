@@ -386,14 +386,30 @@ function Tag({type}:{type:string}) {
   if(!m) return null;
   return <span style={{fontSize:10,fontWeight:700,padding:"2px 8px",borderRadius:99,background:m.bg,color:m.color,whiteSpace:"nowrap"}}>{m.label}</span>;
 }
-function TypeSelector({value,onChange}:{value:TypeKey;onChange:(v:TypeKey)=>void}) {
+function TypeSelector({value,onChange,byType,totalInc,budgetTargets}:{value:TypeKey;onChange:(v:TypeKey)=>void;byType:Record<TypeKey,number>;totalInc:number;budgetTargets:BudgetTargets}) {
   return (
-    <div style={{display:"grid",gridTemplateColumns:"1fr 1fr 1fr",gap:7}}>
+    <div style={{display:"flex",flexDirection:"column" as const,gap:6}}>
       {(Object.entries(TYPE_META) as [TypeKey,typeof TYPE_META[TypeKey]][]).map(([type,meta])=>{
         const active=value===type;
-        return <button key={type} onClick={()=>onChange(type)} style={{padding:"10px 6px",border:`1.5px solid ${active?meta.color:"rgba(255,255,255,0.09)"}`,borderRadius:10,background:active?meta.bg:"rgba(255,255,255,0.03)",color:active?meta.color:"#4b5563",fontWeight:700,fontSize:11,cursor:"pointer",textAlign:"center" as const,fontFamily:"'Sora',sans-serif",lineHeight:1.4}}>
-          <div style={{fontSize:17,marginBottom:3}}>{meta.icon}</div>{meta.label}
-        </button>;
+        const actual=byType[type]||0;
+        const target=budgetTargets[type];
+        const actualPct=totalInc>0?Math.round((actual/totalInc)*100):0;
+        const over=actual>totalInc*(target/100)&&totalInc>0;
+        return(
+          <button key={type} onClick={()=>onChange(type)} style={{padding:"10px 14px",border:`1.5px solid ${active?meta.color:over?"rgba(239,68,68,0.3)":"rgba(255,255,255,0.09)"}`,borderRadius:10,background:active?meta.bg:over?"rgba(239,68,68,0.05)":"rgba(255,255,255,0.03)",cursor:"pointer",textAlign:"left" as const,fontFamily:"'Sora',sans-serif",display:"flex",alignItems:"center",gap:10}}>
+            <span style={{fontSize:20}}>{meta.icon}</span>
+            <div style={{flex:1}}>
+              <div style={{fontSize:12,fontWeight:700,color:active?meta.color:over?"#ef4444":"#94a3b8"}}>{meta.label}</div>
+              <div style={{height:3,borderRadius:99,background:"rgba(255,255,255,0.07)",marginTop:4,overflow:"hidden"}}>
+                <div style={{width:`${Math.min(100,actualPct)}%`,height:"100%",background:over?"#ef4444":meta.color,borderRadius:99}}/>
+              </div>
+            </div>
+            <div style={{textAlign:"right" as const}}>
+              <div style={{fontSize:12,fontWeight:700,color:over?"#ef4444":meta.color}}>{fmt(actual)}</div>
+              <div style={{fontSize:10,color:over?"#ef4444":"#64748b"}}>{actualPct}% / {target}%{over?" ⚠️":""}</div>
+            </div>
+          </button>
+        );
       })}
     </div>
   );
@@ -1174,7 +1190,7 @@ async function handleCoupleSettlement(valor: number) {
             </div>
             {selCat?.sub&&(<div style={{marginBottom:10}}><label style={S.lbl}>Sub-categoria</label><div style={{display:"flex",flexWrap:"wrap",gap:7}}>{selCat.sub.map((s:string)=>{const active=expForm.subcat===s;return<button key={s} onClick={()=>setExpForm(f=>({...f,subcat:active?"":s}))} style={{padding:"7px 13px",border:`1.5px solid ${active?T.accent:"rgba(255,255,255,0.13)"}`,borderRadius:99,background:active?`${T.accent}22`:"rgba(255,255,255,0.04)",color:active?T.accent:"#94a3b8",fontSize:12,fontWeight:active?700:500,cursor:"pointer",fontFamily:"'Sora',sans-serif"}}>{s}</button>;})}</div></div>)}
             <label style={{...S.lbl,marginTop:4,marginBottom:7}}>Tipo</label>
-            <TypeSelector value={expForm.tipo} onChange={(v:TypeKey)=>setExpForm(f=>({...f,tipo:v}))}/>
+            <TypeSelector value={expForm.tipo} onChange={(v:TypeKey)=>setExpForm(f=>({...f,tipo:v}))} byType={byType} totalInc={totalInc} budgetTargets={budgetTargets}/>
             {!editingExp&&(
   <div onClick={()=>setExpIsRecurring(v=>!v)} style={{display:"flex",alignItems:"center",gap:10,padding:"10px 12px",background:expIsRecurring?`${T.accent}15`:"rgba(255,255,255,0.03)",border:`1px solid ${expIsRecurring?T.accent:"rgba(255,255,255,0.08)"}`,borderRadius:9,cursor:"pointer",marginTop:10,marginBottom:6,userSelect:"none"}}>
     <div style={{width:36,height:20,borderRadius:99,background:expIsRecurring?T.accent:"rgba(255,255,255,0.12)",transition:"background .2s",position:"relative",flexShrink:0}}>
@@ -1193,7 +1209,7 @@ async function handleCoupleSettlement(valor: number) {
             <span style={{fontSize:12,color:T.subtext}}>{myExpenses.length} despesa(s)</span>
             <span style={{fontSize:17,fontWeight:800,color:T.negative}}>{fmt(totalExp)}</span>
           </div>
-          {myExpenses.length>0&&(<div style={{display:"grid",gridTemplateColumns:"1fr 1fr 1fr",gap:8,marginBottom:14}}>{(Object.entries(TYPE_META) as [TypeKey,typeof TYPE_META[TypeKey]][]).map(([type,meta])=>{const actual=byType[type]||0,target=budgetTargets[type],over=actual>totalInc*(target/100)&&totalInc>0;return(<div key={type} style={{background:over?"#450a0a":meta.bg,border:`1px solid ${over?"#ef4444":meta.color}40`,borderRadius:10,padding:"10px 8px",textAlign:"center"}}><div style={{fontSize:16,marginBottom:2}}>{meta.icon}</div><div style={{fontSize:12,fontWeight:800,color:over?"#ef4444":meta.color}}>{fmt(actual)}</div><div style={{fontSize:10,color:T.subtext,marginTop:1}}>{pct(actual,totalInc)}% / {target}%</div>{over&&<div style={{fontSize:10,color:"#ef4444",fontWeight:700,marginTop:2}}>⚠️</div>}</div>);})}</div>)}
+          
           <div style={S.card}>
             {myExpenses.length===0&&<div style={{color:T.subtext,fontSize:13,textAlign:"center",padding:"24px 0"}}>Sem despesas para este período.</div>}
             {myExpenses.map(e=>{const cat=expCats.find(c=>c.id===e.cat);return(<div key={e.id} style={{display:"flex",alignItems:"center",gap:10,padding:"11px 0",borderBottom:`1px solid ${T.cardBorder}`}}><span style={{fontSize:20,minWidth:28,textAlign:"center"}}>{cat?.icon||"📦"}</span><div style={{flex:1,minWidth:0}}><div style={{fontSize:13,fontWeight:600,color:"#e2e8f0",whiteSpace:"nowrap",overflow:"hidden",textOverflow:"ellipsis"}}>{e.descricao}{e.subcat?<span style={{color:T.subtext}}> · {e.subcat}</span>:""}</div><div style={{display:"flex",alignItems:"center",gap:5,marginTop:3}}><span style={{fontSize:10,color:T.subtext}}>{new Date(e.data+"T12:00:00").toLocaleDateString("pt-PT")}</span><Tag type={e.tipo}/></div></div><span style={{fontSize:14,fontWeight:700,color:T.negative,minWidth:68,textAlign:"right"}}>{fmt(Number(e.valor))}</span><button onClick={()=>{setEditingExp(e.id);setExpForm({descricao:e.descricao,valor:String(e.valor),cat:e.cat,subcat:e.subcat,data:e.data,tipo:e.tipo});window.scrollTo({top:0,behavior:"smooth"});}} style={{background:"none",border:"none",cursor:"pointer",color:T.accent,fontSize:15,padding:"0 2px"}}>✏️</button>
