@@ -371,23 +371,29 @@ const jointBalance = totalContributions - totalSettledExpenses;
   return(
     <div style={{fontFamily:"'Sora',sans-serif"}}>
       {/* Header */}
-      <div style={{background:`linear-gradient(135deg,${MY_COLOR}15,${PARTNER_COLOR}10)`,border:`1px solid ${MY_COLOR}25`,borderRadius:20,padding:"20px",marginBottom:14}}>
+      <div style={{background:`linear-gradient(135deg,${MY_COLOR}22,${PARTNER_COLOR}15)`,border:`1px solid ${MY_COLOR}40`,borderRadius:24,padding:"20px",marginBottom:14,position:"relative",overflow:"hidden"}}>
+        {/* Glow background */}
+        <div style={{position:"absolute",top:-40,left:-40,width:160,height:160,borderRadius:"50%",background:`radial-gradient(circle,${MY_COLOR}20 0%,transparent 70%)`,pointerEvents:"none"}}/>
+        <div style={{position:"absolute",top:-40,right:-40,width:160,height:160,borderRadius:"50%",background:`radial-gradient(circle,${PARTNER_COLOR}20 0%,transparent 70%)`,pointerEvents:"none"}}/>
         {/* Linha superior: avatares + botões */}
-        <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",marginBottom:14}}>
-          <div style={{display:"flex",alignItems:"center",gap:10}}>
-            <div style={{display:"flex"}}>
-              <div style={{width:44,height:44,borderRadius:"50%",background:`${MY_COLOR}25`,border:`2px solid ${MY_COLOR}`,display:"flex",alignItems:"center",justifyContent:"center",fontSize:20,zIndex:1}}>👤</div>
-              <div style={{width:44,height:44,borderRadius:"50%",background:`${PARTNER_COLOR}25`,border:`2px solid ${PARTNER_COLOR}`,display:"flex",alignItems:"center",justifyContent:"center",fontSize:20,marginLeft:-14}}>👤</div>
+        <div style={{display:"flex",alignItems:"flex-start",justifyContent:"space-between",marginBottom:16,position:"relative"}}>
+          {/* Avatares com iniciais */}
+          <div style={{display:"flex"}}>
+            <div style={{width:52,height:52,borderRadius:"50%",background:`linear-gradient(135deg,${MY_COLOR}40,${MY_COLOR}20)`,border:`2.5px solid ${MY_COLOR}`,display:"flex",alignItems:"center",justifyContent:"center",zIndex:2,boxShadow:`0 0 16px ${MY_COLOR}40`}}>
+              <span style={{fontSize:18,fontWeight:800,color:MY_COLOR}}>{userName.slice(0,2).toUpperCase()}</span>
             </div>
-            <div style={{width:24,height:24,borderRadius:"50%",background:"rgba(255,255,255,0.08)",border:"1px solid rgba(255,255,255,0.12)",display:"flex",alignItems:"center",justifyContent:"center",fontSize:11,color:"#94a3b8",fontWeight:700}}>💑</div>
+            <div style={{width:52,height:52,borderRadius:"50%",background:`linear-gradient(135deg,${PARTNER_COLOR}40,${PARTNER_COLOR}20)`,border:`2.5px solid ${PARTNER_COLOR}`,display:"flex",alignItems:"center",justifyContent:"center",marginLeft:-16,zIndex:1,boxShadow:`0 0 16px ${PARTNER_COLOR}40`}}>
+              <span style={{fontSize:18,fontWeight:800,color:PARTNER_COLOR}}>{partnerName.slice(0,2).toUpperCase()}</span>
+            </div>
+            <div style={{width:24,height:24,borderRadius:"50%",background:"#0f1117",border:"2px solid rgba(255,255,255,0.15)",display:"flex",alignItems:"center",justifyContent:"center",fontSize:12,marginLeft:-10,zIndex:3,alignSelf:"flex-end",marginBottom:2}}>💑</div>
           </div>
-          <div style={{display:"flex",gap:8,alignItems:"center"}}>
-            {/* Notificações */}
+          {/* Botões */}
+          <div style={{display:"flex",gap:6,alignItems:"center"}}>
             <div style={{position:"relative"}}>
-              <button onClick={()=>setShowNotifications(v=>!v)} style={{width:36,height:36,borderRadius:10,background:"rgba(255,255,255,0.05)",border:"1px solid rgba(255,255,255,0.1)",display:"flex",alignItems:"center",justifyContent:"center",cursor:"pointer",fontSize:16,position:"relative"}}>
+              <button onClick={()=>setShowNotifications(v=>!v)} style={{width:34,height:34,borderRadius:10,background:"rgba(255,255,255,0.06)",border:"1px solid rgba(255,255,255,0.1)",display:"flex",alignItems:"center",justifyContent:"center",cursor:"pointer",fontSize:15,position:"relative"}}>
                 🔔
                 {notifications.length>0&&(
-                  <span style={{position:"absolute",top:-4,right:-4,width:18,height:18,borderRadius:"50%",background:"#ef4444",color:"white",fontSize:10,fontWeight:800,display:"flex",alignItems:"center",justifyContent:"center"}}>
+                  <span style={{position:"absolute",top:-4,right:-4,width:16,height:16,borderRadius:"50%",background:"#ef4444",color:"white",fontSize:9,fontWeight:800,display:"flex",alignItems:"center",justifyContent:"center"}}>
                     {notifications.length}
                   </span>
                 )}
@@ -416,19 +422,30 @@ const jointBalance = totalContributions - totalSettledExpenses;
                 </>
               )}
             </div>
-            <button onClick={dissolveCouple} style={{padding:"5px 8px",background:"rgba(239,68,68,0.08)",border:"1px solid rgba(239,68,68,0.15)",borderRadius:8,color:"#f87171",fontSize:10,fontWeight:600,cursor:"pointer",fontFamily:"'Sora',sans-serif"}}>✕</button>
+            <button onClick={dissolveCouple} style={{width:34,height:34,borderRadius:10,background:"rgba(239,68,68,0.08)",border:"1px solid rgba(239,68,68,0.15)",display:"flex",alignItems:"center",justifyContent:"center",color:"#f87171",fontSize:14,cursor:"pointer"}}>✕</button>
           </div>
         </div>
-        {/* Linha inferior: nomes */}
-        <div style={{paddingTop:14,borderTop:"1px solid rgba(255,255,255,0.06)"}}>
-          <div style={{fontSize:16,fontWeight:800,color:"#f1f5f9",marginBottom:4,letterSpacing:"-0.3px"}}>
+        {/* Nomes + stat */}
+        <div style={{position:"relative"}}>
+          <div style={{fontSize:20,fontWeight:800,letterSpacing:"-0.5px",marginBottom:4,lineHeight:1.2}}>
             <span style={{color:MY_COLOR}}>{userName}</span>
-            <span style={{color:"rgba(255,255,255,0.3)",margin:"0 8px"}}>&</span>
+            <span style={{color:"rgba(255,255,255,0.2)",margin:"0 8px"}}>&</span>
             <span style={{color:PARTNER_COLOR}}>{partnerName}</span>
           </div>
-          <div style={{display:"flex",alignItems:"center",gap:6}}>
-            <div style={{width:6,height:6,borderRadius:"50%",background:"#34d399"}}/>
-            <span style={{fontSize:11,color:subtext}}>modo casal ativo · {partnerEmail}</span>
+          <div style={{display:"flex",alignItems:"center",gap:6,marginBottom:16}}>
+            <div style={{width:6,height:6,borderRadius:"50%",background:"#34d399",boxShadow:"0 0 6px #34d399"}}/>
+            <span style={{fontSize:11,color:subtext}}>modo casal ativo</span>
+          </div>
+          {/* Stats */}
+          <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:8}}>
+            <div style={{background:"rgba(255,255,255,0.05)",border:"1px solid rgba(255,255,255,0.08)",borderRadius:12,padding:"10px 12px"}}>
+              <div style={{fontSize:10,color:subtext,textTransform:"uppercase" as const,letterSpacing:"0.08em",marginBottom:4}}>Geridos juntos</div>
+              <div style={{fontSize:18,fontWeight:800,color:"#f1f5f9"}}>{fmt(liquidadas.reduce((s,e)=>s+Number(e.valor),0))}</div>
+            </div>
+            <div style={{background:"rgba(255,255,255,0.05)",border:"1px solid rgba(255,255,255,0.08)",borderRadius:12,padding:"10px 12px"}}>
+              <div style={{fontSize:10,color:subtext,textTransform:"uppercase" as const,letterSpacing:"0.08em",marginBottom:4}}>Por liquidar</div>
+              <div style={{fontSize:18,fontWeight:800,color:porLiquidar.length>0?"#f59e0b":"#34d399"}}>{fmt(myDebt)}</div>
+            </div>
           </div>
         </div>
       </div>
