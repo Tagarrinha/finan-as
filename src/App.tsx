@@ -1173,49 +1173,73 @@ async function handleCoupleSettlement(valor: number) {
   )}
 </>}
 
-        {/* DESPESAS */}
-        {tab==="despesas"&&<>
-          
-          <div style={S.card}>
-            <SectionTitle>Adicionar Despesa</SectionTitle>
-            <div style={S.row2}>
-              <div><label style={S.lbl}>Descrição</label><input style={S.inp} placeholder="Ex: Renda" value={expForm.descricao} onChange={e=>setExpForm(f=>({...f,descricao:e.target.value}))}/></div>
-              <div><label style={S.lbl}>Valor (€)</label><input style={S.inp} type="number" placeholder="0,00" value={expForm.valor} onChange={e=>setExpForm(f=>({...f,valor:e.target.value}))}/></div>
-            </div>
-            <div style={S.row2}>
-              <div><label style={S.lbl}>Categoria</label><select style={S.sel} value={expForm.cat} onChange={e=>setExpForm(f=>({...f,cat:e.target.value,subcat:""}))}>
-                <option value="">Selecionar...</option>{expCats.map(c=><option key={c.id} value={c.id}>{c.icon} {c.label}</option>)}
-              </select></div>
-              <div><label style={S.lbl}>Data</label><input style={S.inp} type="date" value={expForm.data} onChange={e=>setExpForm(f=>({...f,data:e.target.value}))}/></div>
-            </div>
-            {selCat?.sub&&(<div style={{marginBottom:10}}><label style={S.lbl}>Sub-categoria</label><div style={{display:"flex",flexWrap:"wrap",gap:7}}>{selCat.sub.map((s:string)=>{const active=expForm.subcat===s;return<button key={s} onClick={()=>setExpForm(f=>({...f,subcat:active?"":s}))} style={{padding:"7px 13px",border:`1.5px solid ${active?T.accent:"rgba(255,255,255,0.13)"}`,borderRadius:99,background:active?`${T.accent}22`:"rgba(255,255,255,0.04)",color:active?T.accent:"#94a3b8",fontSize:12,fontWeight:active?700:500,cursor:"pointer",fontFamily:"'Sora',sans-serif"}}>{s}</button>;})}</div></div>)}
-            <label style={{...S.lbl,marginTop:4,marginBottom:7}}>Tipo</label>
-            <TypeSelector value={expForm.tipo} onChange={(v:TypeKey)=>setExpForm(f=>({...f,tipo:v}))} byType={byType} totalInc={totalInc} budgetTargets={budgetTargets}/>
-            {!editingExp&&(
-  <div onClick={()=>setExpIsRecurring(v=>!v)} style={{display:"flex",alignItems:"center",gap:10,padding:"10px 12px",background:expIsRecurring?`${T.accent}15`:"rgba(255,255,255,0.03)",border:`1px solid ${expIsRecurring?T.accent:"rgba(255,255,255,0.08)"}`,borderRadius:9,cursor:"pointer",marginTop:10,marginBottom:6,userSelect:"none"}}>
-    <div style={{width:36,height:20,borderRadius:99,background:expIsRecurring?T.accent:"rgba(255,255,255,0.12)",transition:"background .2s",position:"relative",flexShrink:0}}>
-      <div style={{position:"absolute",top:3,left:expIsRecurring?18:3,width:14,height:14,borderRadius:"50%",background:"#fff",transition:"left .2s"}}/>
+       {tab==="despesas"&&<>
+  <div style={{background:T.cardBg,border:`1px solid ${T.cardBorder}`,borderRadius:16,padding:"20px",marginBottom:14,boxShadow:"0 1px 3px rgba(0,0,0,0.3),0 4px 16px rgba(0,0,0,0.2)"}}>
+    {/* Header do formulário */}
+    <div style={{display:"flex",alignItems:"center",gap:10,marginBottom:20,paddingBottom:16,borderBottom:`1px solid ${T.cardBorder}`}}>
+      <div style={{width:36,height:36,borderRadius:10,background:`linear-gradient(135deg,${T.accent},${T.accentDark})`,display:"flex",alignItems:"center",justifyContent:"center",fontSize:18}}>📥</div>
+      <div>
+        <div style={{fontSize:14,fontWeight:800,color:"#f1f5f9"}}>{editingExp?"Editar despesa":"Nova despesa"}</div>
+        <div style={{fontSize:11,color:T.subtext,marginTop:1}}>Preenche os dados abaixo</div>
+      </div>
     </div>
-    <div>
-      <div style={{fontSize:13,fontWeight:600,color:expIsRecurring?"#f1f5f9":"#94a3b8"}}>🔄 Despesa recorrente</div>
-      <div style={{fontSize:11,color:"#475569",marginTop:1}}>{expIsRecurring?"Será guardada como mensal":"Toca para activar"}</div>
+    {/* Descrição + Valor */}
+    <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:10,marginBottom:14}}>
+      <div><label style={S.lbl}>Descrição</label><input style={S.inp} placeholder="Ex: Renda" value={expForm.descricao} onChange={e=>setExpForm(f=>({...f,descricao:e.target.value}))}/></div>
+      <div><label style={S.lbl}>Valor (€)</label><input style={S.inp} type="number" placeholder="0,00" value={expForm.valor} onChange={e=>setExpForm(f=>({...f,valor:e.target.value}))}/></div>
     </div>
+    {/* Categoria + Data */}
+    <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:10,marginBottom:14}}>
+      <div><label style={S.lbl}>Categoria</label><select style={S.sel} value={expForm.cat} onChange={e=>setExpForm(f=>({...f,cat:e.target.value,subcat:""}))}>
+        <option value="">Selecionar...</option>{expCats.map(c=><option key={c.id} value={c.id}>{c.icon} {c.label}</option>)}
+      </select></div>
+      <div><label style={S.lbl}>Data</label><input style={S.inp} type="date" value={expForm.data} onChange={e=>setExpForm(f=>({...f,data:e.target.value}))}/></div>
+    </div>
+    {/* Sub-categoria */}
+    {selCat?.sub&&(
+      <div style={{marginBottom:14}}>
+        <label style={S.lbl}>Sub-categoria</label>
+        <div style={{display:"flex",flexWrap:"wrap",gap:7}}>
+          {selCat.sub.map((s:string)=>{const active=expForm.subcat===s;return<button key={s} onClick={()=>setExpForm(f=>({...f,subcat:active?"":s}))} style={{padding:"7px 13px",border:`1.5px solid ${active?T.accent:"rgba(255,255,255,0.13)"}`,borderRadius:99,background:active?`${T.accent}22`:"rgba(255,255,255,0.04)",color:active?T.accent:"#94a3b8",fontSize:12,fontWeight:active?700:500,cursor:"pointer",fontFamily:"'Sora',sans-serif"}}>{s}</button>;})}
+        </div>
+      </div>
+    )}
+    {/* Tipo */}
+    <div style={{marginBottom:14}}>
+      <label style={S.lbl}>Tipo de despesa</label>
+      <TypeSelector value={expForm.tipo} onChange={(v:TypeKey)=>setExpForm(f=>({...f,tipo:v}))} byType={byType} totalInc={totalInc} budgetTargets={budgetTargets}/>
+    </div>
+    {/* Recorrente */}
+    {!editingExp&&(
+      <div onClick={()=>setExpIsRecurring(v=>!v)} style={{display:"flex",alignItems:"center",gap:10,padding:"12px 14px",background:expIsRecurring?`${T.accent}15`:"rgba(255,255,255,0.03)",border:`1px solid ${expIsRecurring?T.accent:"rgba(255,255,255,0.08)"}`,borderRadius:10,cursor:"pointer",marginBottom:16,userSelect:"none"}}>
+        <div style={{width:36,height:20,borderRadius:99,background:expIsRecurring?T.accent:"rgba(255,255,255,0.12)",transition:"background .2s",position:"relative",flexShrink:0}}>
+          <div style={{position:"absolute",top:3,left:expIsRecurring?18:3,width:14,height:14,borderRadius:"50%",background:"#fff",transition:"left .2s"}}/>
+        </div>
+        <div>
+          <div style={{fontSize:13,fontWeight:600,color:expIsRecurring?"#f1f5f9":"#94a3b8"}}>🔄 Despesa recorrente</div>
+          <div style={{fontSize:11,color:"#475569",marginTop:1}}>{expIsRecurring?"Será guardada como mensal":"Toca para activar"}</div>
+        </div>
+      </div>
+    )}
+    {/* Botão */}
+    <button onClick={()=>editingExp?updateExpense(editingExp):addExpense()} style={{width:"100%",padding:"14px 0",background:`linear-gradient(135deg,${editingExp?"#f59e0b":T.accent},${editingExp?"#d97706":T.accentDark})`,border:"none",borderRadius:12,color:"#fff",fontWeight:800,fontSize:14,cursor:"pointer",fontFamily:"'Sora',sans-serif",boxShadow:editingExp?"0 4px 20px rgba(245,158,11,0.3)":`0 4px 20px ${T.accent}40`,letterSpacing:"-0.2px"}}>
+      {editingExp?"✓ Guardar alterações":"+ Adicionar despesa"}
+    </button>
+    {editingExp&&<button onClick={()=>{setEditingExp(null);setExpForm(f=>({...f,descricao:"",valor:"",subcat:""}));}} style={{width:"100%",marginTop:8,padding:"10px 0",background:"rgba(255,255,255,0.05)",border:`1px solid ${T.cardBorder}`,borderRadius:10,color:T.subtext,fontSize:13,fontWeight:600,cursor:"pointer",fontFamily:"'Sora',sans-serif"}}>✕ Cancelar edição</button>}
   </div>
-)}
-            <button style={btnAdd} onClick={()=>editingExp?updateExpense(editingExp):addExpense()}>{editingExp?"✓ Guardar alterações":"+ Adicionar Despesa"}</button>
-            {editingExp&&<button onClick={()=>{setEditingExp(null);setExpForm(f=>({...f,descricao:"",valor:"",subcat:""}));}} style={{width:"100%",marginTop:8,padding:"10px 0",background:"rgba(255,255,255,0.05)",border:`1px solid ${T.cardBorder}`,borderRadius:9,color:T.subtext,fontSize:13,fontWeight:600,cursor:"pointer",fontFamily:"'Sora',sans-serif"}}>✕ Cancelar edição</button>}
-          </div>
-          <div style={{...S.card,display:"flex",justifyContent:"space-between",alignItems:"center",padding:"12px 16px"}}>
-            <span style={{fontSize:12,color:T.subtext}}>{myExpenses.length} despesa(s)</span>
-            <span style={{fontSize:17,fontWeight:800,color:T.negative}}>{fmt(totalExp)}</span>
-          </div>
-          
-          <div style={S.card}>
-            {myExpenses.length===0&&<div style={{color:T.subtext,fontSize:13,textAlign:"center",padding:"24px 0"}}>Sem despesas para este período.</div>}
-            {myExpenses.map(e=>{const cat=expCats.find(c=>c.id===e.cat);return(<div key={e.id} style={{display:"flex",alignItems:"center",gap:10,padding:"11px 0",borderBottom:`1px solid ${T.cardBorder}`}}><span style={{fontSize:20,minWidth:28,textAlign:"center"}}>{cat?.icon||"📦"}</span><div style={{flex:1,minWidth:0}}><div style={{fontSize:13,fontWeight:600,color:"#e2e8f0",whiteSpace:"nowrap",overflow:"hidden",textOverflow:"ellipsis"}}>{e.descricao}{e.subcat?<span style={{color:T.subtext}}> · {e.subcat}</span>:""}</div><div style={{display:"flex",alignItems:"center",gap:5,marginTop:3}}><span style={{fontSize:10,color:T.subtext}}>{new Date(e.data+"T12:00:00").toLocaleDateString("pt-PT")}</span><Tag type={e.tipo}/></div></div><span style={{fontSize:14,fontWeight:700,color:T.negative,minWidth:68,textAlign:"right"}}>{fmt(Number(e.valor))}</span><button onClick={()=>{setEditingExp(e.id);setExpForm({descricao:e.descricao,valor:String(e.valor),cat:e.cat,subcat:e.subcat,data:e.data,tipo:e.tipo});window.scrollTo({top:0,behavior:"smooth"});}} style={{background:"none",border:"none",cursor:"pointer",color:T.accent,fontSize:15,padding:"0 2px"}}>✏️</button>
-                <button onClick={()=>deleteExpense(e.id)} style={{background:"none",border:"none",cursor:"pointer",color:T.subtext,fontSize:15,padding:"0 2px"}}>✕</button></div>);})}
-          </div>
-        </>}
+
+  {/* Resumo */}
+  <div style={{...S.card,display:"flex",justifyContent:"space-between",alignItems:"center",padding:"12px 16px"}}>
+    <span style={{fontSize:12,color:T.subtext}}>{myExpenses.length} {myExpenses.length===1?"despesa":"despesas"}</span>
+    <span style={{fontSize:17,fontWeight:800,color:T.negative}}>{fmt(totalExp)}</span>
+  </div>
+
+  {/* Lista */}
+  <div style={S.card}>
+    {myExpenses.length===0&&<div style={{color:T.subtext,fontSize:13,textAlign:"center",padding:"24px 0"}}>Sem despesas para este período.</div>}
+    {myExpenses.map(e=>{const cat=expCats.find(c=>c.id===e.cat);return(<div key={e.id} style={{display:"flex",alignItems:"center",gap:10,padding:"11px 0",borderBottom:`1px solid ${T.cardBorder}`}}><span style={{fontSize:20,minWidth:28,textAlign:"center"}}>{cat?.icon||"📦"}</span><div style={{flex:1,minWidth:0}}><div style={{fontSize:13,fontWeight:600,color:"#e2e8f0",whiteSpace:"nowrap",overflow:"hidden",textOverflow:"ellipsis"}}>{e.descricao}{e.subcat?<span style={{color:T.subtext}}> · {e.subcat}</span>:""}</div><div style={{display:"flex",alignItems:"center",gap:5,marginTop:3}}><span style={{fontSize:10,color:T.subtext}}>{new Date(e.data+"T12:00:00").toLocaleDateString("pt-PT")}</span><Tag type={e.tipo}/></div></div><span style={{fontSize:14,fontWeight:700,color:T.negative,minWidth:68,textAlign:"right"}}>{fmt(Number(e.valor))}</span><button onClick={()=>{setEditingExp(e.id);setExpForm({descricao:e.descricao,valor:String(e.valor),cat:e.cat,subcat:e.subcat,data:e.data,tipo:e.tipo});window.scrollTo({top:0,behavior:"smooth"});}} style={{background:"none",border:"none",cursor:"pointer",color:T.accent,fontSize:15,padding:"0 2px"}}>✏️</button><button onClick={()=>deleteExpense(e.id)} style={{background:"none",border:"none",cursor:"pointer",color:T.subtext,fontSize:15,padding:"0 2px"}}>✕</button></div>);})}
+  </div>
+</>}
 
         {/* RECORRENTES */}
         {tab==="recorrentes"&&(
