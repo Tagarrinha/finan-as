@@ -1113,7 +1113,7 @@ async function handleCoupleSettlement(valor: number) {
           <>
             <div style={{display:"flex",alignItems:"flex-end",gap:4,height:100,marginTop:16,marginBottom:10}}>
               {MONTHS.map((m,i)=>{
-                const rev=monthlyRev[world]?.[String(new Date().getFullYear())]?.[i]||0;
+                const rev=incomes.filter(inc=>inc.world===world&&new Date(inc.data).getMonth()===i&&new Date(inc.data).getFullYear()===new Date().getFullYear()).reduce((s,inc)=>s+Number(inc.valor),0);
                 const exp=expenses.filter(e=>e.world===world&&new Date(e.data).getMonth()===i&&new Date(e.data).getFullYear()===new Date().getFullYear()).reduce((s,e)=>s+Number(e.valor),0);
                 const maxVal=Math.max(...MONTHS.map((_,j)=>{const r=monthlyRev[world]?.[String(new Date().getFullYear())]?.[j]||0;const ex=expenses.filter(e=>e.world===world&&new Date(e.data).getMonth()===j&&new Date(e.data).getFullYear()===new Date().getFullYear()).reduce((s,e)=>s+Number(e.valor),0);return Math.max(r,ex);}),1);
                 const rH=Math.max(3,Math.round((rev/maxVal)*88))||2;
