@@ -639,7 +639,6 @@ const jointBalance = totalContributions - totalSettledExpenses;
           }));
           const maxVal = Math.max(...monthlyData.map(m=>m.total),1);
           const hasData = monthlyData.some(m=>m.total>0);
-          if(!hasData) return null;
           return(
             <div style={{background:cardBg,border:`1px solid ${cardBorder}`,borderRadius:14,padding:"14px 16px",marginBottom:12}}>
               <div style={{fontSize:10,fontWeight:700,color:subtext,textTransform:"uppercase" as const,letterSpacing:"0.08em",marginBottom:12}}>Evolução de gastos {thisYear}</div>
