@@ -371,7 +371,7 @@ const jointBalance = totalContributions - totalSettledExpenses;
   return(
     <div style={{fontFamily:"'Sora',sans-serif"}}>
       {/* Header */}
-      <div style={{background:`linear-gradient(135deg,${MY_COLOR}22,${PARTNER_COLOR}15)`,border:`1px solid ${MY_COLOR}40`,borderRadius:24,padding:"20px",marginBottom:14,position:"relative",overflow:"hidden"}}>
+      <div style={{background:`linear-gradient(135deg,${MY_COLOR}22,${PARTNER_COLOR}15)`,border:`1px solid ${MY_COLOR}40`,borderRadius:18,padding:"12px 14px",marginBottom:12,position:"relative",overflow:"hidden"}}>
         {/* Glow background */}
         <div style={{position:"absolute",top:-40,left:-40,width:160,height:160,borderRadius:"50%",background:`radial-gradient(circle,${MY_COLOR}20 0%,transparent 70%)`,pointerEvents:"none"}}/>
         <div style={{position:"absolute",top:-40,right:-40,width:160,height:160,borderRadius:"50%",background:`radial-gradient(circle,${PARTNER_COLOR}20 0%,transparent 70%)`,pointerEvents:"none"}}/>
@@ -379,13 +379,13 @@ const jointBalance = totalContributions - totalSettledExpenses;
         <div style={{display:"flex",alignItems:"flex-start",justifyContent:"space-between",marginBottom:16,position:"relative"}}>
           {/* Avatares com iniciais */}
           <div style={{display:"flex"}}>
-            <div style={{width:52,height:52,borderRadius:"50%",background:`linear-gradient(135deg,${MY_COLOR}40,${MY_COLOR}20)`,border:`2.5px solid ${MY_COLOR}`,display:"flex",alignItems:"center",justifyContent:"center",zIndex:2,boxShadow:`0 0 16px ${MY_COLOR}40`}}>
-              <span style={{fontSize:18,fontWeight:800,color:MY_COLOR}}>{userName.slice(0,2).toUpperCase()}</span>
+            <div style={{width:36,height:36,borderRadius:"50%",background:`linear-gradient(135deg,${MY_COLOR}40,${MY_COLOR}20)`,border:`2px solid ${MY_COLOR}`,display:"flex",alignItems:"center",justifyContent:"center",zIndex:2,boxShadow:`0 0 10px ${MY_COLOR}30`}}>
+              <span style={{fontSize:13,fontWeight:800,color:MY_COLOR}}>{userName.slice(0,2).toUpperCase()}</span>
             </div>
-            <div style={{width:52,height:52,borderRadius:"50%",background:`linear-gradient(135deg,${PARTNER_COLOR}40,${PARTNER_COLOR}20)`,border:`2.5px solid ${PARTNER_COLOR}`,display:"flex",alignItems:"center",justifyContent:"center",marginLeft:-16,zIndex:1,boxShadow:`0 0 16px ${PARTNER_COLOR}40`}}>
-              <span style={{fontSize:18,fontWeight:800,color:PARTNER_COLOR}}>{partnerName.slice(0,2).toUpperCase()}</span>
+            <div style={{width:36,height:36,borderRadius:"50%",background:`linear-gradient(135deg,${PARTNER_COLOR}40,${PARTNER_COLOR}20)`,border:`2px solid ${PARTNER_COLOR}`,display:"flex",alignItems:"center",justifyContent:"center",marginLeft:-10,zIndex:1,boxShadow:`0 0 10px ${PARTNER_COLOR}30`}}>
+              <span style={{fontSize:13,fontWeight:800,color:PARTNER_COLOR}}>{partnerName.slice(0,2).toUpperCase()}</span>
             </div>
-            <div style={{width:24,height:24,borderRadius:"50%",background:"#0f1117",border:"2px solid rgba(255,255,255,0.15)",display:"flex",alignItems:"center",justifyContent:"center",fontSize:12,marginLeft:-10,zIndex:3,alignSelf:"flex-end",marginBottom:2}}>💑</div>
+            <div style={{width:18,height:18,borderRadius:"50%",background:"#0f1117",border:"1.5px solid rgba(255,255,255,0.15)",display:"flex",alignItems:"center",justifyContent:"center",fontSize:9,marginLeft:-7,zIndex:3,alignSelf:"flex-end",marginBottom:1}}>💑</div>
           </div>
           {/* Botões */}
           <div style={{display:"flex",gap:6,alignItems:"center"}}>
