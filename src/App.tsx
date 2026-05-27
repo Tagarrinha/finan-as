@@ -967,9 +967,26 @@ async function handleCoupleSettlement(valor: number) {
       {new Date().toLocaleString("pt-PT",{month:"short"}).toUpperCase()} · {new Date().getFullYear()}
     </div>
     <div style={{fontSize:11,fontWeight:600,color:T.subtext,marginBottom:12,letterSpacing:"0.08em",textTransform:"uppercase"}}>Resultado do mês</div>
-    <div style={{fontSize:56,fontWeight:800,color:balance>=0?T.positive:T.negative,letterSpacing:"-2px",lineHeight:1,marginBottom:16}}>
+    <div style={{fontSize:56,fontWeight:800,color:balance>=0?T.positive:T.negative,letterSpacing:"-2px",lineHeight:1,marginBottom:12}}>
       {balance>=0?"+":""}{hv(fmt(balance))}
     </div>
+    {totalInc>0&&(()=>{
+      const savingsRate=pct(balance,totalInc);
+      const overBudgetCount=(Object.entries(budgetTargets) as [TypeKey,number][]).filter(([type,target])=>(byType[type]||0)>totalInc*(target/100)).length;
+      let msg="",emoji="",color=T.subtext;
+      if(balance<0){msg="Estás a gastar mais do que ganhas";emoji="⚠️";color="#f87171";}
+      else if(savingsRate>=30){msg="Excelente! Estás a poupar muito bem";emoji="🚀";color=T.positive;}
+      else if(savingsRate>=15){msg="Boa gestão este mês";emoji="💚";color=T.positive;}
+      else if(savingsRate>=5){msg="Podes melhorar a taxa de poupança";emoji="💡";color="#f59e0b";}
+      else if(overBudgetCount>0){msg=`${overBudgetCount} categoria${overBudgetCount>1?"s":""} acima do orçamento`;emoji="⚠️";color="#f59e0b";}
+      else{msg="Mantém o ritmo este mês";emoji="👍";color=T.subtext;}
+      return(
+        <div style={{display:"inline-flex",alignItems:"center",gap:6,background:`${color}12`,border:`1px solid ${color}30`,borderRadius:99,padding:"6px 14px",fontSize:12,fontWeight:600,color,marginBottom:16}}>
+          <span>{emoji}</span>
+          <span>{msg}</span>
+        </div>
+      );
+    })()}
     {(()=>{
       const now=new Date();
       const prevMonth=now.getMonth()===0?11:now.getMonth()-1;
