@@ -1102,7 +1102,7 @@ async function handleCoupleSettlement(valor: number) {
       ?(byType["necessidade"]||0)<=totalInc*(budgetTargets["necessidade"]/100)&&(byType["desejo"]||0)<=totalInc*(budgetTargets["desejo"]/100)
         ?"🚀":"⚠️"
       :"⚠️"
-  ):""} /{target}%
+  ):""} /{target}% · {fmt(targetAmt)}
 </div>
               </div>
             );
