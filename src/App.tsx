@@ -414,8 +414,9 @@ function TypeSelector({value,onChange,byType,totalInc,budgetTargets}:{value:Type
                   <span style={{fontSize:9,color:"#64748b",fontWeight:400}}> {actualPct}%/{target}%{over?(investPositive?" 🚀":" ⚠️"):""}</span>
                 </span>
               </div>
-              <div style={{height:3,borderRadius:99,background:"rgba(255,255,255,0.07)",overflow:"hidden"}}>
+              <div style={{height:3,borderRadius:99,background:"rgba(255,255,255,0.07)",overflow:"hidden",position:"relative"}}>
                 <div style={{width:`${Math.min(100,actualPct)}%`,height:"100%",background:barColor,borderRadius:99,transition:"width .4s ease"}}/>
+                <div style={{position:"absolute",top:-2,bottom:-2,left:`${target}%`,width:2,background:"rgba(255,255,255,0.35)",borderRadius:1}}/>
               </div>
             </div>
           </button>
