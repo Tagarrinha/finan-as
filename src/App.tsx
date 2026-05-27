@@ -1107,6 +1107,19 @@ async function handleCoupleSettlement(valor: number) {
                     strokeDashoffset={dashOffset}
                     style={{transition:"stroke-dashoffset .6s ease"}}
                   />
+                  {/* Linha de limite */}
+                  {(()=>{
+                    const angle = Math.PI - (target/100)*Math.PI;
+                    const lx = cx + R*Math.cos(angle);
+                    const ly = cy - R*Math.sin(angle);
+                    const innerR = R - strokeW/2 - 1;
+                    const outerR = R + strokeW/2 + 1;
+                    const x1 = cx + innerR*Math.cos(angle);
+                    const y1 = cy - innerR*Math.sin(angle);
+                    const x2 = cx + outerR*Math.cos(angle);
+                    const y2 = cy - outerR*Math.sin(angle);
+                    return <line x1={x1} y1={y1} x2={x2} y2={y2} stroke="rgba(255,255,255,0.6)" strokeWidth="2" strokeLinecap="round"/>;
+                  })()}
                   {/* % no centro */}
                   <text x={cx} y={cy-4} textAnchor="middle" fill={color} fontSize="13" fontWeight="800" fontFamily="Sora,sans-serif">{actualPct}%</text>
                 </svg>
