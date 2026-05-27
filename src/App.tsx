@@ -1070,7 +1070,7 @@ async function handleCoupleSettlement(valor: number) {
             const actual=byType[type]||0;
             const target=budgetTargets[type];
             const targetAmt=totalInc*(target/100);
-            const actualPct=Math.min(100,totalInc>0?Math.round((actual/targetAmt)*100):0);
+            const actualPct=Math.min(100,totalInc>0?Math.round((actual/totalInc)*100):0);
             const over=actual>targetAmt&&totalInc>0;
             const color=over?"#ef4444":meta.color;
             // SVG semicírculo
