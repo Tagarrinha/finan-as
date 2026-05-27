@@ -1049,11 +1049,16 @@ async function handleCoupleSettlement(valor: number) {
   {(()=>{
     const overItems=(Object.entries(TYPE_META) as [TypeKey,typeof TYPE_META[TypeKey]][]).filter(([type])=>(byType[type]||0)>totalInc*(budgetTargets[type]/100)&&totalInc>0);
     if(!overItems.length) return null;
-    const [,meta]=overItems[0];
+    const needOk=(byType["necessidade"]||0)<=totalInc*(budgetTargets["necessidade"]/100);
+    const desireOk=(byType["desejo"]||0)<=totalInc*(budgetTargets["desejo"]/100);
+    const onlyInvestOver=overItems.length===1&&overItems[0][0]==="investimento";
+    const isPositive=onlyInvestOver&&needOk&&desireOk;
     return(
-      <div style={{background:"rgba(239,68,68,0.07)",border:"1px solid rgba(239,68,68,0.15)",borderRadius:10,padding:"7px 12px",marginBottom:6,display:"flex",alignItems:"center",gap:8}}>
-        <span style={{fontSize:14}}>⚠️</span>
-        <div style={{flex:1,fontSize:11,fontWeight:600,color:"#f87171"}}>{meta.label} acima do orçamento</div>
+      <div style={{background:isPositive?"rgba(52,211,153,0.07)":"rgba(239,68,68,0.07)",border:`1px solid ${isPositive?"rgba(52,211,153,0.2)":"rgba(239,68,68,0.15)"}`,borderRadius:10,padding:"7px 12px",marginBottom:6,display:"flex",alignItems:"center",gap:8}}>
+        <span style={{fontSize:14}}>{isPositive?"🚀":"⚠️"}</span>
+        <div style={{flex:1,fontSize:11,fontWeight:600,color:isPositive?"#34d399":"#f87171"}}>
+          {isPositive?"Estás a investir acima do planeado — bom sinal!":overItems[0][1].label+" acima do orçamento"}
+        </div>
       </div>
     );
   })()}
