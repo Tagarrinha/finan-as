@@ -400,10 +400,11 @@ function TypeSelector({value,onChange,byType,totalInc,budgetTargets}:{value:Type
         const needOk=(byType["necessidade"]||0)<=totalInc*(budgetTargets["necessidade"]/100);
         const desireOk=(byType["desejo"]||0)<=totalInc*(budgetTargets["desejo"]/100);
         const investPositive=isInvestOver&&needOk&&desireOk;
-        const barColor=investPositive?meta.color:over?"#ef4444":meta.color;
-        const borderColor=active?meta.color:"rgba(255,255,255,0.09)";
+        const barColor=over&&!investPositive?"#ef4444":meta.color;
+        const borderColor=active?meta.color:over&&!investPositive?"rgba(239,68,68,0.4)":"rgba(255,255,255,0.09)";
+        const bgColor=active?meta.bg:over&&!investPositive?"rgba(239,68,68,0.05)":"rgba(255,255,255,0.03)";
         return(
-          <button key={type} onClick={()=>onChange(type)} style={{padding:"9px 12px",border:`1.5px solid ${borderColor}`,borderRadius:9,background:active?meta.bg:"rgba(255,255,255,0.03)",cursor:"pointer",textAlign:"left" as const,fontFamily:"'Sora',sans-serif",display:"flex",alignItems:"center",gap:8}}>
+          <button key={type} onClick={()=>onChange(type)} style={{padding:"9px 12px",border:`1.5px solid ${borderColor}`,borderRadius:9,background:bgColor,cursor:"pointer",textAlign:"left" as const,fontFamily:"'Sora',sans-serif",display:"flex",alignItems:"center",gap:8}}>
             <span style={{fontSize:15}}>{meta.icon}</span>
             <div style={{flex:1}}>
               <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:4}}>
