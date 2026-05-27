@@ -1094,8 +1094,8 @@ async function handleCoupleSettlement(valor: number) {
                   {/* % no centro */}
                   <text x={cx} y={cy-4} textAnchor="middle" fill={color} fontSize="13" fontWeight="800" fontFamily="Sora,sans-serif">{actualPct}%</text>
                 </svg>
-                <div style={{fontSize:10,fontWeight:700,color:"#e2e8f0",textAlign:"center" as const}}>{meta.label}</div>
-                <div style={{fontSize:11,fontWeight:800,color,textAlign:"center" as const}}>{fmt(actual)}</div>
+                <div style={{fontSize:11,fontWeight:700,color:"#e2e8f0",textAlign:"center" as const}}>{meta.label}</div>
+                <div style={{fontSize:12,fontWeight:800,color,textAlign:"center" as const}}>{fmt(actual)}</div>
                 <div style={{fontSize:9,color:T.subtext,textAlign:"center" as const}}>/{target}%{over?" ⚠️":""}</div>
               </div>
             );
@@ -1122,10 +1122,10 @@ async function handleCoupleSettlement(valor: number) {
               </div>
               <span style={{fontSize:18,flexShrink:0}}>{c.icon}</span>
               <div style={{flex:1,minWidth:0}}>
-                <div style={{fontSize:12,fontWeight:600,color:"#f1f5f9"}}>{c.label}</div>
+                <div style={{fontSize:11,fontWeight:600,color:"#f1f5f9"}}>{c.label}</div>
                 <div style={{fontSize:9,color:T.subtext}}>{pctVal}% do total</div>
               </div>
-              <div style={{fontSize:13,fontWeight:800,color:meta?.color||T.accent}}>{fmt(c.total)}</div>
+              <div style={{fontSize:12,fontWeight:800,color:meta?.color||T.accent}}>{fmt(c.total)}</div>
             </div>
           );
         })}
