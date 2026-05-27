@@ -962,272 +962,265 @@ async function handleCoupleSettlement(valor: number) {
         {/* RESUMO */}
         {tab==="resumo"&&<>
   {/* ── HERO ── */}
-  <div style={{padding:"24px 0 20px",textAlign:"center"}}>
-    <div style={{fontSize:11,fontWeight:700,color:T.subtext,letterSpacing:"0.15em",textTransform:"uppercase",marginBottom:8}}>
-      {new Date().toLocaleString("pt-PT",{month:"short"}).toUpperCase()} · {new Date().getFullYear()}
-    </div>
-    <div style={{fontSize:11,fontWeight:600,color:T.subtext,marginBottom:12,letterSpacing:"0.08em",textTransform:"uppercase"}}>Resultado do mês</div>
-    <div style={{fontSize:56,fontWeight:800,color:balance>=0?T.positive:T.negative,letterSpacing:"-2px",lineHeight:1,marginBottom:12}}>
-      {balance>=0?"+":""}{hv(fmt(balance))}
-    </div>
-    {totalInc>0&&(()=>{
-      const savingsRate=pct(balance,totalInc);
-      const overBudgetCount=(Object.entries(budgetTargets) as [TypeKey,number][]).filter(([type,target])=>(byType[type]||0)>totalInc*(target/100)).length;
-      let msg="",emoji="",color=T.subtext;
-      if(balance<0){msg="Estás a gastar mais do que ganhas";emoji="⚠️";color="#f87171";}
-      else if(savingsRate>=30){msg="Excelente! Estás a poupar muito bem";emoji="🚀";color=T.positive;}
-      else if(savingsRate>=15){msg="Boa gestão este mês";emoji="💚";color=T.positive;}
-      else if(savingsRate>=5){msg="Podes melhorar a taxa de poupança";emoji="💡";color="#f59e0b";}
-      else if(overBudgetCount>0){msg=`${overBudgetCount} categoria${overBudgetCount>1?"s":""} acima do orçamento`;emoji="⚠️";color="#f59e0b";}
-      else{msg="Mantém o ritmo este mês";emoji="👍";color=T.subtext;}
-      return(
-        <div style={{display:"inline-flex",alignItems:"center",gap:6,background:`${color}12`,border:`1px solid ${color}30`,borderRadius:99,padding:"6px 14px",fontSize:12,fontWeight:600,color,marginBottom:16}}>
-          <span>{emoji}</span>
-          <span>{msg}</span>
-        </div>
-      );
-    })()}
-    {(()=>{
-      const now=new Date();
-      const prevMonth=now.getMonth()===0?11:now.getMonth()-1;
-      const prevYear=now.getMonth()===0?now.getFullYear()-1:now.getFullYear();
-      const prevInc=incomes.filter(i=>i.world===world&&new Date(i.data).getMonth()===prevMonth&&new Date(i.data).getFullYear()===prevYear).reduce((s,i)=>s+Number(i.valor),0);
-      const prevExp=expenses.filter(e=>e.world===world&&new Date(e.data).getMonth()===prevMonth&&new Date(e.data).getFullYear()===prevYear).reduce((s,e)=>s+Number(e.valor),0);
-      const prevBal=prevInc-prevExp;
-      if(prevBal===0) return null;
-      const diff=Math.round(((balance-prevBal)/Math.abs(prevBal))*100);
-      const up=diff>=0;
-      return(
-        <div style={{display:"inline-flex",alignItems:"center",gap:6,background:up?"rgba(52,211,153,0.12)":"rgba(251,113,133,0.12)",border:`1px solid ${up?"rgba(52,211,153,0.3)":"rgba(251,113,133,0.3)"}`,borderRadius:99,padding:"6px 14px",fontSize:12,fontWeight:700,color:up?T.positive:T.negative}}>
-          <span>{up?"↗":"↘"}</span>
-          <span>{up?"+":""}{diff}% vs mês anterior</span>
-        </div>
-      );
-    })()}
-  </div>
-
-  {/* ── FLUXO ── */}
-  <div style={{marginBottom:14}}>
-    <div style={{fontSize:11,fontWeight:700,color:T.subtext,letterSpacing:"0.1em",textTransform:"uppercase",marginBottom:10}}>Fluxo</div>
-    <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:10}}>
-      <div style={{background:T.cardBg,border:`1px solid ${T.cardBorder}`,borderRadius:16,padding:"12px 14px",display:"flex",alignItems:"center",gap:10}}>
-        <div style={{width:36,height:36,borderRadius:10,background:"rgba(52,211,153,0.15)",display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0}}>
-          <svg width="18" height="18" viewBox="0 0 24 24" fill={T.positive}><path d="M20 12l-1.41-1.41L13 16.17V4h-2v12.17l-5.58-5.59L4 12l8 8 8-8z"/></svg>
-        </div>
-        <div>
-          <div style={{fontSize:10,fontWeight:700,color:T.subtext,letterSpacing:"0.08em",textTransform:"uppercase",marginBottom:2}}>Receitas</div>
-          <div style={{fontSize:16,fontWeight:800,color:"#f1f5f9"}}>{hv(fmt(totalInc))}</div>
-          <div style={{fontSize:10,color:T.subtext}}>{myIncomes.length} entrada{myIncomes.length!==1?"s":""}</div>
+  {(()=>{
+    const savingsRate=totalInc>0?pct(balance,totalInc):0;
+    const heroColor=balance<0?T.negative:savingsRate>=20?T.positive:T.accent;
+    const now=new Date();
+    const prevMonth=now.getMonth()===0?11:now.getMonth()-1;
+    const prevYear=now.getMonth()===0?now.getFullYear()-1:now.getFullYear();
+    const prevInc=incomes.filter(i=>i.world===world&&new Date(i.data).getMonth()===prevMonth&&new Date(i.data).getFullYear()===prevYear).reduce((s,i)=>s+Number(i.valor),0);
+    const prevExp=expenses.filter(e=>e.world===world&&new Date(e.data).getMonth()===prevMonth&&new Date(e.data).getFullYear()===prevYear).reduce((s,e)=>s+Number(e.valor),0);
+    const prevBal=prevInc-prevExp;
+    const diff=prevBal!==0?Math.round(((balance-prevBal)/Math.abs(prevBal))*100):null;
+    const overBudgetCount=(Object.entries(budgetTargets) as [TypeKey,number][]).filter(([type,target])=>(byType[type]||0)>totalInc*(target/100)&&totalInc>0).length;
+    let msg="",emoji="";
+    if(totalInc===0){msg="Regista os teus rendimentos para começar";emoji="👋";}
+    else if(balance<0){msg="Estás a gastar mais do que ganhas";emoji="⚠️";}
+    else if(savingsRate>=30){msg="Estás a poupar muito bem este mês";emoji="🚀";}
+    else if(savingsRate>=15){msg="Boa gestão financeira este mês";emoji="💚";}
+    else if(savingsRate>=5){msg="Podes melhorar a taxa de poupança";emoji="💡";}
+    else if(overBudgetCount>0){msg=`${overBudgetCount} categoria${overBudgetCount>1?"s":""} acima do orçamento`;emoji="⚠️";}
+    else{msg="Mantém o ritmo este mês";emoji="👍";}
+    return(
+      <div style={{position:"relative",borderRadius:24,overflow:"hidden",marginBottom:16,padding:"28px 20px 24px"}}>
+        {/* Fundo dinâmico */}
+        <div style={{position:"absolute",inset:0,background:`linear-gradient(135deg,${heroColor}18 0%,${heroColor}08 50%,transparent 100%)`,borderRadius:24}}/>
+        <div style={{position:"absolute",inset:0,border:`1px solid ${heroColor}30`,borderRadius:24}}/>
+        <div style={{position:"absolute",top:-60,right:-60,width:200,height:200,borderRadius:"50%",background:`radial-gradient(circle,${heroColor}20 0%,transparent 70%)`,pointerEvents:"none"}}/>
+        <div style={{position:"relative",zIndex:1}}>
+          {/* Data */}
+          <div style={{fontSize:10,fontWeight:700,color:T.subtext,letterSpacing:"0.15em",textTransform:"uppercase" as const,marginBottom:16}}>
+            {now.toLocaleString("pt-PT",{month:"long"}).toUpperCase()} · {now.getFullYear()}
+          </div>
+          {/* Número principal */}
+          <div style={{fontSize:52,fontWeight:800,color:heroColor,letterSpacing:"-2px",lineHeight:1,marginBottom:8,textShadow:`0 0 40px ${heroColor}40`}}>
+            {balance>=0?"+":""}{hv(fmt(balance))}
+          </div>
+          {/* Mensagem contextual */}
+          <div style={{fontSize:13,color:T.subtext,marginBottom:16}}>{emoji} {msg}</div>
+          {/* Linha receitas/despesas */}
+          <div style={{display:"flex",gap:16,alignItems:"center",marginBottom:diff!==null?12:0}}>
+            <div style={{display:"flex",alignItems:"center",gap:6}}>
+              <div style={{width:8,height:8,borderRadius:"50%",background:T.positive}}/>
+              <span style={{fontSize:12,color:T.subtext}}>Receitas</span>
+              <span style={{fontSize:13,fontWeight:700,color:"#f1f5f9"}}>{hv(fmt(totalInc))}</span>
+            </div>
+            <div style={{width:1,height:16,background:"rgba(255,255,255,0.1)"}}/>
+            <div style={{display:"flex",alignItems:"center",gap:6}}>
+              <div style={{width:8,height:8,borderRadius:"50%",background:T.negative}}/>
+              <span style={{fontSize:12,color:T.subtext}}>Despesas</span>
+              <span style={{fontSize:13,fontWeight:700,color:"#f1f5f9"}}>{hv(fmt(totalExp))}</span>
+            </div>
+          </div>
+          {/* vs mês anterior */}
+          {diff!==null&&(
+            <div style={{display:"inline-flex",alignItems:"center",gap:5,background:diff>=0?"rgba(52,211,153,0.1)":"rgba(251,113,133,0.1)",border:`1px solid ${diff>=0?"rgba(52,211,153,0.25)":"rgba(251,113,133,0.25)"}`,borderRadius:99,padding:"4px 12px",fontSize:11,fontWeight:700,color:diff>=0?T.positive:T.negative}}>
+              {diff>=0?"↗":"↘"} {diff>=0?"+":""}{diff}% vs mês anterior
+            </div>
+          )}
+          {/* Savings rate se positivo */}
+          {totalInc>0&&balance>=0&&(
+            <div style={{marginTop:16,display:"flex",alignItems:"center",gap:8}}>
+              <div style={{flex:1,height:4,borderRadius:99,background:"rgba(255,255,255,0.07)",overflow:"hidden"}}>
+                <div style={{width:`${Math.min(100,savingsRate)}%`,height:"100%",background:`linear-gradient(90deg,${heroColor},${heroColor}88)`,borderRadius:99,transition:"width .6s ease"}}/>
+              </div>
+              <span style={{fontSize:11,fontWeight:700,color:heroColor,whiteSpace:"nowrap" as const}}>{savingsRate}% poupado</span>
+            </div>
+          )}
         </div>
       </div>
-      <div style={{background:T.cardBg,border:`1px solid ${T.cardBorder}`,borderRadius:16,padding:"12px 14px",display:"flex",alignItems:"center",gap:10}}>
-        <div style={{width:36,height:36,borderRadius:10,background:"rgba(251,113,133,0.15)",display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0}}>
-          <svg width="18" height="18" viewBox="0 0 24 24" fill={T.negative}><path d="M4 12l1.41 1.41L11 7.83V20h2V7.83l5.58 5.59L20 12l-8-8-8 8z"/></svg>
-        </div>
-        <div>
-          <div style={{fontSize:10,fontWeight:700,color:T.subtext,letterSpacing:"0.08em",textTransform:"uppercase",marginBottom:2}}>Despesas</div>
-          <div style={{fontSize:16,fontWeight:800,color:"#f1f5f9"}}>{hv(fmt(totalExp))}</div>
-          <div style={{fontSize:10,color:T.subtext}}>{myExpenses.length} item{myExpenses.length!==1?"s":""}</div>
-        </div>
-      </div>
-    </div>
-  </div>
+    );
+  })()}
 
-  {/* ── ALERTA RECORRENTES ── */}
+  {/* ── ALERTAS ── */}
   {dueRecurring>0&&(
-    <div onClick={()=>setTab("recorrentes")} style={{background:"rgba(245,158,11,0.08)",border:"1px solid rgba(245,158,11,0.3)",borderRadius:14,padding:"12px 14px",marginBottom:14,cursor:"pointer",display:"flex",alignItems:"center",gap:12}}>
-      <div style={{width:32,height:32,borderRadius:9,background:"rgba(245,158,11,0.15)",display:"flex",alignItems:"center",justifyContent:"center",fontSize:16,flexShrink:0}}>🔔</div>
+    <div onClick={()=>setTab("recorrentes")} style={{background:"rgba(245,158,11,0.08)",border:"1px solid rgba(245,158,11,0.25)",borderRadius:14,padding:"12px 14px",marginBottom:10,cursor:"pointer",display:"flex",alignItems:"center",gap:10}}>
+      <span style={{fontSize:18}}>🔔</span>
       <div style={{flex:1}}>
-        <div style={{fontSize:13,fontWeight:700,color:"#f59e0b"}}>{dueRecurring} despesa{dueRecurring>1?"s":""} recorrente{dueRecurring>1?"s":""} a vencer</div>
-        <div style={{fontSize:11,color:"#78350f",marginTop:1}}>Toca para ver e registar</div>
+        <div style={{fontSize:13,fontWeight:700,color:"#f59e0b"}}>{dueRecurring} recorrente{dueRecurring>1?"s":""} a vencer</div>
+        <div style={{fontSize:11,color:T.subtext,marginTop:1}}>Toca para registar</div>
       </div>
-      <span style={{color:"#f59e0b"}}>→</span>
+      <span style={{color:"#f59e0b",fontSize:12}}>→</span>
     </div>
   )}
-
-  {/* ── ALERTA ORÇAMENTO ── */}
   {(()=>{
-    const overItems=(Object.entries(TYPE_META) as [TypeKey,typeof TYPE_META[TypeKey]][]).filter(([type])=>{
-      const actual=byType[type]||0;
-      return actual>totalInc*(budgetTargets[type]/100)&&totalInc>0;
-    });
+    const overItems=(Object.entries(TYPE_META) as [TypeKey,typeof TYPE_META[TypeKey]][]).filter(([type])=>(byType[type]||0)>totalInc*(budgetTargets[type]/100)&&totalInc>0);
     if(!overItems.length) return null;
-    const [type,meta]=overItems[0];
-    const actual=byType[type]||0;
-    const target=budgetTargets[type];
-    const actualPct=pct(actual,totalInc);
+    const [,meta]=overItems[0];
     return(
-      <div style={{background:"rgba(245,158,11,0.08)",border:"1px solid rgba(245,158,11,0.3)",borderRadius:14,padding:"12px 14px",marginBottom:14,display:"flex",alignItems:"flex-start",gap:12}}>
-        <div style={{width:32,height:32,borderRadius:9,background:"rgba(245,158,11,0.15)",display:"flex",alignItems:"center",justifyContent:"center",fontSize:16,flexShrink:0}}>⚠️</div>
-        <div>
-          <div style={{fontSize:13,fontWeight:700,color:"#f59e0b",marginBottom:2}}>{meta.label} acima do orçamento</div>
-          <div style={{fontSize:12,color:T.subtext}}>Estás em {actualPct}% — alvo {target}%.</div>
-        </div>
+      <div style={{background:"rgba(239,68,68,0.07)",border:"1px solid rgba(239,68,68,0.2)",borderRadius:14,padding:"12px 14px",marginBottom:10,display:"flex",alignItems:"center",gap:10}}>
+        <span style={{fontSize:18}}>⚠️</span>
+        <div style={{flex:1,fontSize:13,fontWeight:600,color:"#f87171"}}>{meta.label} acima do orçamento</div>
       </div>
     );
   })()}
 
   {/* ── COMPOSIÇÃO ── */}
   <div style={{marginBottom:14}}>
-    <div style={{fontSize:11,fontWeight:700,color:T.subtext,letterSpacing:"0.1em",textTransform:"uppercase",marginBottom:10}}>Composição</div>
-    <div style={S.card}>
+    <div style={{fontSize:10,fontWeight:700,color:T.subtext,letterSpacing:"0.1em",textTransform:"uppercase" as const,marginBottom:10}}>Composição</div>
+    <div style={{display:"flex",flexDirection:"column" as const,gap:8}}>
       {(Object.entries(TYPE_META) as [TypeKey,typeof TYPE_META[TypeKey]][]).map(([type,meta])=>{
         const actual=byType[type]||0,target=budgetTargets[type],targetAmt=totalInc*(target/100),actualPct=pct(actual,totalInc),over=actual>targetAmt&&totalInc>0;
         return(
-          <div key={type} style={{marginBottom:18}}>
+          <div key={type} style={{background:T.cardBg,border:`1px solid ${over?"rgba(239,68,68,0.3)":T.cardBorder}`,borderRadius:14,padding:"12px 14px"}}>
             <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:8}}>
-              <span style={{fontSize:14,fontWeight:600,color:over?"#ef4444":"#f1f5f9"}}>{meta.label}</span>
-              <span style={{fontSize:13,fontWeight:700,color:over?"#ef4444":T.subtext}}>{actualPct}% / {target}%</span>
+              <div style={{display:"flex",alignItems:"center",gap:8}}>
+                <div style={{width:28,height:28,borderRadius:8,background:`${meta.color}18`,border:`1px solid ${meta.color}30`,display:"flex",alignItems:"center",justifyContent:"center",fontSize:14}}>{meta.icon}</div>
+                <span style={{fontSize:13,fontWeight:600,color:over?"#f87171":"#f1f5f9"}}>{meta.label}</span>
+              </div>
+              <div style={{textAlign:"right" as const}}>
+                <div style={{fontSize:14,fontWeight:800,color:over?"#f87171":meta.color}}>{fmt(actual)}</div>
+                <div style={{fontSize:10,color:T.subtext}}>{actualPct}% / {target}%</div>
+              </div>
             </div>
-            <div style={{position:"relative",height:6,borderRadius:99,background:"rgba(255,255,255,0.07)"}}>
-              <div style={{position:"absolute",left:0,top:0,bottom:0,width:`${Math.min(100,actualPct)}%`,background:over?"#ef4444":meta.color,borderRadius:99,transition:"width .5s ease"}}/>
-              <div style={{position:"absolute",top:-4,bottom:-4,left:`${target}%`,width:2,background:"rgba(255,255,255,0.25)",borderRadius:1}}/>
-            </div>
-            <div style={{display:"flex",justifyContent:"space-between",marginTop:5}}>
-              <span style={{fontSize:11,color:over?"#f87171":T.subtext}}>{fmt(actual)}</span>
-              <span style={{fontSize:11,color:T.subtext}}>limite {fmt(targetAmt)}</span>
+            <div style={{position:"relative",height:5,borderRadius:99,background:"rgba(255,255,255,0.07)"}}>
+              <div style={{position:"absolute",left:0,top:0,bottom:0,width:`${Math.min(100,actualPct)}%`,background:over?"linear-gradient(90deg,#ef4444,#f87171)":meta.color,borderRadius:99,transition:"width .5s ease"}}/>
+              <div style={{position:"absolute",top:-3,bottom:-3,left:`${target}%`,width:2,background:"rgba(255,255,255,0.3)",borderRadius:1}}/>
             </div>
           </div>
         );
       })}
-      {totalInc===0&&<div style={{color:T.subtext,fontSize:12,textAlign:"center",padding:"8px 0"}}>Regista rendimentos para ver a composição.</div>}
+      {totalInc===0&&<div style={{color:T.subtext,fontSize:12,textAlign:"center" as const,padding:"16px 0"}}>Regista rendimentos para ver a composição.</div>}
     </div>
   </div>
 
   {/* ── TOP CATEGORIAS ── */}
+  {byCat.filter(c=>c.total>0).length>0&&(
+    <div style={{marginBottom:14}}>
+      <div style={{fontSize:10,fontWeight:700,color:T.subtext,letterSpacing:"0.1em",textTransform:"uppercase" as const,marginBottom:10}}>Top categorias</div>
+      <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:8}}>
+        {byCat.filter(c=>c.total>0).slice(0,6).map((c,idx)=>{
+          const meta=TYPE_META[c.type];
+          const pctVal=pct(c.total,totalExp);
+          return(
+            <div key={c.id} style={{background:T.cardBg,border:`1px solid ${T.cardBorder}`,borderRadius:14,padding:"12px",position:"relative",overflow:"hidden"}}>
+              <div style={{position:"absolute",top:0,left:0,right:0,height:2,background:`linear-gradient(90deg,${meta?.color||T.accent},transparent)`,opacity:0.6}}/>
+              <div style={{fontSize:22,marginBottom:6}}>{c.icon}</div>
+              <div style={{fontSize:12,fontWeight:700,color:"#f1f5f9",marginBottom:2}}>{c.label}</div>
+              <div style={{fontSize:15,fontWeight:800,color:meta?.color||T.accent}}>{fmt(c.total)}</div>
+              <div style={{fontSize:10,color:T.subtext,marginTop:2}}>{pctVal}% do total</div>
+              {idx===0&&<div style={{position:"absolute",top:8,right:8,fontSize:9,fontWeight:700,color:meta?.color||T.accent,background:`${meta?.color||T.accent}15`,padding:"2px 6px",borderRadius:99}}>TOP</div>}
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  )}
+
+  {/* ── EVOLUÇÃO ── */}
   <div style={{marginBottom:14}}>
-    <div style={{fontSize:11,fontWeight:700,color:T.subtext,letterSpacing:"0.1em",textTransform:"uppercase",marginBottom:10}}>Top categorias</div>
+    <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:10}}>
+      <div style={{fontSize:10,fontWeight:700,color:T.subtext,letterSpacing:"0.1em",textTransform:"uppercase" as const}}>Evolução</div>
+      <span style={{fontSize:11,color:T.subtext}}>{new Date().getFullYear()}</span>
+    </div>
     <div style={S.card}>
-      {byCat.filter(c=>c.total>0).slice(0,6).map(c=>(
-        <div key={c.id} style={{marginBottom:12}}>
-          <div style={{display:"flex",justifyContent:"space-between",marginBottom:5}}>
-            <span style={{fontSize:13,color:"#e2e8f0"}}>{c.icon} {c.label}</span>
-            <span style={{fontSize:13,fontWeight:700,color:"#f1f5f9"}}>{fmt(c.total)}</span>
+      <div style={{display:"flex",gap:6,marginBottom:14}}>
+        <button onClick={()=>setChartView("fluxo")} style={{flex:1,padding:"7px 0",border:`1px solid ${chartView==="fluxo"?T.accent:"rgba(255,255,255,0.1)"}`,borderRadius:8,background:chartView==="fluxo"?`${T.accent}20`:"transparent",color:chartView==="fluxo"?T.accent:"#64748b",fontSize:11,fontWeight:700,cursor:"pointer",fontFamily:"'Sora',sans-serif"}}>
+          📊 Receitas vs Despesas
+        </button>
+        <button onClick={()=>setChartView("networth")} style={{flex:1,padding:"7px 0",border:`1px solid ${chartView==="networth"?T.accent:"rgba(255,255,255,0.1)"}`,borderRadius:8,background:chartView==="networth"?`${T.accent}20`:"transparent",color:chartView==="networth"?T.accent:"#64748b",fontSize:11,fontWeight:700,cursor:"pointer",fontFamily:"'Sora',sans-serif"}}>
+          💎 Net Worth
+        </button>
+      </div>
+      {chartView==="fluxo"&&(
+        <>
+          <div style={{display:"flex",alignItems:"flex-end",gap:4,height:100,marginTop:56,marginBottom:10}}>
+            {MONTHS.map((m,i)=>{
+              const rev=incomes.filter(inc=>inc.world===world&&new Date(inc.data).getMonth()===i&&new Date(inc.data).getFullYear()===new Date().getFullYear()).reduce((s,inc)=>s+Number(inc.valor),0);
+              const exp=expenses.filter(e=>e.world===world&&new Date(e.data).getMonth()===i&&new Date(e.data).getFullYear()===new Date().getFullYear()).reduce((s,e)=>s+Number(e.valor),0);
+              const maxVal=Math.max(...MONTHS.map((_,j)=>{const r=incomes.filter(inc=>inc.world===world&&new Date(inc.data).getMonth()===j&&new Date(inc.data).getFullYear()===new Date().getFullYear()).reduce((s,inc)=>s+Number(inc.valor),0);const ex=expenses.filter(e=>e.world===world&&new Date(e.data).getMonth()===j&&new Date(e.data).getFullYear()===new Date().getFullYear()).reduce((s,e)=>s+Number(e.valor),0);return Math.max(r,ex);}),1);
+              const rH=Math.max(3,Math.round((rev/maxVal)*88))||2;
+              const eH=Math.max(3,Math.round((exp/maxVal)*88))||2;
+              const isCurrent=i===new Date().getMonth();
+              return(
+                <div key={i} style={{flex:1,display:"flex",flexDirection:"column" as const,alignItems:"center",gap:3}}>
+                  <div style={{display:"flex",alignItems:"flex-end",gap:1,height:88,width:"100%"}}>
+                    <div style={{width:"45%",height:rH,minHeight:rH,background:isCurrent?T.positive:`${T.positive}55`,borderRadius:"3px 3px 0 0",transition:"height .4s"}}/>
+                    <div style={{width:"45%",height:eH,minHeight:eH,background:isCurrent?T.negative:`${T.negative}55`,borderRadius:"3px 3px 0 0",transition:"height .4s"}}/>
+                  </div>
+                  <span style={{fontSize:7,color:isCurrent?T.accent:T.subtext,fontWeight:isCurrent?700:400}}>{m}</span>
+                </div>
+              );
+            })}
           </div>
-          <ProgressBar value={c.total} max={maxCat} color={TYPE_META[c.type]?.color||"#6b7280"} height={4}/>
-        </div>
-      ))}
-      {byCat.filter(c=>c.total>0).length===0&&<div style={{color:T.subtext,fontSize:13,textAlign:"center",padding:"16px 0"}}>Sem despesas registadas.</div>}
+          <div style={{display:"flex",gap:16,paddingTop:8,borderTop:`1px solid ${T.cardBorder}`}}>
+            <div style={{display:"flex",alignItems:"center",gap:6,fontSize:11,color:"#94a3b8"}}><div style={{width:10,height:10,borderRadius:2,background:T.positive}}/>Receitas</div>
+            <div style={{display:"flex",alignItems:"center",gap:6,fontSize:11,color:"#94a3b8"}}><div style={{width:10,height:10,borderRadius:2,background:T.negative}}/>Despesas</div>
+            <div style={{marginLeft:"auto",fontSize:11,color:T.subtext}}>mês actual destacado</div>
+          </div>
+        </>
+      )}
+      {chartView==="networth"&&(
+        <>
+          <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:12}}>
+            <div>
+              <div style={{fontSize:10,fontWeight:700,color:T.subtext,textTransform:"uppercase" as const,letterSpacing:"0.08em",marginBottom:2}}>Net Worth actual</div>
+              <div style={{fontSize:18,fontWeight:800,color:totalSaldo>=0?T.positive:T.negative}}>{hv(fmt(totalSaldo))}</div>
+            </div>
+            <div style={{fontSize:11,color:T.subtext}}>{new Date().getFullYear()}</div>
+          </div>
+          {(()=>{
+            const H=80;const W=300;
+            const hasSnaps=nwSnapshots.length>0;
+            if(!hasSnaps) return <div style={{height:H,display:"flex",alignItems:"center",justifyContent:"center",color:T.subtext,fontSize:12}}>Sem dados ainda</div>;
+            const maxVal=Math.max(...nwSnapshots.map(s=>s.valor),1);
+            const minVal=Math.min(...nwSnapshots.map(s=>s.valor),0);
+            const range=maxVal-minVal||1;
+            const currentMonth=new Date().getMonth();
+            const points=MONTHS.map((_,i)=>{
+              const snap=nwSnapshots.find(s=>s.mes===i);
+              const x=Math.round((i/11)*W);
+              const y=snap?Math.round(H-((snap.valor-minVal)/range)*(H-8)):null;
+              return{x,y,snap,i};
+            }).filter(p=>p.y!==null) as {x:number;y:number;snap:any;i:number}[];
+            if(points.length===0) return null;
+            if(points.length===1) return(
+              <div style={{height:H,display:"flex",flexDirection:"column" as const,alignItems:"center",justifyContent:"center",gap:8}}>
+                <div style={{width:12,height:12,borderRadius:"50%",background:T.accent,boxShadow:`0 0 12px ${T.accent}`}}/>
+                <div style={{fontSize:11,color:T.subtext}}>A linha cresce com os meses</div>
+              </div>
+            );
+            const pathD=points.map((p,idx)=>`${idx===0?"M":"L"}${p.x},${p.y}`).join(" ");
+            const areaD=`${pathD} L${points[points.length-1].x},${H} L${points[0].x},${H} Z`;
+            return(
+              <div style={{marginBottom:8}}>
+                <svg viewBox={`0 0 ${W} ${H}`} style={{width:"100%",height:H,overflow:"visible"}}>
+                  <defs>
+                    <linearGradient id="nwGrad" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="0%" stopColor={T.accent} stopOpacity="0.25"/>
+                      <stop offset="100%" stopColor={T.accent} stopOpacity="0"/>
+                    </linearGradient>
+                  </defs>
+                  <path d={areaD} fill="url(#nwGrad)"/>
+                  <path d={pathD} fill="none" stroke={T.accent} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                  {points.map((p,idx)=>{
+                    const isCurrent=p.i===currentMonth;
+                    return(
+                      <g key={idx}>
+                        {isCurrent&&<circle cx={p.x} cy={p.y} r={8} fill={T.accent} fillOpacity="0.15"/>}
+                        <circle cx={p.x} cy={p.y} r={isCurrent?4:2.5} fill={isCurrent?T.accent:T.cardBg} stroke={T.accent} strokeWidth="1.5"/>
+                      </g>
+                    );
+                  })}
+                </svg>
+                <div style={{display:"flex",justifyContent:"space-between",marginTop:4}}>
+                  {MONTHS.map((m,i)=>{
+                    const isCurrent=i===currentMonth;
+                    return <span key={i} style={{fontSize:7,color:isCurrent?T.accent:T.subtext,fontWeight:isCurrent?700:400,flex:1,textAlign:"center" as const}}>{m}</span>;
+                  })}
+                </div>
+              </div>
+            );
+          })()}
+          <div style={{paddingTop:8,borderTop:`1px solid ${T.cardBorder}`,fontSize:11,color:T.subtext,textAlign:"center" as const}}>
+            Evolução do Net Worth em {new Date().getFullYear()}
+          </div>
+        </>
+      )}
     </div>
   </div>
-
-  {/* ── EVOLUÇÃO + NET WORTH ── */}
-<div style={{marginBottom:14}}>
-  <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:10}}>
-    <div style={{fontSize:11,fontWeight:700,color:T.subtext,letterSpacing:"0.1em",textTransform:"uppercase"}}>Evolução</div>
-    <span style={{fontSize:11,color:T.subtext}}>{new Date().getFullYear()}</span>
-  </div>
-        <div style={S.card}>
-        <div style={{display:"flex",gap:6,marginBottom:14}}>
-          <button onClick={()=>setChartView("fluxo")} style={{flex:1,padding:"7px 0",border:`1px solid ${chartView==="fluxo"?T.accent:"rgba(255,255,255,0.1)"}`,borderRadius:8,background:chartView==="fluxo"?`${T.accent}20`:"transparent",color:chartView==="fluxo"?T.accent:"#64748b",fontSize:11,fontWeight:700,cursor:"pointer",fontFamily:"'Sora',sans-serif"}}>
-            📊 Receitas vs Despesas
-          </button>
-          <button onClick={()=>setChartView("networth")} style={{flex:1,padding:"7px 0",border:`1px solid ${chartView==="networth"?T.accent:"rgba(255,255,255,0.1)"}`,borderRadius:8,background:chartView==="networth"?`${T.accent}20`:"transparent",color:chartView==="networth"?T.accent:"#64748b",fontSize:11,fontWeight:700,cursor:"pointer",fontFamily:"'Sora',sans-serif"}}>
-            💎 Net Worth
-          </button>
-        </div>
-        {chartView==="fluxo"&&(
-          <>
-            <div style={{display:"flex",alignItems:"flex-end",gap:4,height:100,marginTop:56,marginBottom:10}}>
-              {MONTHS.map((m,i)=>{
-                const rev=incomes.filter(inc=>inc.world===world&&new Date(inc.data).getMonth()===i&&new Date(inc.data).getFullYear()===new Date().getFullYear()).reduce((s,inc)=>s+Number(inc.valor),0);
-                const exp=expenses.filter(e=>e.world===world&&new Date(e.data).getMonth()===i&&new Date(e.data).getFullYear()===new Date().getFullYear()).reduce((s,e)=>s+Number(e.valor),0);
-                const maxVal=Math.max(...MONTHS.map((_,j)=>{const r=monthlyRev[world]?.[String(new Date().getFullYear())]?.[j]||0;const ex=expenses.filter(e=>e.world===world&&new Date(e.data).getMonth()===j&&new Date(e.data).getFullYear()===new Date().getFullYear()).reduce((s,e)=>s+Number(e.valor),0);return Math.max(r,ex);}),1);
-                const rH=Math.max(3,Math.round((rev/maxVal)*88))||2;
-                const eH=Math.max(3,Math.round((exp/maxVal)*88))||2;
-                const isCurrent=i===new Date().getMonth();
-                return(
-                  <div key={i} style={{flex:1,display:"flex",flexDirection:"column",alignItems:"center",gap:3}}>
-                    <div style={{display:"flex",alignItems:"flex-end",gap:1,height:88,width:"100%"}}>
-                      <div style={{width:"45%",height:rH,minHeight:rH,background:isCurrent?T.positive:`${T.positive}55`,borderRadius:"3px 3px 0 0",transition:"height .4s"}}/>
-                      <div style={{width:"45%",height:eH,minHeight:eH,background:isCurrent?T.negative:`${T.negative}55`,borderRadius:"3px 3px 0 0",transition:"height .4s"}}/>
-                    </div>
-                    <span style={{fontSize:7,color:isCurrent?T.accent:T.subtext,fontWeight:isCurrent?700:400}}>{m}</span>
-                  </div>
-                );
-              })}
-            </div>
-            <div style={{display:"flex",gap:16,paddingTop:8,borderTop:`1px solid ${T.cardBorder}`}}>
-              <div style={{display:"flex",alignItems:"center",gap:6,fontSize:11,color:"#94a3b8"}}><div style={{width:10,height:10,borderRadius:2,background:T.positive}}/>Receitas</div>
-              <div style={{display:"flex",alignItems:"center",gap:6,fontSize:11,color:"#94a3b8"}}><div style={{width:10,height:10,borderRadius:2,background:T.negative}}/>Despesas</div>
-              <div style={{marginLeft:"auto",fontSize:11,color:T.subtext}}>mês actual destacado</div>
-            </div>
-          </>
-        )}
-      {chartView==="networth"&&(
-          <>
-            <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:12}}>
-              <div>
-                <div style={{fontSize:10,fontWeight:700,color:T.subtext,textTransform:"uppercase" as const,letterSpacing:"0.08em",marginBottom:2}}>Net Worth actual</div>
-                <div style={{fontSize:18,fontWeight:800,color:totalSaldo>=0?T.positive:T.negative}}>{hv(fmt(totalSaldo))}</div>
-              </div>
-              <div style={{fontSize:11,color:T.subtext}}>{new Date().getFullYear()}</div>
-            </div>
-            {(()=>{
-              const H=80;
-              const W=300;
-              const hasSnaps=nwSnapshots.length>0;
-              if(!hasSnaps) return <div style={{height:H,display:"flex",alignItems:"center",justifyContent:"center",color:T.subtext,fontSize:12}}>Sem dados ainda</div>;
-              const maxVal=Math.max(...nwSnapshots.map(s=>s.valor),1);
-              const minVal=Math.min(...nwSnapshots.map(s=>s.valor),0);
-              const range=maxVal-minVal||1;
-              const currentMonth=new Date().getMonth();
-              const points=MONTHS.map((_,i)=>{
-                const snap=nwSnapshots.find(s=>s.mes===i);
-                const x=Math.round((i/11)*W);
-                const y=snap?Math.round(H-((snap.valor-minVal)/range)*(H-8)):null;
-                return{x,y,snap,i};
-              }).filter(p=>p.y!==null) as {x:number;y:number;snap:any;i:number}[];
-              if(points.length===0) return null;
-              if(points.length===1) return(
-                <div style={{height:H,display:"flex",flexDirection:"column" as const,alignItems:"center",justifyContent:"center",gap:8}}>
-                  <div style={{width:12,height:12,borderRadius:"50%",background:T.accent,boxShadow:`0 0 12px ${T.accent}`}}/>
-                  <div style={{fontSize:11,color:T.subtext}}>Dados de maio registados — a linha cresce com os meses</div>
-                </div>
-              );
-              const pathD=points.map((p,idx)=>`${idx===0?"M":"L"}${p.x},${p.y}`).join(" ");
-              const areaD=`${pathD} L${points[points.length-1].x},${H} L${points[0].x},${H} Z`;
-              return(
-                <div style={{marginBottom:8}}>
-                  <svg viewBox={`0 0 ${W} ${H}`} style={{width:"100%",height:H,overflow:"visible"}}>
-                    <defs>
-                      <linearGradient id="nwGrad" x1="0" y1="0" x2="0" y2="1">
-                        <stop offset="0%" stopColor={T.accent} stopOpacity="0.25"/>
-                        <stop offset="100%" stopColor={T.accent} stopOpacity="0"/>
-                      </linearGradient>
-                    </defs>
-                    <path d={areaD} fill="url(#nwGrad)"/>
-                    <path d={pathD} fill="none" stroke={T.accent} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                    {points.map((p,idx)=>{
-                      const isCurrent=p.i===currentMonth;
-                      return(
-                        <g key={idx}>
-                          {isCurrent&&<circle cx={p.x} cy={p.y} r={8} fill={T.accent} fillOpacity="0.15"/>}
-                          <circle cx={p.x} cy={p.y} r={isCurrent?4:2.5} fill={isCurrent?T.accent:T.cardBg} stroke={T.accent} strokeWidth="1.5"/>
-                        </g>
-                      );
-                    })}
-                  </svg>
-                  <div style={{display:"flex",justifyContent:"space-between",marginTop:4}}>
-                    {MONTHS.map((m,i)=>{
-                      const isCurrent=i===currentMonth;
-                      return <span key={i} style={{fontSize:7,color:isCurrent?T.accent:T.subtext,fontWeight:isCurrent?700:400,flex:1,textAlign:"center"}}>{m}</span>;
-                    })}
-                  </div>
-                </div>
-              );
-            })()}
-            <div style={{paddingTop:8,borderTop:`1px solid ${T.cardBorder}`,fontSize:11,color:T.subtext,textAlign:"center" as const}}>
-              Evolução do Net Worth em {new Date().getFullYear()}
-            </div>
-          </>
-        )}
-      </div>
-</div>
-
-
-  
 </>}
+
 
        {tab==="despesas"&&<>
   {successMsg&&(
