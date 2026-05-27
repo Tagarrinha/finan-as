@@ -881,3 +881,6 @@ const jointBalance = totalContributions - totalSettledExpenses;
     </div>
   )}
 </>}
+    </div>
+  );
+}
