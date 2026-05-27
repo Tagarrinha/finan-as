@@ -1096,7 +1096,14 @@ async function handleCoupleSettlement(valor: number) {
                 </svg>
                 <div style={{fontSize:11,fontWeight:700,color:"#e2e8f0",textAlign:"center" as const}}>{meta.label}</div>
                 <div style={{fontSize:12,fontWeight:800,color,textAlign:"center" as const}}>{fmt(actual)}</div>
-                <div style={{fontSize:9,color:T.subtext,textAlign:"center" as const}}>/{target}%{over?" ⚠️":""}</div>
+                <div style={{fontSize:9,color:T.subtext,textAlign:"center" as const}}>
+  {over?(
+    type==="investimento"
+      ?(byType["necessidade"]||0)<=totalInc*(budgetTargets["necessidade"]/100)&&(byType["desejo"]||0)<=totalInc*(budgetTargets["desejo"]/100)
+        ?"🚀":"⚠️"
+      :"⚠️"
+  ):""} /{target}%
+</div>
               </div>
             );
           })}
