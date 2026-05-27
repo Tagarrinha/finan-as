@@ -983,49 +983,54 @@ async function handleCoupleSettlement(valor: number) {
     else if(overBudgetCount>0){msg=`${overBudgetCount} categoria${overBudgetCount>1?"s":""} acima do orçamento`;emoji="⚠️";}
     else{msg="Mantém o ritmo este mês";emoji="👍";}
     return(
-      <div style={{position:"relative",borderRadius:24,overflow:"hidden",marginBottom:16,padding:"28px 20px 24px"}}>
-        {/* Fundo dinâmico */}
-        <div style={{position:"absolute",inset:0,background:`linear-gradient(135deg,${heroColor}18 0%,${heroColor}08 50%,transparent 100%)`,borderRadius:24}}/>
-        <div style={{position:"absolute",inset:0,border:`1px solid ${heroColor}30`,borderRadius:24}}/>
-        <div style={{position:"absolute",top:-60,right:-60,width:200,height:200,borderRadius:"50%",background:`radial-gradient(circle,${heroColor}20 0%,transparent 70%)`,pointerEvents:"none"}}/>
+      <div style={{position:"relative",borderRadius:20,overflow:"hidden",marginBottom:14,padding:"20px 18px"}}>
+        <div style={{position:"absolute",inset:0,background:`linear-gradient(135deg,${heroColor}15 0%,${heroColor}06 50%,transparent 100%)`,borderRadius:20}}/>
+        <div style={{position:"absolute",inset:0,border:`1px solid ${heroColor}25`,borderRadius:20}}/>
+        <div style={{position:"absolute",top:-50,right:-50,width:160,height:160,borderRadius:"50%",background:`radial-gradient(circle,${heroColor}18 0%,transparent 70%)`,pointerEvents:"none"}}/>
         <div style={{position:"relative",zIndex:1}}>
-          {/* Data */}
-          <div style={{fontSize:10,fontWeight:700,color:T.subtext,letterSpacing:"0.15em",textTransform:"uppercase" as const,marginBottom:16}}>
-            {now.toLocaleString("pt-PT",{month:"long"}).toUpperCase()} · {now.getFullYear()}
+          {/* Data + Net Worth */}
+          <div style={{display:"flex",justifyContent:"space-between",alignItems:"flex-start",marginBottom:12}}>
+            <div style={{fontSize:10,fontWeight:700,color:T.subtext,letterSpacing:"0.15em",textTransform:"uppercase" as const}}>
+              {now.toLocaleString("pt-PT",{month:"long"}).toUpperCase()} · {now.getFullYear()}
+            </div>
+            {totalSaldo>0&&(
+              <div style={{textAlign:"right" as const}}>
+                <div style={{fontSize:9,color:T.subtext,letterSpacing:"0.08em",textTransform:"uppercase" as const}}>Net Worth</div>
+                <div style={{fontSize:12,fontWeight:800,color:T.accent}}>{hv(fmt(totalSaldo))}</div>
+              </div>
+            )}
           </div>
-          {/* Número principal */}
-          <div style={{fontSize:52,fontWeight:800,color:heroColor,letterSpacing:"-2px",lineHeight:1,marginBottom:8,textShadow:`0 0 40px ${heroColor}40`}}>
+          {/* Número principal — mais compacto */}
+          <div style={{fontSize:40,fontWeight:800,color:heroColor,letterSpacing:"-1.5px",lineHeight:1,marginBottom:6,textShadow:`0 0 30px ${heroColor}35`}}>
             {balance>=0?"+":""}{hv(fmt(balance))}
           </div>
           {/* Mensagem contextual */}
-          <div style={{fontSize:13,color:T.subtext,marginBottom:16}}>{emoji} {msg}</div>
-          {/* Linha receitas/despesas */}
-          <div style={{display:"flex",gap:16,alignItems:"center",marginBottom:diff!==null?12:0}}>
-            <div style={{display:"flex",alignItems:"center",gap:6}}>
-              <div style={{width:8,height:8,borderRadius:"50%",background:T.positive}}/>
-              <span style={{fontSize:12,color:T.subtext}}>Receitas</span>
-              <span style={{fontSize:13,fontWeight:700,color:"#f1f5f9"}}>{hv(fmt(totalInc))}</span>
+          <div style={{fontSize:12,color:T.subtext,marginBottom:12}}>{emoji} {msg}</div>
+          {/* Receitas / Despesas inline */}
+          <div style={{display:"flex",gap:12,alignItems:"center",marginBottom:diff!==null?10:0}}>
+            <div style={{display:"flex",alignItems:"center",gap:5}}>
+              <div style={{width:6,height:6,borderRadius:"50%",background:T.positive}}/>
+              <span style={{fontSize:11,color:T.subtext}}>Receitas</span>
+              <span style={{fontSize:12,fontWeight:700,color:"#f1f5f9"}}>{hv(fmt(totalInc))}</span>
             </div>
-            <div style={{width:1,height:16,background:"rgba(255,255,255,0.1)"}}/>
-            <div style={{display:"flex",alignItems:"center",gap:6}}>
-              <div style={{width:8,height:8,borderRadius:"50%",background:T.negative}}/>
-              <span style={{fontSize:12,color:T.subtext}}>Despesas</span>
-              <span style={{fontSize:13,fontWeight:700,color:"#f1f5f9"}}>{hv(fmt(totalExp))}</span>
+            <div style={{width:1,height:12,background:"rgba(255,255,255,0.1)"}}/>
+            <div style={{display:"flex",alignItems:"center",gap:5}}>
+              <div style={{width:6,height:6,borderRadius:"50%",background:T.negative}}/>
+              <span style={{fontSize:11,color:T.subtext}}>Despesas</span>
+              <span style={{fontSize:12,fontWeight:700,color:"#f1f5f9"}}>{hv(fmt(totalExp))}</span>
             </div>
           </div>
-          {/* vs mês anterior */}
           {diff!==null&&(
-            <div style={{display:"inline-flex",alignItems:"center",gap:5,background:diff>=0?"rgba(52,211,153,0.1)":"rgba(251,113,133,0.1)",border:`1px solid ${diff>=0?"rgba(52,211,153,0.25)":"rgba(251,113,133,0.25)"}`,borderRadius:99,padding:"4px 12px",fontSize:11,fontWeight:700,color:diff>=0?T.positive:T.negative}}>
+            <div style={{display:"inline-flex",alignItems:"center",gap:5,background:diff>=0?"rgba(52,211,153,0.1)":"rgba(251,113,133,0.1)",border:`1px solid ${diff>=0?"rgba(52,211,153,0.2)":"rgba(251,113,133,0.2)"}`,borderRadius:99,padding:"3px 10px",fontSize:10,fontWeight:700,color:diff>=0?T.positive:T.negative,marginBottom:totalInc>0&&balance>=0?10:0}}>
               {diff>=0?"↗":"↘"} {diff>=0?"+":""}{diff}% vs mês anterior
             </div>
           )}
-          {/* Savings rate se positivo */}
           {totalInc>0&&balance>=0&&(
-            <div style={{marginTop:16,display:"flex",alignItems:"center",gap:8}}>
-              <div style={{flex:1,height:4,borderRadius:99,background:"rgba(255,255,255,0.07)",overflow:"hidden"}}>
+            <div style={{display:"flex",alignItems:"center",gap:8}}>
+              <div style={{flex:1,height:3,borderRadius:99,background:"rgba(255,255,255,0.07)",overflow:"hidden"}}>
                 <div style={{width:`${Math.min(100,savingsRate)}%`,height:"100%",background:`linear-gradient(90deg,${heroColor},${heroColor}88)`,borderRadius:99,transition:"width .6s ease"}}/>
               </div>
-              <span style={{fontSize:11,fontWeight:700,color:heroColor,whiteSpace:"nowrap" as const}}>{savingsRate}% poupado</span>
+              <span style={{fontSize:10,fontWeight:700,color:heroColor,whiteSpace:"nowrap" as const}}>{savingsRate}% poupado</span>
             </div>
           )}
         </div>
@@ -1035,13 +1040,12 @@ async function handleCoupleSettlement(valor: number) {
 
   {/* ── ALERTAS ── */}
   {dueRecurring>0&&(
-    <div onClick={()=>setTab("recorrentes")} style={{background:"rgba(245,158,11,0.08)",border:"1px solid rgba(245,158,11,0.25)",borderRadius:14,padding:"12px 14px",marginBottom:10,cursor:"pointer",display:"flex",alignItems:"center",gap:10}}>
-      <span style={{fontSize:18}}>🔔</span>
+    <div onClick={()=>setTab("recorrentes")} style={{background:"rgba(245,158,11,0.07)",border:"1px solid rgba(245,158,11,0.2)",borderRadius:12,padding:"10px 14px",marginBottom:8,cursor:"pointer",display:"flex",alignItems:"center",gap:10}}>
+      <span style={{fontSize:16}}>🔔</span>
       <div style={{flex:1}}>
-        <div style={{fontSize:13,fontWeight:700,color:"#f59e0b"}}>{dueRecurring} recorrente{dueRecurring>1?"s":""} a vencer</div>
-        <div style={{fontSize:11,color:T.subtext,marginTop:1}}>Toca para registar</div>
+        <div style={{fontSize:12,fontWeight:700,color:"#f59e0b"}}>{dueRecurring} recorrente{dueRecurring>1?"s":""} a vencer</div>
       </div>
-      <span style={{color:"#f59e0b",fontSize:12}}>→</span>
+      <span style={{color:"#f59e0b",fontSize:11}}>→</span>
     </div>
   )}
   {(()=>{
@@ -1049,41 +1053,50 @@ async function handleCoupleSettlement(valor: number) {
     if(!overItems.length) return null;
     const [,meta]=overItems[0];
     return(
-      <div style={{background:"rgba(239,68,68,0.07)",border:"1px solid rgba(239,68,68,0.2)",borderRadius:14,padding:"12px 14px",marginBottom:10,display:"flex",alignItems:"center",gap:10}}>
-        <span style={{fontSize:18}}>⚠️</span>
-        <div style={{flex:1,fontSize:13,fontWeight:600,color:"#f87171"}}>{meta.label} acima do orçamento</div>
+      <div style={{background:"rgba(239,68,68,0.07)",border:"1px solid rgba(239,68,68,0.15)",borderRadius:12,padding:"10px 14px",marginBottom:8,display:"flex",alignItems:"center",gap:10}}>
+        <span style={{fontSize:16}}>⚠️</span>
+        <div style={{flex:1,fontSize:12,fontWeight:600,color:"#f87171"}}>{meta.label} acima do orçamento</div>
       </div>
     );
   })()}
 
-  {/* ── COMPOSIÇÃO ── */}
-  <div style={{marginBottom:14}}>
-    <div style={{fontSize:10,fontWeight:700,color:T.subtext,letterSpacing:"0.1em",textTransform:"uppercase" as const,marginBottom:10}}>Composição</div>
-    <div style={{display:"flex",flexDirection:"column" as const,gap:8}}>
-      {(Object.entries(TYPE_META) as [TypeKey,typeof TYPE_META[TypeKey]][]).map(([type,meta])=>{
-        const actual=byType[type]||0,target=budgetTargets[type],targetAmt=totalInc*(target/100),actualPct=pct(actual,totalInc),over=actual>targetAmt&&totalInc>0;
-        return(
-          <div key={type} style={{background:T.cardBg,border:`1px solid ${over?"rgba(239,68,68,0.3)":T.cardBorder}`,borderRadius:14,padding:"12px 14px"}}>
-            <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:8}}>
-              <div style={{display:"flex",alignItems:"center",gap:8}}>
-                <div style={{width:28,height:28,borderRadius:8,background:`${meta.color}18`,border:`1px solid ${meta.color}30`,display:"flex",alignItems:"center",justifyContent:"center",fontSize:14}}>{meta.icon}</div>
-                <span style={{fontSize:13,fontWeight:600,color:over?"#f87171":"#f1f5f9"}}>{meta.label}</span>
+  {/* ── COMPOSIÇÃO — barra horizontal segmentada ── */}
+  {totalInc>0&&(
+    <div style={{marginBottom:14}}>
+      <div style={{fontSize:10,fontWeight:700,color:T.subtext,letterSpacing:"0.1em",textTransform:"uppercase" as const,marginBottom:10}}>Composição</div>
+      <div style={{background:T.cardBg,border:`1px solid ${T.cardBorder}`,borderRadius:14,padding:"14px"}}>
+        {/* Barra segmentada */}
+        <div style={{display:"flex",height:10,borderRadius:99,overflow:"hidden",marginBottom:12,gap:2}}>
+          {(Object.entries(TYPE_META) as [TypeKey,typeof TYPE_META[TypeKey]][]).map(([type,meta])=>{
+            const actual=byType[type]||0;
+            const w=pct(actual,totalExp);
+            if(!w) return null;
+            return <div key={type} style={{width:`${w}%`,background:meta.color,transition:"width .5s ease",minWidth:4}}/>;
+          })}
+          {totalExp===0&&<div style={{width:"100%",background:"rgba(255,255,255,0.07)",borderRadius:99}}/>}
+        </div>
+        {/* Legenda compacta */}
+        <div style={{display:"flex",flexDirection:"column" as const,gap:8}}>
+          {(Object.entries(TYPE_META) as [TypeKey,typeof TYPE_META[TypeKey]][]).map(([type,meta])=>{
+            const actual=byType[type]||0;
+            const target=budgetTargets[type];
+            const targetAmt=totalInc*(target/100);
+            const actualPct=pct(actual,totalInc);
+            const over=actual>targetAmt&&totalInc>0;
+            return(
+              <div key={type} style={{display:"flex",alignItems:"center",gap:8}}>
+                <div style={{width:8,height:8,borderRadius:2,background:over?"#ef4444":meta.color,flexShrink:0}}/>
+                <span style={{fontSize:12,color:"#e2e8f0",flex:1}}>{meta.label}</span>
+                <span style={{fontSize:12,fontWeight:700,color:over?"#f87171":meta.color}}>{fmt(actual)}</span>
+                <span style={{fontSize:10,color:over?"#f87171":T.subtext,minWidth:60,textAlign:"right" as const}}>{actualPct}% / {target}%{over?" ⚠️":""}</span>
               </div>
-              <div style={{textAlign:"right" as const}}>
-                <div style={{fontSize:14,fontWeight:800,color:over?"#f87171":meta.color}}>{fmt(actual)}</div>
-                <div style={{fontSize:10,color:T.subtext}}>{actualPct}% / {target}%</div>
-              </div>
-            </div>
-            <div style={{position:"relative",height:5,borderRadius:99,background:"rgba(255,255,255,0.07)"}}>
-              <div style={{position:"absolute",left:0,top:0,bottom:0,width:`${Math.min(100,actualPct)}%`,background:over?"linear-gradient(90deg,#ef4444,#f87171)":meta.color,borderRadius:99,transition:"width .5s ease"}}/>
-              <div style={{position:"absolute",top:-3,bottom:-3,left:`${target}%`,width:2,background:"rgba(255,255,255,0.3)",borderRadius:1}}/>
-            </div>
-          </div>
-        );
-      })}
-      {totalInc===0&&<div style={{color:T.subtext,fontSize:12,textAlign:"center" as const,padding:"16px 0"}}>Regista rendimentos para ver a composição.</div>}
+            );
+          })}
+        </div>
+      </div>
     </div>
-  </div>
+  )}
+
 
   {/* ── TOP CATEGORIAS ── */}
   {byCat.filter(c=>c.total>0).length>0&&(
