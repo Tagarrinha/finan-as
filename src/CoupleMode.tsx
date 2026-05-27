@@ -700,39 +700,40 @@ const jointBalance = totalContributions - totalSettledExpenses;
         
       </>}
 
-      {/* ── DESPESAS ── */}
+     {/* ── DESPESAS ── */}
       {tab==="despesas"&&<>
   {successMsg&&(
-    <div style={{background:"rgba(52,211,153,0.12)",border:"1px solid rgba(52,211,153,0.3)",borderRadius:12,padding:"12px 16px",marginBottom:14,display:"flex",alignItems:"center",gap:10}}>
-      <span style={{fontSize:18}}>✅</span>
+    <div style={{background:"rgba(52,211,153,0.12)",border:"1px solid rgba(52,211,153,0.3)",borderRadius:12,padding:"12px 16px",marginBottom:12,display:"flex",alignItems:"center",gap:10}}>
+      <span style={{fontSize:16}}>✅</span>
       <span style={{fontSize:13,fontWeight:700,color:"#34d399"}}>{successMsg}</span>
     </div>
   )}
-  {/* ── Resumo do acerto (quando há pendentes) ── */}
+
+  {/* ── Resumo acerto compacto ── */}
   {porLiquidar.length>0&&(()=>{
-    const totalOwedByPartner = porLiquidar.filter(e=>e.pago_por===userId).reduce((s,e)=>s+(isUser1?e.split_user2:e.split_user1),0);
-    const totalOwedByMe = porLiquidar.filter(e=>e.pago_por!==userId).reduce((s,e)=>s+(isUser1?e.split_user1:e.split_user2),0);
-    const net = totalOwedByPartner - totalOwedByMe;
+    const totalOwedByPartner=porLiquidar.filter(e=>e.pago_por===userId).reduce((s,e)=>s+(isUser1?e.split_user2:e.split_user1),0);
+    const totalOwedByMe=porLiquidar.filter(e=>e.pago_por!==userId).reduce((s,e)=>s+(isUser1?e.split_user1:e.split_user2),0);
+    const net=totalOwedByPartner-totalOwedByMe;
     return(
-      <div style={{background:"rgba(255,255,255,0.04)",border:"1px solid rgba(255,255,255,0.08)",borderRadius:14,padding:"16px",marginBottom:14,textAlign:"center" as const}}>
-        <div style={{fontSize:10,fontWeight:700,color:subtext,textTransform:"uppercase" as const,letterSpacing:"0.08em",marginBottom:8}}>Resumo do acerto</div>
-        {net>0?(
-          <><div style={{fontSize:12,color:PARTNER_COLOR,marginBottom:4}}>{partnerName} deve-te no total</div>
-          <div style={{fontSize:26,fontWeight:800,color:PARTNER_COLOR,marginBottom:14}}>{fmt(net)}</div></>
-        ):net<0?(
-          <><div style={{fontSize:12,color:MY_COLOR,marginBottom:4}}>Deves a {partnerName} no total</div>
-          <div style={{fontSize:26,fontWeight:800,color:MY_COLOR,marginBottom:14}}>{fmt(Math.abs(net))}</div></>
-        ):(
-          <div style={{fontSize:14,fontWeight:700,color:"#34d399",marginBottom:14}}>✓ Estão empatados!</div>
-        )}
-        <button
-          onClick={async()=>{
-            if(!window.confirm(`Marcar todas as ${porLiquidar.length} despesas como liquidadas?`)) return;
-            for(const e of porLiquidar){ await marcarLiquidado(e); }
-          }}
-          style={{width:"100%",padding:"13px 0",background:"linear-gradient(135deg,#34d399,#059669)",border:"none",borderRadius:12,color:"#fff",fontSize:14,fontWeight:800,cursor:"pointer",fontFamily:"'Sora',sans-serif",boxShadow:"0 4px 20px rgba(52,211,153,0.3)"}}>
-          ✓ Liquidar tudo de uma vez ({porLiquidar.length} despesa{porLiquidar.length>1?"s":""})
-        </button>
+      <div style={{background:"rgba(255,255,255,0.03)",border:"1px solid rgba(255,255,255,0.07)",borderRadius:14,padding:"14px 16px",marginBottom:12}}>
+        <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:12}}>
+          <div>
+            <div style={{fontSize:10,fontWeight:700,color:subtext,textTransform:"uppercase" as const,letterSpacing:"0.08em",marginBottom:4}}>Acerto pendente</div>
+            {net>0?<div style={{fontSize:13,color:PARTNER_COLOR}}><span style={{fontWeight:800,fontSize:18}}>{fmt(net)}</span> a receber de {partnerName}</div>
+            :net<0?<div style={{fontSize:13,color:MY_COLOR}}><span style={{fontWeight:800,fontSize:18}}>{fmt(Math.abs(net))}</span> a pagar a {partnerName}</div>
+            :<div style={{fontSize:13,fontWeight:700,color:"#34d399"}}>✓ Empatados</div>}
+          </div>
+          <button
+            onClick={async()=>{
+              if(!window.confirm(`Liquidar todas as ${porLiquidar.length} despesas?`)) return;
+              for(const e of porLiquidar){ await marcarLiquidado(e); }
+            }}
+            style={{padding:"9px 16px",background:"linear-gradient(135deg,#34d399,#059669)",border:"none",borderRadius:10,color:"#fff",fontSize:12,fontWeight:700,cursor:"pointer",fontFamily:"'Sora',sans-serif",whiteSpace:"nowrap" as const}}>
+            ✓ Liquidar tudo
+          </button>
+        </div>
+        <div style={{height:1,background:"rgba(255,255,255,0.06)",marginBottom:4}}/>
+        <div style={{fontSize:10,color:subtext}}>{porLiquidar.length} despesa{porLiquidar.length>1?"s":""} pendente{porLiquidar.length>1?"s":""}</div>
       </div>
     );
   })()}
@@ -741,13 +742,13 @@ const jointBalance = totalContributions - totalSettledExpenses;
   <button onClick={()=>{
     if(showForm){setShowForm(false);setEditingExpenseId(null);setForm(f=>({...f,descricao:"",valor:"",subcat:""}));}
     else setShowForm(true);
-  }} style={{width:"100%",marginBottom:14,padding:"11px 0",background:showForm?`${accent}18`:`linear-gradient(135deg,${accent},${accentDark})`,border:showForm?`1px solid ${accent}40`:"none",borderRadius:10,color:showForm?accent:"#fff",fontWeight:700,fontSize:13,cursor:"pointer",fontFamily:"'Sora',sans-serif"}}>
+  }} style={{width:"100%",marginBottom:12,padding:"11px 0",background:showForm?`${accent}18`:`linear-gradient(135deg,${accent},${accentDark})`,border:showForm?`1px solid ${accent}40`:"none",borderRadius:10,color:showForm?accent:"#fff",fontWeight:700,fontSize:13,cursor:"pointer",fontFamily:"'Sora',sans-serif"}}>
     {showForm?(editingExpenseId?"✕ Cancelar edição":"✕ Cancelar"):"+ Adicionar despesa conjunta"}
   </button>
 
   {/* ── Formulário ── */}
   {showForm&&(
-    <div style={{background:cardBg,border:`1px solid ${accent}30`,borderRadius:14,padding:"16px",marginBottom:14}}>
+    <div style={{background:cardBg,border:`1px solid ${accent}30`,borderRadius:14,padding:"16px",marginBottom:12}}>
       <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:8,marginBottom:10}}>
         <div><div style={{fontSize:10,color:subtext,marginBottom:5}}>Descrição</div><input style={inp} placeholder="Ex: Prestação banco" value={form.descricao} onChange={e=>setForm(f=>({...f,descricao:e.target.value}))}/></div>
         <div><div style={{fontSize:10,color:subtext,marginBottom:5}}>Valor total (€)</div><input style={inp} type="number" placeholder="0,00" value={form.valor} onChange={e=>setForm(f=>({...f,valor:e.target.value}))}/></div>
@@ -777,175 +778,106 @@ const jointBalance = totalContributions - totalSettledExpenses;
           </div>
         )}
       </div>
-      <div style={{marginBottom:12}}>
-        <div style={{fontSize:10,color:subtext,marginBottom:5}}>Tipo</div>
+      <div style={{marginBottom:10}}>
+        <div style={{fontSize:10,color:subtext,marginBottom:6}}>Tipo</div>
         <div style={{display:"grid",gridTemplateColumns:"1fr 1fr 1fr",gap:6}}>
           {(Object.entries(TYPE_META) as [TypeKey,typeof TYPE_META[TypeKey]][]).map(([t,m])=>(
             <button key={t} onClick={()=>setForm(f=>({...f,tipo:t}))} style={{padding:"8px 4px",border:`1.5px solid ${form.tipo===t?m.color:"rgba(255,255,255,0.08)"}`,borderRadius:9,background:form.tipo===t?m.bg:"transparent",color:form.tipo===t?m.color:"#4b5563",fontWeight:700,fontSize:11,cursor:"pointer",fontFamily:"'Sora',sans-serif",textAlign:"center" as const}}>{m.label}</button>
           ))}
         </div>
       </div>
-      {!form.liquidado&&<div style={{marginBottom:12}}>
-        <div style={{fontSize:10,color:subtext,marginBottom:8}}>Quem pagou?</div>
-        <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:8}}>
-          <button onClick={()=>setForm(f=>({...f,pagoPor:"me"}))} style={{padding:"10px 8px",border:`1.5px solid ${form.pagoPor==="me"?MY_COLOR:"rgba(255,255,255,0.08)"}`,borderRadius:12,background:form.pagoPor==="me"?`${MY_COLOR}18`:"rgba(255,255,255,0.04)",color:form.pagoPor==="me"?MY_COLOR:"#64748b",fontWeight:700,fontSize:12,cursor:"pointer",fontFamily:"'Sora',sans-serif",textAlign:"center" as const}}>
-            <div style={{fontSize:18,marginBottom:4}}>👤</div><div>{userName}</div>
-          </button>
-          <button onClick={()=>setForm(f=>({...f,pagoPor:"partner"}))} style={{padding:"10px 8px",border:`1.5px solid ${form.pagoPor==="partner"?PARTNER_COLOR:"rgba(255,255,255,0.08)"}`,borderRadius:12,background:form.pagoPor==="partner"?`${PARTNER_COLOR}18`:"rgba(255,255,255,0.04)",color:form.pagoPor==="partner"?PARTNER_COLOR:"#64748b",fontWeight:700,fontSize:12,cursor:"pointer",fontFamily:"'Sora',sans-serif",textAlign:"center" as const}}>
-            <div style={{fontSize:18,marginBottom:4}}>👤</div><div>{partnerName}</div>
-          </button>
+      {!form.liquidado&&(
+        <div style={{marginBottom:10}}>
+          <div style={{fontSize:10,color:subtext,marginBottom:6}}>Quem pagou?</div>
+          <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:8}}>
+            <button onClick={()=>setForm(f=>({...f,pagoPor:"me"}))} style={{padding:"8px",border:`1.5px solid ${form.pagoPor==="me"?MY_COLOR:"rgba(255,255,255,0.08)"}`,borderRadius:10,background:form.pagoPor==="me"?`${MY_COLOR}18`:"rgba(255,255,255,0.03)",color:form.pagoPor==="me"?MY_COLOR:"#64748b",fontWeight:700,fontSize:12,cursor:"pointer",fontFamily:"'Sora',sans-serif",textAlign:"center" as const}}>👤 {userName}</button>
+            <button onClick={()=>setForm(f=>({...f,pagoPor:"partner"}))} style={{padding:"8px",border:`1.5px solid ${form.pagoPor==="partner"?PARTNER_COLOR:"rgba(255,255,255,0.08)"}`,borderRadius:10,background:form.pagoPor==="partner"?`${PARTNER_COLOR}18`:"rgba(255,255,255,0.03)",color:form.pagoPor==="partner"?PARTNER_COLOR:"#64748b",fontWeight:700,fontSize:12,cursor:"pointer",fontFamily:"'Sora',sans-serif",textAlign:"center" as const}}>👤 {partnerName}</button>
+          </div>
         </div>
-      </div>}
-      <div style={{marginBottom:14}}>
-        <div style={{fontSize:10,color:subtext,marginBottom:8}}>Estado do pagamento</div>
+      )}
+      <div style={{marginBottom:12}}>
+        <div style={{fontSize:10,color:subtext,marginBottom:6}}>Estado</div>
         <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:8}}>
-          <button onClick={()=>setForm(f=>({...f,liquidado:true}))} style={{padding:"12px 8px",border:`1.5px solid ${form.liquidado?"#34d399":"rgba(255,255,255,0.08)"}`,borderRadius:12,background:form.liquidado?"rgba(52,211,153,0.12)":"rgba(255,255,255,0.04)",color:form.liquidado?"#34d399":"#64748b",fontWeight:700,fontSize:12,cursor:"pointer",fontFamily:"'Sora',sans-serif",textAlign:"center" as const}}>
-            <div style={{fontSize:20,marginBottom:4}}>✅</div>
-            <div>Liquidado</div>
-            <div style={{fontSize:10,fontWeight:400,marginTop:2,opacity:.8}}>Regista nas contas pessoais</div>
-          </button>
-          <button onClick={()=>setForm(f=>({...f,liquidado:false}))} style={{padding:"12px 8px",border:`1.5px solid ${!form.liquidado?"#f59e0b":"rgba(255,255,255,0.08)"}`,borderRadius:12,background:!form.liquidado?"rgba(245,158,11,0.12)":"rgba(255,255,255,0.04)",color:!form.liquidado?"#f59e0b":"#64748b",fontWeight:700,fontSize:12,cursor:"pointer",fontFamily:"'Sora',sans-serif",textAlign:"center" as const}}>
-            <div style={{fontSize:20,marginBottom:4}}>⏳</div>
-            <div>Por liquidar</div>
-            <div style={{fontSize:10,fontWeight:400,marginTop:2,opacity:.8}}>Aparece no resumo acima</div>
-          </button>
+          <button onClick={()=>setForm(f=>({...f,liquidado:true}))} style={{padding:"10px 8px",border:`1.5px solid ${form.liquidado?"#34d399":"rgba(255,255,255,0.08)"}`,borderRadius:10,background:form.liquidado?"rgba(52,211,153,0.1)":"rgba(255,255,255,0.03)",color:form.liquidado?"#34d399":"#64748b",fontWeight:700,fontSize:12,cursor:"pointer",fontFamily:"'Sora',sans-serif",textAlign:"center" as const}}>✅ Liquidado</button>
+          <button onClick={()=>setForm(f=>({...f,liquidado:false}))} style={{padding:"10px 8px",border:`1.5px solid ${!form.liquidado?"#f59e0b":"rgba(255,255,255,0.08)"}`,borderRadius:10,background:!form.liquidado?"rgba(245,158,11,0.1)":"rgba(255,255,255,0.03)",color:!form.liquidado?"#f59e0b":"#64748b",fontWeight:700,fontSize:12,cursor:"pointer",fontFamily:"'Sora',sans-serif",textAlign:"center" as const}}>⏳ Por liquidar</button>
         </div>
       </div>
-      <button onClick={editingExpenseId?updateExpense:addExpense} disabled={saving} style={{width:"100%",padding:"11px 0",background:`linear-gradient(135deg,${editingExpenseId?"#f59e0b":accent},${editingExpenseId?"#d97706":accentDark})`,border:"none",borderRadius:9,color:"#fff",fontWeight:700,fontSize:13,cursor:saving?"not-allowed":"pointer",fontFamily:"'Sora',sans-serif",opacity:saving?0.7:1}}>
+      <button onClick={editingExpenseId?updateExpense:addExpense} disabled={saving} style={{width:"100%",padding:"12px 0",background:`linear-gradient(135deg,${editingExpenseId?"#f59e0b":accent},${editingExpenseId?"#d97706":accentDark})`,border:"none",borderRadius:10,color:"#fff",fontWeight:700,fontSize:13,cursor:saving?"not-allowed":"pointer",fontFamily:"'Sora',sans-serif",opacity:saving?0.7:1}}>
         {saving?"A guardar...":(editingExpenseId?"✓ Guardar alterações":"+ Adicionar despesa")}
       </button>
     </div>
   )}
 
-  {/* ── Lista despesas ── */}
+  {/* ── Lista vazia ── */}
   {expenses.length===0&&!showForm&&(
-    <div style={{textAlign:"center" as const,padding:"32px 0",color:subtext}}>
-      <div style={{fontSize:32,marginBottom:10}}>💳</div>
+    <div style={{textAlign:"center" as const,padding:"40px 0",color:subtext}}>
+      <div style={{fontSize:32,marginBottom:8}}>💳</div>
       <div style={{fontSize:14,fontWeight:700,color:"#e2e8f0",marginBottom:4}}>Sem despesas conjuntas</div>
+      <div style={{fontSize:12,color:subtext}}>Adiciona a primeira despesa conjunta</div>
     </div>
   )}
 
-  {/* Por liquidar */}
+  {/* ── Por liquidar ── */}
   {porLiquidar.length>0&&(
-    <>
-      <div style={{fontSize:11,fontWeight:700,color:"#f59e0b",textTransform:"uppercase" as const,letterSpacing:"0.08em",marginBottom:8}}>⏳ Por liquidar</div>
+    <div style={{marginBottom:16}}>
+      <div style={{fontSize:10,fontWeight:700,color:"#f59e0b",textTransform:"uppercase" as const,letterSpacing:"0.08em",marginBottom:8}}>⏳ Por liquidar</div>
       {porLiquidar.map(e=>{
         const cat=expCats.find(c=>c.id===e.cat);
         const myShare=isUser1?e.split_user1:e.split_user2;
         const ptShare=isUser1?e.split_user2:e.split_user1;
+        const iPaid=e.pago_por===userId;
         return(
-          <div key={e.id} style={{background:"rgba(245,158,11,0.06)",border:"1px solid rgba(245,158,11,0.25)",borderRadius:12,padding:"12px 14px",marginBottom:10}}>
-            <div style={{display:"flex",alignItems:"flex-start",gap:10,marginBottom:8}}>
-              <div style={{width:36,height:36,borderRadius:10,background:"rgba(245,158,11,0.15)",display:"flex",alignItems:"center",justifyContent:"center",fontSize:18,flexShrink:0}}>{cat?.icon||"📦"}</div>
-              <div style={{flex:1}}>
-                <div style={{fontSize:13,fontWeight:700,color:"#e2e8f0"}}>{e.descricao}</div>
-                <div style={{fontSize:10,color:subtext}}>{new Date(e.data+"T12:00:00").toLocaleDateString("pt-PT")}</div>
+          <div key={e.id} style={{display:"flex",alignItems:"center",gap:10,padding:"12px 0",borderBottom:"1px solid rgba(255,255,255,0.06)"}}>
+            <div style={{width:36,height:36,borderRadius:10,background:"rgba(245,158,11,0.12)",display:"flex",alignItems:"center",justifyContent:"center",fontSize:17,flexShrink:0}}>{cat?.icon||"📦"}</div>
+            <div style={{flex:1,minWidth:0}}>
+              <div style={{fontSize:13,fontWeight:600,color:"#e2e8f0",whiteSpace:"nowrap" as const,overflow:"hidden",textOverflow:"ellipsis"}}>{e.descricao}</div>
+              <div style={{display:"flex",alignItems:"center",gap:6,marginTop:3}}>
+                <span style={{fontSize:10,color:subtext}}>{new Date(e.data+"T12:00:00").toLocaleDateString("pt-PT")}</span>
+                <span style={{fontSize:10,color:iPaid?PARTNER_COLOR:MY_COLOR,fontWeight:600}}>
+                  {iPaid?`${partnerName} deve ${fmt(ptShare)}`:`deves ${fmt(myShare)}`}
+                </span>
               </div>
-              <div style={{fontSize:15,fontWeight:800,color:negative}}>{fmt(e.valor)}</div>
             </div>
-            {(()=>{
-              const iPaid=e.pago_por===userId;
-              const paidByName=iPaid?userName:partnerName;
-              const owedAmount=iPaid?ptShare:myShare;
-              const owedByName=iPaid?partnerName:userName;
-              const owedColor=iPaid?PARTNER_COLOR:MY_COLOR;
-              return(
-                <div style={{background:"rgba(255,255,255,0.04)",border:"1px solid rgba(255,255,255,0.08)",borderRadius:10,padding:"10px 12px",marginBottom:10}}>
-                  <div style={{fontSize:11,color:subtext,marginBottom:6}}>💳 Pago por <strong style={{color:iPaid?MY_COLOR:PARTNER_COLOR}}>{paidByName}</strong></div>
-                  <div style={{background:`${owedColor}15`,borderRadius:8,padding:"8px 10px",textAlign:"center" as const}}>
-                    <div style={{fontSize:10,color:owedColor,fontWeight:600,marginBottom:2}}>{owedByName} deve a {paidByName}</div>
-                    <div style={{fontSize:18,fontWeight:800,color:owedColor}}>{fmt(owedAmount)}</div>
-                  </div>
-                </div>
-              );
-            })()}
-            <div style={{display:"flex",gap:8}}>
-              <button onClick={()=>marcarLiquidado(e)} style={{flex:1,padding:"8px 0",background:"rgba(52,211,153,0.15)",border:"1px solid rgba(52,211,153,0.3)",borderRadius:9,color:"#34d399",fontSize:12,fontWeight:700,cursor:"pointer",fontFamily:"'Sora',sans-serif"}}>✓ Liquidar</button>
-              <button onClick={()=>openEditExpense(e)} style={{padding:"8px 12px",background:"rgba(245,158,11,0.08)",border:"1px solid rgba(245,158,11,0.2)",borderRadius:9,color:"#f59e0b",fontSize:12,cursor:"pointer"}}>✏️</button>
-              <button onClick={()=>deleteExpense(e)} style={{padding:"8px 12px",background:"rgba(239,68,68,0.08)",border:"1px solid rgba(239,68,68,0.2)",borderRadius:9,color:"#f87171",fontSize:12,cursor:"pointer"}}>🗑️</button>
+            <div style={{display:"flex",alignItems:"center",gap:6,flexShrink:0}}>
+              <span style={{fontSize:13,fontWeight:700,color:negative}}>{fmt(e.valor)}</span>
+              <button onClick={()=>marcarLiquidado(e)} style={{width:28,height:28,background:"rgba(52,211,153,0.15)",border:"1px solid rgba(52,211,153,0.3)",borderRadius:7,color:"#34d399",fontSize:13,cursor:"pointer",display:"flex",alignItems:"center",justifyContent:"center"}}>✓</button>
+              <button onClick={()=>openEditExpense(e)} style={{width:28,height:28,background:"rgba(255,255,255,0.05)",border:"1px solid rgba(255,255,255,0.08)",borderRadius:7,color:subtext,fontSize:12,cursor:"pointer",display:"flex",alignItems:"center",justifyContent:"center"}}>✏️</button>
+              <button onClick={()=>deleteExpense(e)} style={{width:28,height:28,background:"rgba(239,68,68,0.06)",border:"1px solid rgba(239,68,68,0.15)",borderRadius:7,color:"#f87171",fontSize:12,cursor:"pointer",display:"flex",alignItems:"center",justifyContent:"center"}}>✕</button>
             </div>
           </div>
         );
       })}
-    </>
+    </div>
   )}
 
-  {/* Liquidadas */}
+  {/* ── Liquidadas ── */}
   {liquidadas.length>0&&(
-    <>
-      <div style={{fontSize:11,fontWeight:700,color:"#34d399",textTransform:"uppercase" as const,letterSpacing:"0.08em",marginBottom:8,marginTop:porLiquidar.length>0?16:0}}>✅ Liquidadas</div>
+    <div>
+      <div style={{fontSize:10,fontWeight:700,color:"#34d399",textTransform:"uppercase" as const,letterSpacing:"0.08em",marginBottom:8}}>✅ Liquidadas</div>
       {liquidadas.map(e=>{
         const cat=expCats.find(c=>c.id===e.cat);
         const myShare=isUser1?e.split_user1:e.split_user2;
         const ptShare=isUser1?e.split_user2:e.split_user1;
         return(
-          <div key={e.id} style={{background:cardBg,border:`1px solid ${cardBorder}`,borderRadius:12,padding:"12px 14px",marginBottom:10,opacity:.8}}>
-            <div style={{display:"flex",alignItems:"center",gap:10,marginBottom:6}}>
-              <span style={{fontSize:18}}>{cat?.icon||"📦"}</span>
-              <div style={{flex:1}}>
-                <div style={{display:"flex",alignItems:"center",gap:6}}>
-                  <div style={{fontSize:13,fontWeight:600,color:"#e2e8f0"}}>{e.descricao}</div>
-                  <span style={{fontSize:10,background:"rgba(52,211,153,0.15)",color:"#34d399",padding:"1px 6px",borderRadius:99,fontWeight:700}}>👫 pessoal</span>
-                </div>
-                <div style={{fontSize:10,color:subtext}}>{new Date(e.data+"T12:00:00").toLocaleDateString("pt-PT")}</div>
+          <div key={e.id} style={{display:"flex",alignItems:"center",gap:10,padding:"11px 0",borderBottom:`1px solid ${cardBorder}`}}>
+            <span style={{fontSize:17,minWidth:28,textAlign:"center" as const}}>{cat?.icon||"📦"}</span>
+            <div style={{flex:1,minWidth:0}}>
+              <div style={{fontSize:13,fontWeight:600,color:"#e2e8f0",whiteSpace:"nowrap" as const,overflow:"hidden",textOverflow:"ellipsis"}}>{e.descricao}</div>
+              <div style={{display:"flex",alignItems:"center",gap:6,marginTop:2}}>
+                <span style={{fontSize:10,color:subtext}}>{new Date(e.data+"T12:00:00").toLocaleDateString("pt-PT")}</span>
+                <span style={{fontSize:10,color:MY_COLOR,fontWeight:600}}>{fmt(myShare)}</span>
+                <span style={{fontSize:10,color:subtext}}>·</span>
+                <span style={{fontSize:10,color:PARTNER_COLOR,fontWeight:600}}>{fmt(ptShare)}</span>
               </div>
+            </div>
+            <div style={{display:"flex",alignItems:"center",gap:6,flexShrink:0}}>
               <span style={{fontSize:13,fontWeight:700,color:negative}}>{fmt(e.valor)}</span>
-            </div>
-            <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:6,marginBottom:8}}>
-              <div style={{background:`${MY_COLOR}10`,borderRadius:8,padding:"5px 10px",display:"flex",justifyContent:"space-between"}}><span style={{fontSize:11,color:MY_COLOR}}>{userName}</span><span style={{fontSize:11,fontWeight:700,color:MY_COLOR}}>{fmt(myShare)}</span></div>
-              <div style={{background:`${PARTNER_COLOR}10`,borderRadius:8,padding:"5px 10px",display:"flex",justifyContent:"space-between"}}><span style={{fontSize:11,color:PARTNER_COLOR}}>{partnerName}</span><span style={{fontSize:11,fontWeight:700,color:PARTNER_COLOR}}>{fmt(ptShare)}</span></div>
-            </div>
-            <div style={{display:"flex",gap:8}}>
-              <button onClick={()=>openEditExpense(e)} style={{flex:1,padding:"7px 0",background:"rgba(245,158,11,0.08)",border:"1px solid rgba(245,158,11,0.2)",borderRadius:9,color:"#f59e0b",fontSize:12,fontWeight:600,cursor:"pointer",fontFamily:"'Sora',sans-serif"}}>✏️ Editar</button>
-              <button onClick={()=>deleteExpense(e)} style={{flex:1,padding:"7px 0",background:"rgba(239,68,68,0.08)",border:"1px solid rgba(239,68,68,0.2)",borderRadius:9,color:"#f87171",fontSize:12,cursor:"pointer",fontFamily:"'Sora',sans-serif"}}>🗑️ Apagar</button>
+              <button onClick={()=>openEditExpense(e)} style={{width:28,height:28,background:"rgba(255,255,255,0.05)",border:"1px solid rgba(255,255,255,0.08)",borderRadius:7,color:subtext,fontSize:12,cursor:"pointer",display:"flex",alignItems:"center",justifyContent:"center"}}>✏️</button>
+              <button onClick={()=>deleteExpense(e)} style={{width:28,height:28,background:"rgba(239,68,68,0.06)",border:"1px solid rgba(239,68,68,0.15)",borderRadius:7,color:"#f87171",fontSize:12,cursor:"pointer",display:"flex",alignItems:"center",justifyContent:"center"}}>✕</button>
             </div>
           </div>
         );
       })}
-    </>
+    </div>
   )}
 </>}
-{/* ── RECORRENTES ── */}
-{tab==="recorrentes"&&couple&&(
-  <CoupleRecurring
-    coupleId={couple.id}
-    isUser1={isUser1}
-    userName={userName}
-    partnerName={partnerName}
-    expCats={expCats}
-    accent={accent}
-    accentDark={accentDark}
-    cardBg={cardBg}
-    cardBorder={cardBorder}
-    subtext={subtext}
-    negative={negative}
-    items={recurringItems}
-    setItems={setRecurringItems}
-    onApplyDue={async (r) => {
-      const total = Number(r.valor);
-      const s1 = r.split_user1 || total / 2;
-      const s2 = r.split_user2 || total / 2;
-      const {data, error} = await supabase.from("couple_expenses").insert({
-        couple_id: couple.id,
-        created_by: userId,
-        descricao: r.descricao,
-        valor: total,
-        cat: r.cat,
-        subcat: "",
-        tipo: r.tipo,
-        data: new Date().toISOString().slice(0,10),
-        split_user1: s1,
-        split_user2: s2,
-        pago_por: userId,
-        liquidado: r.liquidado_auto,
-      }).select().single();
-      if(!error && data) {
-        setExpenses(p => [data as CoupleExpense, ...p]);
-        if(r.liquidado_auto) await syncToPersonal(data as CoupleExpense);
-      }
-    }}
-  />
-)}
-</div>
-);
-}
