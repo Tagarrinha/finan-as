@@ -1112,18 +1112,28 @@ async function handleCoupleSettlement(valor: number) {
   {byCat.filter(c=>c.total>0).length>0&&(
     <div style={{marginBottom:14}}>
       <div style={{fontSize:10,fontWeight:700,color:T.subtext,letterSpacing:"0.1em",textTransform:"uppercase" as const,marginBottom:10}}>Top categorias</div>
-      <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:8}}>
+      <div style={{background:T.cardBg,border:`1px solid ${T.cardBorder}`,borderRadius:14,overflow:"hidden"}}>
         {byCat.filter(c=>c.total>0).slice(0,6).map((c,idx)=>{
           const meta=TYPE_META[c.type];
           const pctVal=pct(c.total,totalExp);
+          const rankColors=["#FFD700","#C0C0C0","#CD7F32","rgba(255,255,255,0.3)","rgba(255,255,255,0.3)","rgba(255,255,255,0.3)"];
           return(
-            <div key={c.id} style={{background:T.cardBg,border:`1px solid ${T.cardBorder}`,borderRadius:14,padding:"12px",position:"relative",overflow:"hidden"}}>
-              <div style={{position:"absolute",top:0,left:0,right:0,height:2,background:`linear-gradient(90deg,${meta?.color||T.accent},transparent)`,opacity:0.6}}/>
-              <div style={{fontSize:22,marginBottom:6}}>{c.icon}</div>
-              <div style={{fontSize:12,fontWeight:700,color:"#f1f5f9",marginBottom:2}}>{c.label}</div>
-              <div style={{fontSize:15,fontWeight:800,color:meta?.color||T.accent}}>{fmt(c.total)}</div>
-              <div style={{fontSize:10,color:T.subtext,marginTop:2}}>{pctVal}% do total</div>
-              {idx===0&&<div style={{position:"absolute",top:8,right:8,fontSize:9,fontWeight:700,color:meta?.color||T.accent,background:`${meta?.color||T.accent}15`,padding:"2px 6px",borderRadius:99}}>TOP</div>}
+            <div key={c.id} style={{display:"flex",alignItems:"center",gap:12,padding:"12px 14px",borderBottom:idx<5?`1px solid ${T.cardBorder}`:"none"}}>
+              {/* Rank */}
+              <div style={{width:24,height:24,borderRadius:"50%",background:`${rankColors[idx]}18`,border:`1.5px solid ${rankColors[idx]}`,display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0}}>
+                <span style={{fontSize:10,fontWeight:800,color:rankColors[idx]}}>{idx+1}</span>
+              </div>
+              {/* Emoji */}
+              <span style={{fontSize:22,flexShrink:0}}>{c.icon}</span>
+              {/* Info */}
+              <div style={{flex:1,minWidth:0}}>
+                <div style={{fontSize:13,fontWeight:600,color:"#f1f5f9"}}>{c.label}</div>
+                <div style={{fontSize:10,color:T.subtext}}>{pctVal}% do total</div>
+              </div>
+              {/* Valor */}
+              <div style={{textAlign:"right" as const,flexShrink:0}}>
+                <div style={{fontSize:14,fontWeight:800,color:meta?.color||T.accent}}>{fmt(c.total)}</div>
+              </div>
             </div>
           );
         })}
