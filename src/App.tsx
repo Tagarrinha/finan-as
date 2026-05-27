@@ -983,7 +983,7 @@ async function handleCoupleSettlement(valor: number) {
     else if(overBudgetCount>0){msg=`${overBudgetCount} categoria${overBudgetCount>1?"s":""} acima do orçamento`;emoji="⚠️";}
     else{msg="Mantém o ritmo este mês";emoji="👍";}
     return(
-      <div style={{position:"relative",borderRadius:20,overflow:"hidden",marginBottom:14,padding:"20px 18px"}}>
+      <div style={{position:"relative",borderRadius:18,overflow:"hidden",marginBottom:10,padding:"14px 16px"}}>
         <div style={{position:"absolute",inset:0,background:`linear-gradient(135deg,${heroColor}15 0%,${heroColor}06 50%,transparent 100%)`,borderRadius:20}}/>
         <div style={{position:"absolute",inset:0,border:`1px solid ${heroColor}25`,borderRadius:20}}/>
         <div style={{position:"absolute",top:-50,right:-50,width:160,height:160,borderRadius:"50%",background:`radial-gradient(circle,${heroColor}18 0%,transparent 70%)`,pointerEvents:"none"}}/>
@@ -1001,11 +1001,11 @@ async function handleCoupleSettlement(valor: number) {
             )}
           </div>
           {/* Número principal — mais compacto */}
-          <div style={{fontSize:40,fontWeight:800,color:heroColor,letterSpacing:"-1.5px",lineHeight:1,marginBottom:6,textShadow:`0 0 30px ${heroColor}35`}}>
+          <div style={{fontSize:32,fontWeight:800,color:heroColor,letterSpacing:"-1.5px",lineHeight:1,marginBottom:4,textShadow:`0 0 30px ${heroColor}35`}}>
             {balance>=0?"+":""}{hv(fmt(balance))}
           </div>
           {/* Mensagem contextual */}
-          <div style={{fontSize:12,color:T.subtext,marginBottom:12}}>{emoji} {msg}</div>
+          <div style={{fontSize:11,color:T.subtext,marginBottom:8}}>{emoji} {msg}</div>
           {/* Receitas / Despesas inline */}
           <div style={{display:"flex",gap:12,alignItems:"center",marginBottom:diff!==null?10:0}}>
             <div style={{display:"flex",alignItems:"center",gap:5}}>
@@ -1040,12 +1040,10 @@ async function handleCoupleSettlement(valor: number) {
 
   {/* ── ALERTAS ── */}
   {dueRecurring>0&&(
-    <div onClick={()=>setTab("recorrentes")} style={{background:"rgba(245,158,11,0.07)",border:"1px solid rgba(245,158,11,0.2)",borderRadius:12,padding:"10px 14px",marginBottom:8,cursor:"pointer",display:"flex",alignItems:"center",gap:10}}>
-      <span style={{fontSize:16}}>🔔</span>
-      <div style={{flex:1}}>
-        <div style={{fontSize:12,fontWeight:700,color:"#f59e0b"}}>{dueRecurring} recorrente{dueRecurring>1?"s":""} a vencer</div>
-      </div>
-      <span style={{color:"#f59e0b",fontSize:11}}>→</span>
+    <div onClick={()=>setTab("recorrentes")} style={{background:"rgba(245,158,11,0.07)",border:"1px solid rgba(245,158,11,0.2)",borderRadius:10,padding:"7px 12px",marginBottom:6,cursor:"pointer",display:"flex",alignItems:"center",gap:8}}>
+      <span style={{fontSize:14}}>🔔</span>
+      <div style={{flex:1,fontSize:11,fontWeight:700,color:"#f59e0b"}}>{dueRecurring} recorrente{dueRecurring>1?"s":""} a vencer</div>
+      <span style={{color:"#f59e0b",fontSize:10}}>→</span>
     </div>
   )}
   {(()=>{
@@ -1053,9 +1051,9 @@ async function handleCoupleSettlement(valor: number) {
     if(!overItems.length) return null;
     const [,meta]=overItems[0];
     return(
-      <div style={{background:"rgba(239,68,68,0.07)",border:"1px solid rgba(239,68,68,0.15)",borderRadius:12,padding:"10px 14px",marginBottom:8,display:"flex",alignItems:"center",gap:10}}>
-        <span style={{fontSize:16}}>⚠️</span>
-        <div style={{flex:1,fontSize:12,fontWeight:600,color:"#f87171"}}>{meta.label} acima do orçamento</div>
+      <div style={{background:"rgba(239,68,68,0.07)",border:"1px solid rgba(239,68,68,0.15)",borderRadius:10,padding:"7px 12px",marginBottom:6,display:"flex",alignItems:"center",gap:8}}>
+        <span style={{fontSize:14}}>⚠️</span>
+        <div style={{flex:1,fontSize:11,fontWeight:600,color:"#f87171"}}>{meta.label} acima do orçamento</div>
       </div>
     );
   })()}
@@ -1064,8 +1062,8 @@ async function handleCoupleSettlement(valor: number) {
   {totalInc>0&&(
     <div style={{marginBottom:14}}>
       <div style={{fontSize:10,fontWeight:700,color:T.subtext,letterSpacing:"0.1em",textTransform:"uppercase" as const,marginBottom:10}}>Composição</div>
-      <div style={{background:T.cardBg,border:`1px solid ${T.cardBorder}`,borderRadius:14,padding:"14px 10px"}}>
-        <div style={{display:"grid",gridTemplateColumns:"1fr 1fr 1fr",gap:8}}>
+      <div style={{background:T.cardBg,border:`1px solid ${T.cardBorder}`,borderRadius:12,padding:"10px 6px"}}>
+        <div style={{display:"grid",gridTemplateColumns:"1fr 1fr 1fr",gap:4}}>
           {(Object.entries(TYPE_META) as [TypeKey,typeof TYPE_META[TypeKey]][]).map(([type,meta])=>{
             const actual=byType[type]||0;
             const target=budgetTargets[type];
@@ -1079,7 +1077,7 @@ async function handleCoupleSettlement(valor: number) {
             const dashOffset=circumference*(1-(actualPct/100));
             return(
               <div key={type} style={{display:"flex",flexDirection:"column" as const,alignItems:"center",gap:4}}>
-                <svg width="80" height="50" viewBox="0 0 80 50">
+                <svg width="70" height="42" viewBox="0 0 80 50">
                   {/* Track */}
                   <path
                     d={`M ${cx-R},${cy} A ${R},${R} 0 0,1 ${cx+R},${cy}`}
@@ -1096,9 +1094,9 @@ async function handleCoupleSettlement(valor: number) {
                   {/* % no centro */}
                   <text x={cx} y={cy-4} textAnchor="middle" fill={color} fontSize="13" fontWeight="800" fontFamily="Sora,sans-serif">{actualPct}%</text>
                 </svg>
-                <div style={{fontSize:11,fontWeight:700,color:"#e2e8f0",textAlign:"center" as const}}>{meta.label}</div>
-                <div style={{fontSize:12,fontWeight:800,color,textAlign:"center" as const}}>{fmt(actual)}</div>
-                <div style={{fontSize:9,color:T.subtext,textAlign:"center" as const}}>limite {target}%{over?" ⚠️":""}</div>
+                <div style={{fontSize:10,fontWeight:700,color:"#e2e8f0",textAlign:"center" as const}}>{meta.label}</div>
+                <div style={{fontSize:11,fontWeight:800,color,textAlign:"center" as const}}>{fmt(actual)}</div>
+                <div style={{fontSize:9,color:T.subtext,textAlign:"center" as const}}>/{target}%{over?" ⚠️":""}</div>
               </div>
             );
           })}
@@ -1112,28 +1110,22 @@ async function handleCoupleSettlement(valor: number) {
   {byCat.filter(c=>c.total>0).length>0&&(
     <div style={{marginBottom:14}}>
       <div style={{fontSize:10,fontWeight:700,color:T.subtext,letterSpacing:"0.1em",textTransform:"uppercase" as const,marginBottom:10}}>Top categorias</div>
-      <div style={{background:T.cardBg,border:`1px solid ${T.cardBorder}`,borderRadius:14,overflow:"hidden"}}>
+      <div style={{background:T.cardBg,border:`1px solid ${T.cardBorder}`,borderRadius:12,overflow:"hidden"}}>
         {byCat.filter(c=>c.total>0).slice(0,6).map((c,idx)=>{
           const meta=TYPE_META[c.type];
           const pctVal=pct(c.total,totalExp);
           const rankColors=["#FFD700","#C0C0C0","#CD7F32","rgba(255,255,255,0.3)","rgba(255,255,255,0.3)","rgba(255,255,255,0.3)"];
           return(
-            <div key={c.id} style={{display:"flex",alignItems:"center",gap:12,padding:"12px 14px",borderBottom:idx<5?`1px solid ${T.cardBorder}`:"none"}}>
-              {/* Rank */}
-              <div style={{width:24,height:24,borderRadius:"50%",background:`${rankColors[idx]}18`,border:`1.5px solid ${rankColors[idx]}`,display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0}}>
-                <span style={{fontSize:10,fontWeight:800,color:rankColors[idx]}}>{idx+1}</span>
+            <div key={c.id} style={{display:"flex",alignItems:"center",gap:8,padding:"8px 12px",borderBottom:idx<5?`1px solid ${T.cardBorder}`:"none"}}>
+              <div style={{width:20,height:20,borderRadius:"50%",background:`${rankColors[idx]}18`,border:`1.5px solid ${rankColors[idx]}`,display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0}}>
+                <span style={{fontSize:9,fontWeight:800,color:rankColors[idx]}}>{idx+1}</span>
               </div>
-              {/* Emoji */}
-              <span style={{fontSize:22,flexShrink:0}}>{c.icon}</span>
-              {/* Info */}
+              <span style={{fontSize:18,flexShrink:0}}>{c.icon}</span>
               <div style={{flex:1,minWidth:0}}>
-                <div style={{fontSize:13,fontWeight:600,color:"#f1f5f9"}}>{c.label}</div>
-                <div style={{fontSize:10,color:T.subtext}}>{pctVal}% do total</div>
+                <div style={{fontSize:12,fontWeight:600,color:"#f1f5f9"}}>{c.label}</div>
+                <div style={{fontSize:9,color:T.subtext}}>{pctVal}% do total</div>
               </div>
-              {/* Valor */}
-              <div style={{textAlign:"right" as const,flexShrink:0}}>
-                <div style={{fontSize:14,fontWeight:800,color:meta?.color||T.accent}}>{fmt(c.total)}</div>
-              </div>
+              <div style={{fontSize:13,fontWeight:800,color:meta?.color||T.accent}}>{fmt(c.total)}</div>
             </div>
           );
         })}
