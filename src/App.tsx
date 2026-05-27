@@ -396,16 +396,25 @@ function TypeSelector({value,onChange,byType,totalInc,budgetTargets}:{value:Type
         const target=budgetTargets[type];
         const actualPct=totalInc>0?Math.round((actual/totalInc)*100):0;
         const over=actual>totalInc*(target/100)&&totalInc>0;
+        const isInvestOver=type==="investimento"&&over;
+        const needOk=(byType["necessidade"]||0)<=totalInc*(budgetTargets["necessidade"]/100);
+        const desireOk=(byType["desejo"]||0)<=totalInc*(budgetTargets["desejo"]/100);
+        const investPositive=isInvestOver&&needOk&&desireOk;
+        const barColor=investPositive?meta.color:over?"#ef4444":meta.color;
+        const borderColor=active?meta.color:"rgba(255,255,255,0.09)";
         return(
-          <button key={type} onClick={()=>onChange(type)} style={{padding:"8px 12px",border:`1.5px solid ${active?meta.color:over?"rgba(239,68,68,0.3)":"rgba(255,255,255,0.09)"}`,borderRadius:9,background:active?meta.bg:over?"rgba(239,68,68,0.05)":"rgba(255,255,255,0.03)",cursor:"pointer",textAlign:"left" as const,fontFamily:"'Sora',sans-serif",display:"flex",alignItems:"center",gap:8}}>
-            <span style={{fontSize:16}}>{meta.icon}</span>
+          <button key={type} onClick={()=>onChange(type)} style={{padding:"9px 12px",border:`1.5px solid ${borderColor}`,borderRadius:9,background:active?meta.bg:"rgba(255,255,255,0.03)",cursor:"pointer",textAlign:"left" as const,fontFamily:"'Sora',sans-serif",display:"flex",alignItems:"center",gap:8}}>
+            <span style={{fontSize:15}}>{meta.icon}</span>
             <div style={{flex:1}}>
-              <div style={{display:"flex",justifyContent:"space-between",alignItems:"center"}}>
-                <span style={{fontSize:12,fontWeight:700,color:active?meta.color:over?"#ef4444":"#94a3b8"}}>{meta.label}</span>
-                <span style={{fontSize:11,fontWeight:700,color:over?"#ef4444":meta.color}}>{fmt(actual)} <span style={{fontSize:10,color:over?"#ef4444":"#64748b",fontWeight:400}}>{actualPct}%/{target}%{over?" ⚠️":""}</span></span>
+              <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:4}}>
+                <span style={{fontSize:12,fontWeight:700,color:active?meta.color:"#94a3b8"}}>{meta.label}</span>
+                <span style={{fontSize:11,fontWeight:700,color:meta.color}}>
+                  {fmt(actual)}
+                  <span style={{fontSize:9,color:"#64748b",fontWeight:400}}> {actualPct}%/{target}%{over?(investPositive?" 🚀":" ⚠️"):""}</span>
+                </span>
               </div>
-              <div style={{height:2,borderRadius:99,background:"rgba(255,255,255,0.07)",marginTop:4,overflow:"hidden"}}>
-                <div style={{width:`${Math.min(100,actualPct)}%`,height:"100%",background:over?"#ef4444":meta.color,borderRadius:99}}/>
+              <div style={{height:3,borderRadius:99,background:"rgba(255,255,255,0.07)",overflow:"hidden"}}>
+                <div style={{width:`${Math.min(100,actualPct)}%`,height:"100%",background:barColor,borderRadius:99,transition:"width .4s ease"}}/>
               </div>
             </div>
           </button>
