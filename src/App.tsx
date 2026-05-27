@@ -1060,10 +1060,10 @@ async function handleCoupleSettlement(valor: number) {
 
   {/* ── COMPOSIÇÃO — gauges semicirculares ── */}
   {totalInc>0&&(
-    <div style={{marginBottom:14}}>
-      <div style={{fontSize:10,fontWeight:700,color:T.subtext,letterSpacing:"0.1em",textTransform:"uppercase" as const,marginBottom:10}}>Composição</div>
-      <div style={{background:T.cardBg,border:`1px solid ${T.cardBorder}`,borderRadius:12,padding:"10px 6px"}}>
-        <div style={{display:"grid",gridTemplateColumns:"1fr 1fr 1fr",gap:4}}>
+<div style={{marginBottom:10}}>
+<div style={{fontSize:10,fontWeight:700,color:T.subtext,letterSpacing:"0.1em",textTransform:"uppercase" as const,marginBottom:8}}>Composição</div>
+<div style={{background:T.cardBg,border:`1px solid ${T.cardBorder}`,borderRadius:12,padding:"6px 4px"}}>
+<div style={{display:"grid",gridTemplateColumns:"1fr 1fr 1fr",gap:2}}>
           {(Object.entries(TYPE_META) as [TypeKey,typeof TYPE_META[TypeKey]][]).map(([type,meta])=>{
             const actual=byType[type]||0;
             const target=budgetTargets[type];
@@ -1076,8 +1076,8 @@ async function handleCoupleSettlement(valor: number) {
             const circumference=Math.PI*R;
             const dashOffset=circumference*(1-(actualPct/100));
             return(
-              <div key={type} style={{display:"flex",flexDirection:"column" as const,alignItems:"center",gap:4}}>
-                <svg width="70" height="42" viewBox="0 0 80 50">
+              <div key={type} style={{display:"flex",flexDirection:"column" as const,alignItems:"center",gap:2}}>
+                <svg width="60" height="34" viewBox="0 0 80 50">
                   {/* Track */}
                   <path
                     d={`M ${cx-R},${cy} A ${R},${R} 0 0,1 ${cx+R},${cy}`}
