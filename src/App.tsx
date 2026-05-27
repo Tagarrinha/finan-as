@@ -983,7 +983,7 @@ async function handleCoupleSettlement(valor: number) {
     else if(overBudgetCount>0){msg=`${overBudgetCount} categoria${overBudgetCount>1?"s":""} acima do orçamento`;emoji="⚠️";}
     else{msg="Mantém o ritmo este mês";emoji="👍";}
     return(
-      <div style={{position:"relative",borderRadius:18,overflow:"hidden",marginBottom:10,padding:"14px 16px"}}>
+      <div style={{position:"relative",borderRadius:18,overflow:"hidden",marginBottom:10,padding:"10px 14px"}}>
         <div style={{position:"absolute",inset:0,background:`linear-gradient(135deg,${heroColor}15 0%,${heroColor}06 50%,transparent 100%)`,borderRadius:20}}/>
         <div style={{position:"absolute",inset:0,border:`1px solid ${heroColor}25`,borderRadius:20}}/>
         <div style={{position:"absolute",top:-50,right:-50,width:160,height:160,borderRadius:"50%",background:`radial-gradient(circle,${heroColor}18 0%,transparent 70%)`,pointerEvents:"none"}}/>
@@ -1001,7 +1001,7 @@ async function handleCoupleSettlement(valor: number) {
             )}
           </div>
           {/* Número principal — mais compacto */}
-          <div style={{fontSize:32,fontWeight:800,color:heroColor,letterSpacing:"-1.5px",lineHeight:1,marginBottom:4,textShadow:`0 0 30px ${heroColor}35`}}>
+          <div style={{fontSize:28,fontWeight:800,color:heroColor,letterSpacing:"-1.5px",lineHeight:1,marginBottom:4,textShadow:`0 0 30px ${heroColor}35`}}>
             {balance>=0?"+":""}{hv(fmt(balance))}
           </div>
           {/* Mensagem contextual */}
@@ -1060,10 +1060,10 @@ async function handleCoupleSettlement(valor: number) {
 
   {/* ── COMPOSIÇÃO — gauges semicirculares ── */}
   {totalInc>0&&(
-<div style={{marginBottom:10}}>
+<div style={{marginBottom:12}}>
 <div style={{fontSize:10,fontWeight:700,color:T.subtext,letterSpacing:"0.1em",textTransform:"uppercase" as const,marginBottom:8}}>Composição</div>
-<div style={{background:T.cardBg,border:`1px solid ${T.cardBorder}`,borderRadius:12,padding:"6px 4px"}}>
-<div style={{display:"grid",gridTemplateColumns:"1fr 1fr 1fr",gap:2}}>
+<div style={{background:T.cardBg,border:`1px solid ${T.cardBorder}`,borderRadius:12,padding:"10px 6px"}}>
+<div style={{display:"grid",gridTemplateColumns:"1fr 1fr 1fr",gap:4}}>
           {(Object.entries(TYPE_META) as [TypeKey,typeof TYPE_META[TypeKey]][]).map(([type,meta])=>{
             const actual=byType[type]||0;
             const target=budgetTargets[type];
@@ -1076,7 +1076,7 @@ async function handleCoupleSettlement(valor: number) {
             const circumference=Math.PI*R;
             const dashOffset=circumference*(1-(actualPct/100));
             return(
-              <div key={type} style={{display:"flex",flexDirection:"column" as const,alignItems:"center",gap:2}}>
+              <div key={type} style={{display:"flex",flexDirection:"column" as const,alignItems:"center",gap:4}}>
                 <svg width="60" height="34" viewBox="0 0 80 50">
                   {/* Track */}
                   <path
