@@ -1060,35 +1060,45 @@ async function handleCoupleSettlement(valor: number) {
     );
   })()}
 
-  {/* ── COMPOSIÇÃO — barra horizontal segmentada ── */}
+  {/* ── COMPOSIÇÃO — gauges semicirculares ── */}
   {totalInc>0&&(
     <div style={{marginBottom:14}}>
       <div style={{fontSize:10,fontWeight:700,color:T.subtext,letterSpacing:"0.1em",textTransform:"uppercase" as const,marginBottom:10}}>Composição</div>
-      <div style={{background:T.cardBg,border:`1px solid ${T.cardBorder}`,borderRadius:14,padding:"14px"}}>
-        {/* Barra segmentada */}
-        <div style={{display:"flex",height:10,borderRadius:99,overflow:"hidden",marginBottom:12,gap:2}}>
-          {(Object.entries(TYPE_META) as [TypeKey,typeof TYPE_META[TypeKey]][]).map(([type,meta])=>{
-            const actual=byType[type]||0;
-            const w=pct(actual,totalExp);
-            if(!w) return null;
-            return <div key={type} style={{width:`${w}%`,background:meta.color,transition:"width .5s ease",minWidth:4}}/>;
-          })}
-          {totalExp===0&&<div style={{width:"100%",background:"rgba(255,255,255,0.07)",borderRadius:99}}/>}
-        </div>
-        {/* Legenda compacta */}
-        <div style={{display:"flex",flexDirection:"column" as const,gap:8}}>
+      <div style={{background:T.cardBg,border:`1px solid ${T.cardBorder}`,borderRadius:14,padding:"14px 10px"}}>
+        <div style={{display:"grid",gridTemplateColumns:"1fr 1fr 1fr",gap:8}}>
           {(Object.entries(TYPE_META) as [TypeKey,typeof TYPE_META[TypeKey]][]).map(([type,meta])=>{
             const actual=byType[type]||0;
             const target=budgetTargets[type];
             const targetAmt=totalInc*(target/100);
-            const actualPct=pct(actual,totalInc);
+            const actualPct=Math.min(100,totalInc>0?Math.round((actual/targetAmt)*100):0);
             const over=actual>targetAmt&&totalInc>0;
+            const color=over?"#ef4444":meta.color;
+            // SVG semicírculo
+            const R=34,cx=40,cy=42,strokeW=7;
+            const circumference=Math.PI*R;
+            const dashOffset=circumference*(1-(actualPct/100));
             return(
-              <div key={type} style={{display:"flex",alignItems:"center",gap:8}}>
-                <div style={{width:8,height:8,borderRadius:2,background:over?"#ef4444":meta.color,flexShrink:0}}/>
-                <span style={{fontSize:12,color:"#e2e8f0",flex:1}}>{meta.label}</span>
-                <span style={{fontSize:12,fontWeight:700,color:over?"#f87171":meta.color}}>{fmt(actual)}</span>
-                <span style={{fontSize:10,color:over?"#f87171":T.subtext,minWidth:60,textAlign:"right" as const}}>{actualPct}% / {target}%{over?" ⚠️":""}</span>
+              <div key={type} style={{display:"flex",flexDirection:"column" as const,alignItems:"center",gap:4}}>
+                <svg width="80" height="50" viewBox="0 0 80 50">
+                  {/* Track */}
+                  <path
+                    d={`M ${cx-R},${cy} A ${R},${R} 0 0,1 ${cx+R},${cy}`}
+                    fill="none" stroke="rgba(255,255,255,0.07)" strokeWidth={strokeW} strokeLinecap="round"
+                  />
+                  {/* Progress */}
+                  <path
+                    d={`M ${cx-R},${cy} A ${R},${R} 0 0,1 ${cx+R},${cy}`}
+                    fill="none" stroke={color} strokeWidth={strokeW} strokeLinecap="round"
+                    strokeDasharray={circumference}
+                    strokeDashoffset={dashOffset}
+                    style={{transition:"stroke-dashoffset .6s ease"}}
+                  />
+                  {/* % no centro */}
+                  <text x={cx} y={cy-4} textAnchor="middle" fill={color} fontSize="13" fontWeight="800" fontFamily="Sora,sans-serif">{actualPct}%</text>
+                </svg>
+                <div style={{fontSize:11,fontWeight:700,color:"#e2e8f0",textAlign:"center" as const}}>{meta.label}</div>
+                <div style={{fontSize:12,fontWeight:800,color,textAlign:"center" as const}}>{fmt(actual)}</div>
+                <div style={{fontSize:9,color:T.subtext,textAlign:"center" as const}}>limite {target}%{over?" ⚠️":""}</div>
               </div>
             );
           })}
