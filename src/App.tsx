@@ -43,6 +43,7 @@ const BASE_PERSONAL_EXP: ExpCat[] = [
   { id:"prendas",      label:"Prendas",             icon:"🎁", type:"desejo" },
   { id:"viagens",      label:"Viagens",             icon:"✈️", type:"desejo" },
   { id:"educacao",     label:"Educação",            icon:"📚", type:"investimento" },
+  { id:"investimento_p", label:"Investimento",      icon:"📈", type:"investimento" },
   { id:"outros_p",     label:"Outros",              icon:"📦", type:"desejo" },
 ];
 const BASE_PERSONAL_INC: IncCat[] = [
