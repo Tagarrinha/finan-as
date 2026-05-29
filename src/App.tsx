@@ -205,17 +205,14 @@ function LeftNav({ isOpen, onClose, activeTab, onNavigate, accent, accentDark, o
         .lnav-close:hover { background: rgba(255,255,255,0.07); color: rgba(255,255,255,0.8); }
 
         .lnav-section-label {
-          font-family: 'Sora', sans-serif; font-size: 10px; font-weight: 800;
-          letter-spacing: 0.13em; text-transform: uppercase;
-          color: rgba(255,255,255,0.45);
-          padding: 14px 16px 6px;
-          display: flex; align-items: center; gap: 6px;
+          font-family: 'Sora', sans-serif; font-size: 11px; font-weight: 800;
+          letter-spacing: 0.08em; text-transform: uppercase;
+          color: #f1f5f9;
+          padding: 16px 14px 6px 14px;
+          border-top: 1px solid rgba(255,255,255,0.06);
+          margin-top: 4px;
         }
-        .lnav-section-label::before {
-          content: ''; display: block; width: 16px; height: 1.5px;
-          background: rgba(255,255,255,0.2); border-radius: 99px;
-        }
-        .lnav-nav { flex: 1; padding: 6px 10px; overflow-y: scroll; display: flex; flex-direction: column; gap: 2px; -webkit-overflow-scrolling: touch; }
+        .lnav-nav { flex: 1; padding: 6px 10px; overflow-y: auto; display: flex; flex-direction: column; gap: 2px; min-height: 0; }
 
         .lnav-item {
           display: flex; align-items: center; gap: 11px;
