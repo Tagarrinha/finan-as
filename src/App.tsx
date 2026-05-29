@@ -619,6 +619,8 @@ const [expRecurringDays,setExpRecurringDays]=useState("30");
   const [editingExp,setEditingExp]=useState<number|null>(null);
   const [editingInc,setEditingInc]=useState<number|null>(null);
   const [hideValues, setHideValues] = useState(false);
+const [searchExp, setSearchExp] = useState("");
+const [searchInc, setSearchInc] = useState("");
 const [successMsg, setSuccessMsg] = useState("");
   const [chartView, setChartView] = useState<"networth"|"fluxo">("fluxo");
   const [nwSnapshots, setNwSnapshots] = useState<{mes:number;ano:number;valor:number}[]>([]);
@@ -1364,6 +1366,17 @@ async function handleCoupleSettlement(valor: number) {
     <span style={{fontSize:12,color:T.subtext}}>{myExpenses.length} {myExpenses.length===1?"despesa":"despesas"}</span>
     <span style={{fontSize:17,fontWeight:800,color:T.negative}}>{fmt(totalExp)}</span>
   </div>
+  {/* Search */}
+  <div style={{position:"relative",marginBottom:10}}>
+    <input
+      style={{...S.inp,paddingLeft:34,fontSize:13}}
+      placeholder="Pesquisar despesas..."
+      value={searchExp}
+      onChange={e=>setSearchExp(e.target.value)}
+    />
+    <span style={{position:"absolute",left:10,top:"50%",transform:"translateY(-50%)",fontSize:14,pointerEvents:"none"}}>🔍</span>
+    {searchExp&&<button onClick={()=>setSearchExp("")} style={{position:"absolute",right:10,top:"50%",transform:"translateY(-50%)",background:"none",border:"none",color:T.subtext,cursor:"pointer",fontSize:14}}>✕</button>}
+  </div>
 
   {/* Lista */}
   <div style={S.card}>
@@ -1489,6 +1502,18 @@ async function handleCoupleSettlement(valor: number) {
   <div style={{...S.card,display:"flex",justifyContent:"space-between",alignItems:"center",padding:"12px 16px"}}>
     <span style={{fontSize:12,color:T.subtext}}>{myIncomes.length} {myIncomes.length===1?"entrada":"entradas"}</span>
     <span style={{fontSize:17,fontWeight:800,color:T.positive}}>{fmt(totalInc)}</span>
+  </div>
+  
+  {/* Search */}
+  <div style={{position:"relative",marginBottom:10}}>
+    <input
+      style={{...S.inp,paddingLeft:34,fontSize:13}}
+      placeholder="Pesquisar rendimentos..."
+      value={searchInc}
+      onChange={e=>setSearchInc(e.target.value)}
+    />
+    <span style={{position:"absolute",left:10,top:"50%",transform:"translateY(-50%)",fontSize:14,pointerEvents:"none"}}>🔍</span>
+    {searchInc&&<button onClick={()=>setSearchInc("")} style={{position:"absolute",right:10,top:"50%",transform:"translateY(-50%)",background:"none",border:"none",color:T.subtext,cursor:"pointer",fontSize:14}}>✕</button>}
   </div>
 
   {/* Lista */}

@@ -53,6 +53,7 @@ export default function CoupleMode({ userId, userEmail, userName, expCats, accen
   const [notifications, setNotifications] = useState<{id:string;mensagem:string;lida:boolean;created_at:string}[]>([]);
   const [showNotifications, setShowNotifications] = useState(false);
   const [successMsg, setSuccessMsg] = useState("");
+  const [searchCouple, setSearchCouple] = useState("");
 
   useEffect(()=>{ loadCouple(); },[userId,userEmail]);
 
@@ -808,6 +809,17 @@ const jointBalance = totalContributions - totalSettledExpenses;
     </div>
   )}
 
+  {/* Search */}
+  <div style={{position:"relative",marginBottom:10}}>
+    <input
+      style={{width:"100%",background:"rgba(255,255,255,0.06)",border:"1px solid rgba(255,255,255,0.1)",borderRadius:8,padding:"9px 12px 9px 34px",color:"#e2e8f0",fontSize:13,boxSizing:"border-box" as const,outline:"none",fontFamily:"'Sora',sans-serif"}}
+      placeholder="Pesquisar despesas..."
+      value={searchCouple}
+      onChange={e=>setSearchCouple(e.target.value)}
+    />
+    <span style={{position:"absolute",left:10,top:"50%",transform:"translateY(-50%)",fontSize:14,pointerEvents:"none"}}>🔍</span>
+    {searchCouple&&<button onClick={()=>setSearchCouple("")} style={{position:"absolute",right:10,top:"50%",transform:"translateY(-50%)",background:"none",border:"none",color:subtext,cursor:"pointer",fontSize:14}}>✕</button>}
+  </div>
   {/* ── Lista vazia ── */}
   {expenses.length===0&&!showForm&&(
     <div style={{textAlign:"center" as const,padding:"40px 0",color:subtext}}>
@@ -818,10 +830,10 @@ const jointBalance = totalContributions - totalSettledExpenses;
   )}
 
   {/* ── Por liquidar ── */}
-  {porLiquidar.length>0&&(
+  {porLiquidar.filter(e=>!searchCouple||e.descricao.toLowerCase().includes(searchCouple.toLowerCase())).length>0&&(
     <div style={{marginBottom:16}}>
       <div style={{fontSize:10,fontWeight:700,color:"#f59e0b",textTransform:"uppercase" as const,letterSpacing:"0.08em",marginBottom:8}}>⏳ Por liquidar</div>
-      {porLiquidar.map(e=>{
+      {porLiquidar.filter(e=>!searchCouple||e.descricao.toLowerCase().includes(searchCouple.toLowerCase())).map(e=>{
         const cat=expCats.find(c=>c.id===e.cat);
         const myShare=isUser1?e.split_user1:e.split_user2;
         const ptShare=isUser1?e.split_user2:e.split_user1;
@@ -851,10 +863,10 @@ const jointBalance = totalContributions - totalSettledExpenses;
   )}
 
   {/* ── Liquidadas ── */}
-  {liquidadas.length>0&&(
+  {liquidadas.filter(e=>!searchCouple||e.descricao.toLowerCase().includes(searchCouple.toLowerCase())).length>0&&(
     <div>
       <div style={{fontSize:10,fontWeight:700,color:"#34d399",textTransform:"uppercase" as const,letterSpacing:"0.08em",marginBottom:8}}>✅ Liquidadas</div>
-      {liquidadas.map(e=>{
+      {liquidadas.filter(e=>!searchCouple||e.descricao.toLowerCase().includes(searchCouple.toLowerCase())).map(e=>{
         const cat=expCats.find(c=>c.id===e.cat);
         const myShare=isUser1?e.split_user1:e.split_user2;
         const ptShare=isUser1?e.split_user2:e.split_user1;
