@@ -557,14 +557,15 @@ const jointBalance = totalContributions - totalSettledExpenses;
             return d.getMonth()===prevMonth&&d.getFullYear()===prevYear;
           });
           // Agrupa por categoria
-          const catMap:Record<string,{total:number;prev:number;icon:string;label:string}> = {};
+          const catMap:Record<string,{total:number;prev:number;icon:string;label:string;type:TypeKey}> = {};
           thisMonthExp.forEach(e=>{
             const cat=expCats.find(c=>c.id===e.cat);
-            if(!catMap[e.cat]) catMap[e.cat]={total:0,prev:0,icon:cat?.icon||"📦",label:cat?.label||e.cat};
+            if(!catMap[e.cat]) catMap[e.cat]={total:0,prev:0,icon:cat?.icon||"📦",label:cat?.label||e.cat,type:e.tipo||"necessidade"};
             catMap[e.cat].total+=Number(e.valor);
           });
           prevMonthExp.forEach(e=>{
-            if(!catMap[e.cat]) catMap[e.cat]={total:0,prev:0,icon:expCats.find(c=>c.id===e.cat)?.icon||"📦",label:expCats.find(c=>c.id===e.cat)?.label||e.cat};
+            const cat=expCats.find(c=>c.id===e.cat);
+            if(!catMap[e.cat]) catMap[e.cat]={total:0,prev:0,icon:cat?.icon||"📦",label:cat?.label||e.cat,type:e.tipo||"necessidade"};
             catMap[e.cat].prev+=Number(e.valor);
           });
           const topCats = Object.values(catMap).sort((a,b)=>b.total-a.total).slice(0,5);
@@ -617,7 +618,7 @@ const jointBalance = totalContributions - totalSettledExpenses;
                         </div>
                       </div>
                       <div style={{height:6,borderRadius:99,background:"rgba(255,255,255,0.07)",overflow:"hidden"}}>
-                        <div style={{width:`${Math.round((c.total/maxVal)*100)}%`,height:"100%",borderRadius:99,background:`linear-gradient(90deg,${accent},${accentDark})`}}/>
+                        <div style={{width:`${Math.round((c.total/maxVal)*100)}%`,height:"100%",borderRadius:99,background:TYPE_META[c.type]?.color||accent}}/>
                       </div>
                     </div>
                   );
