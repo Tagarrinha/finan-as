@@ -54,6 +54,9 @@ export default function CoupleMode({ userId, userEmail, userName, expCats, accen
   const [showNotifications, setShowNotifications] = useState(false);
   const [successMsg, setSuccessMsg] = useState("");
   const [searchCouple, setSearchCouple] = useState("");
+  const [dateFrom, setDateFrom] = useState("");
+  const [dateTo, setDateTo] = useState("");
+  const [showDateFilter, setShowDateFilter] = useState(false);
 
   useEffect(()=>{ loadCouple(); },[userId,userEmail]);
 
@@ -809,8 +812,60 @@ const jointBalance = totalContributions - totalSettledExpenses;
     </div>
   )}
 
-  {/* Search */}
-  <div style={{position:"relative",marginBottom:10}}>
+  {/* Filtro de datas */}
+  <div style={{marginBottom:10}}>
+    <div style={{display:"flex",gap:6,marginBottom:showDateFilter?8:0}}>
+      <div style={{position:"relative",flex:1}}>
+        <input
+          style={{width:"100%",background:"rgba(255,255,255,0.06)",border:"1px solid rgba(255,255,255,0.1)",borderRadius:8,padding:"9px 12px 9px 34px",color:"#e2e8f0",fontSize:13,boxSizing:"border-box" as const,outline:"none",fontFamily:"'Sora',sans-serif"}}
+          placeholder="Pesquisar despesas..."
+          value={searchCouple}
+          onChange={e=>setSearchCouple(e.target.value)}
+        />
+        <span style={{position:"absolute",left:10,top:"50%",transform:"translateY(-50%)",fontSize:14,pointerEvents:"none"}}>🔍</span>
+        {searchCouple&&<button onClick={()=>setSearchCouple("")} style={{position:"absolute",right:10,top:"50%",transform:"translateY(-50%)",background:"none",border:"none",color:subtext,cursor:"pointer",fontSize:14}}>✕</button>}
+      </div>
+      <button onClick={()=>setShowDateFilter(v=>!v)} style={{padding:"0 12px",background:showDateFilter||dateFrom||dateTo?`${accent}20`:"rgba(255,255,255,0.06)",border:`1px solid ${showDateFilter||dateFrom||dateTo?accent:"rgba(255,255,255,0.1)"}`,borderRadius:8,color:showDateFilter||dateFrom||dateTo?accent:subtext,fontSize:13,cursor:"pointer",whiteSpace:"nowrap" as const}}>
+        📅{dateFrom||dateTo?" ✓":""}
+      </button>
+    </div>
+    {showDateFilter&&(
+      <div style={{background:"rgba(255,255,255,0.04)",border:"1px solid rgba(255,255,255,0.08)",borderRadius:10,padding:"10px 12px"}}>
+        <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:8,marginBottom:8}}>
+          <div>
+            <div style={{fontSize:10,color:subtext,marginBottom:4}}>De</div>
+            <input type="date" value={dateFrom} onChange={e=>setDateFrom(e.target.value)} style={{width:"100%",background:"rgba(255,255,255,0.06)",border:"1px solid rgba(255,255,255,0.1)",borderRadius:7,padding:"7px 10px",color:"#e2e8f0",fontSize:12,boxSizing:"border-box" as const,outline:"none",fontFamily:"'Sora',sans-serif"}}/>
+          </div>
+          <div>
+            <div style={{fontSize:10,color:subtext,marginBottom:4}}>Até</div>
+            <input type="date" value={dateTo} onChange={e=>setDateTo(e.target.value)} style={{width:"100%",background:"rgba(255,255,255,0.06)",border:"1px solid rgba(255,255,255,0.1)",borderRadius:7,padding:"7px 10px",color:"#e2e8f0",fontSize:12,boxSizing:"border-box" as const,outline:"none",fontFamily:"'Sora',sans-serif"}}/>
+          </div>
+        </div>
+        {(dateFrom||dateTo)&&(()=>{
+          const filtered=expenses.filter(e=>{
+            const d=e.data;
+            if(dateFrom&&d<dateFrom) return false;
+            if(dateTo&&d>dateTo) return false;
+            return true;
+          });
+          const total=filtered.reduce((s,e)=>s+Number(e.valor),0);
+          const myTotal=filtered.reduce((s,e)=>s+(isUser1?e.split_user1:e.split_user2),0);
+          return(
+            <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",padding:"8px 10px",background:"rgba(255,255,255,0.04)",borderRadius:8}}>
+              <span style={{fontSize:11,color:subtext}}>{filtered.length} despesa{filtered.length!==1?"s":""} · a tua parte</span>
+              <div style={{textAlign:"right" as const}}>
+                <div style={{fontSize:13,fontWeight:800,color:negative}}>{fmt(total)}</div>
+                <div style={{fontSize:10,color:subtext}}>tua parte: {fmt(myTotal)}</div>
+              </div>
+            </div>
+          );
+        })()}
+        <button onClick={()=>{setDateFrom("");setDateTo("");}} style={{width:"100%",marginTop:8,padding:"7px 0",background:"rgba(255,255,255,0.04)",border:"1px solid rgba(255,255,255,0.08)",borderRadius:7,color:subtext,fontSize:11,cursor:"pointer",fontFamily:"'Sora',sans-serif"}}>Limpar datas</button>
+      </div>
+    )}
+  </div>
+  {/* Search — removido, integrado acima */}
+  <div style={{position:"relative",marginBottom:10,display:"none"}}>
     <input
       style={{width:"100%",background:"rgba(255,255,255,0.06)",border:"1px solid rgba(255,255,255,0.1)",borderRadius:8,padding:"9px 12px 9px 34px",color:"#e2e8f0",fontSize:13,boxSizing:"border-box" as const,outline:"none",fontFamily:"'Sora',sans-serif"}}
       placeholder="Pesquisar despesas..."
@@ -830,10 +885,20 @@ const jointBalance = totalContributions - totalSettledExpenses;
   )}
 
   {/* ── Por liquidar ── */}
-  {porLiquidar.filter(e=>!searchCouple||e.descricao.toLowerCase().includes(searchCouple.toLowerCase())).length>0&&(
+  {porLiquidar.filter(e=>{
+    if(searchCouple&&!e.descricao.toLowerCase().includes(searchCouple.toLowerCase())) return false;
+    if(dateFrom&&e.data<dateFrom) return false;
+    if(dateTo&&e.data>dateTo) return false;
+    return true;
+  }).length>0&&(
     <div style={{marginBottom:16}}>
       <div style={{fontSize:10,fontWeight:700,color:"#f59e0b",textTransform:"uppercase" as const,letterSpacing:"0.08em",marginBottom:8}}>⏳ Por liquidar</div>
-      {porLiquidar.filter(e=>!searchCouple||e.descricao.toLowerCase().includes(searchCouple.toLowerCase())).map(e=>{
+      {porLiquidar.filter(e=>{
+        if(searchCouple&&!e.descricao.toLowerCase().includes(searchCouple.toLowerCase())) return false;
+        if(dateFrom&&e.data<dateFrom) return false;
+        if(dateTo&&e.data>dateTo) return false;
+        return true;
+      }).map(e=>{
         const cat=expCats.find(c=>c.id===e.cat);
         const myShare=isUser1?e.split_user1:e.split_user2;
         const ptShare=isUser1?e.split_user2:e.split_user1;
@@ -863,10 +928,20 @@ const jointBalance = totalContributions - totalSettledExpenses;
   )}
 
   {/* ── Liquidadas ── */}
-  {liquidadas.filter(e=>!searchCouple||e.descricao.toLowerCase().includes(searchCouple.toLowerCase())).length>0&&(
+  {liquidadas.filter(e=>{
+    if(searchCouple&&!e.descricao.toLowerCase().includes(searchCouple.toLowerCase())) return false;
+    if(dateFrom&&e.data<dateFrom) return false;
+    if(dateTo&&e.data>dateTo) return false;
+    return true;
+  }).length>0&&(
     <div>
       <div style={{fontSize:10,fontWeight:700,color:"#34d399",textTransform:"uppercase" as const,letterSpacing:"0.08em",marginBottom:8}}>✅ Liquidadas</div>
-      {liquidadas.filter(e=>!searchCouple||e.descricao.toLowerCase().includes(searchCouple.toLowerCase())).map(e=>{
+      {liquidadas.filter(e=>{
+        if(searchCouple&&!e.descricao.toLowerCase().includes(searchCouple.toLowerCase())) return false;
+        if(dateFrom&&e.data<dateFrom) return false;
+        if(dateTo&&e.data>dateTo) return false;
+        return true;
+      }).map(e=>{
         const cat=expCats.find(c=>c.id===e.cat);
         const myShare=isUser1?e.split_user1:e.split_user2;
         const ptShare=isUser1?e.split_user2:e.split_user1;
