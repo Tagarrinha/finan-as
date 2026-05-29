@@ -105,16 +105,19 @@ type NavTab = "resumo"|"despesas"|"rendimentos"|"objetivos"|"comparacao"|"casal"
 
 interface NavItem { id: NavTab; label: string; icon: string; }
 
-const LEFT_NAV_ITEMS: NavItem[] = [
+const LEFT_NAV_PERSONAL: NavItem[] = [
   { id:"resumo",      label:"Dashboard",   icon:"📊" },
-  { id:"casal",       label:"Modo Casal",  icon:"👫" },
-  { id:"objetivos",   label:"Metas",       icon:"🎯" },
   { id:"despesas",    label:"Despesas",    icon:"📥" },
   { id:"rendimentos", label:"Rendimentos", icon:"💶" },
+  { id:"objetivos",   label:"Metas",       icon:"🎯" },
+  { id:"recorrentes", label:"Recorrentes", icon:"🔄" },
   { id:"comparacao",  label:"Comparação",  icon:"📈" },
   { id:"exportar",    label:"Exportar",    icon:"📤" },
-  { id:"definicoes",  label:"Definições",  icon:"⚙️" },
 ];
+const LEFT_NAV_COUPLE: NavItem[] = [
+  { id:"casal",       label:"Modo Casal",  icon:"👫" },
+];
+const LEFT_NAV_ITEMS: NavItem[] = [...LEFT_NAV_PERSONAL, ...LEFT_NAV_COUPLE];
 
 function LeftNav({ isOpen, onClose, activeTab, onNavigate, accent, accentDark, onSettings }: {
   isOpen: boolean;
@@ -296,8 +299,8 @@ function LeftNav({ isOpen, onClose, activeTab, onNavigate, accent, accentDark, o
 
         {/* Nav */}
         <nav className="lnav-nav" aria-label="Navegação principal">
-          <div className="lnav-section-label">Menu</div>
-          {LEFT_NAV_ITEMS.map(item => (
+          <div className="lnav-section-label">👤 Pessoal</div>
+          {LEFT_NAV_PERSONAL.map(item => (
             <button
               key={item.id}
               className={`lnav-item${activeTab === item.id ? " active" : ""}`}
@@ -308,6 +311,26 @@ function LeftNav({ isOpen, onClose, activeTab, onNavigate, accent, accentDark, o
               <span className="lnav-item-label">{item.label}</span>
             </button>
           ))}
+          <div className="lnav-section-label" style={{marginTop:8}}>👫 Casal</div>
+          {LEFT_NAV_COUPLE.map(item => (
+            <button
+              key={item.id}
+              className={`lnav-item${activeTab === item.id ? " active" : ""}`}
+              onClick={() => handleNav(item.id)}
+              aria-current={activeTab === item.id ? "page" : undefined}
+            >
+              <span className="lnav-item-icon">{item.icon}</span>
+              <span className="lnav-item-label">{item.label}</span>
+            </button>
+          ))}
+          <div className="lnav-section-label" style={{marginTop:8}}>⚙️ Sistema</div>
+          <button
+            className={`lnav-item${activeTab === "definicoes" ? " active" : ""}`}
+            onClick={() => handleNav("definicoes")}
+          >
+            <span className="lnav-item-icon">⚙️</span>
+            <span className="lnav-item-label">Definições</span>
+          </button>
         </nav>
 
         {/* Footer */}
