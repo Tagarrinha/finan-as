@@ -1610,7 +1610,7 @@ async function handleCoupleSettlement(valor: number) {
     </div>
 
       {/* ── BOTTOM NAV ── */}
-      <div style={{position:"fixed",bottom:16,left:"50%",transform:"translateX(-50%)",zIndex:60,width:"calc(100% - 32px)",maxWidth:420}}>
+      <div style={{position:"fixed",bottom:16,left:"50%",transform:"translateX(-50%)",zIndex:60,width:"auto"}}>
         <div style={{background:"rgba(15,18,30,0.85)",backdropFilter:"blur(20px)",WebkitBackdropFilter:"blur(20px)",border:"1px solid rgba(255,255,255,0.08)",borderRadius:24,padding:"10px 8px",display:"flex",alignItems:"center",justifyContent:"space-around",boxShadow:"0 8px 32px rgba(0,0,0,0.5)",paddingBottom:"env(safe-area-inset-bottom, 10px)"}}>
 
           {/* Dashboard */}
