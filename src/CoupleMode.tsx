@@ -60,6 +60,15 @@ export default function CoupleMode({ userId, userEmail, userName, expCats, accen
 
   useEffect(()=>{ loadCouple(); },[userId,userEmail]);
 
+  // Polling de notificações a cada 30 segundos
+  useEffect(()=>{
+    const interval = setInterval(async()=>{
+      const {data} = await supabase.from("notifications").select("*").eq("user_id",userId).eq("lida",false).order("created_at",{ascending:false}).limit(20);
+      if(data) setNotifications(data);
+    }, 30000);
+    return ()=>clearInterval(interval);
+  },[userId]);
+
   async function loadCouple() {
     setLoading(true);
     const {data:c} = await supabase.from("couples").select("*")
@@ -183,6 +192,7 @@ async function syncToPersonal(e: CoupleExpense) {
   setExpenses(p=>p.map(x=>x.id===e.id?{...x,liquidado:true}:x));
   // Notifica o parceiro
   const partnerId = isUser1 ? couple!.user2_id : couple!.user1_id;
+  console.log("Notificar parceiro:", partnerId, "isUser1:", isUser1, "couple:", couple);
   if(partnerId) await createNotification(partnerId, "liquidado", `${userName} liquidou a despesa: ${e.descricao} — ${fmt(Number(e.valor))}`);
   await syncToPersonal(e);
   // Deduz a parte do utilizador actual da conta pessoal
