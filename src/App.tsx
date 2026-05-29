@@ -1614,7 +1614,7 @@ async function handleCoupleSettlement(valor: number) {
         <div style={{background:"rgba(15,18,30,0.85)",backdropFilter:"blur(20px)",WebkitBackdropFilter:"blur(20px)",border:"1px solid rgba(255,255,255,0.08)",borderRadius:24,padding:"10px 8px",display:"flex",alignItems:"center",justifyContent:"space-around",boxShadow:"0 8px 32px rgba(0,0,0,0.5)",paddingBottom:"env(safe-area-inset-bottom, 10px)"}}>
 
           {/* Dashboard */}
-          <button onClick={()=>setTab("resumo")} style={{display:"flex",flexDirection:"column" as const,alignItems:"center",gap:4,padding:"8px 20px",borderRadius:16,border:"none",background:tab==="resumo"?`${T.accent}20`:"transparent",cursor:"pointer",transition:"all .2s",minWidth:70}}>
+          <button onClick={()=>setTab("resumo")} style={{display:"flex",flexDirection:"column" as const,alignItems:"center",gap:4,padding:"8px 0",borderRadius:16,border:"none",background:tab==="resumo"?`${T.accent}20`:"transparent",cursor:"pointer",transition:"all .2s",width:80}}>
             <svg width="22" height="22" viewBox="0 0 24 24" fill={tab==="resumo"?T.accent:"rgba(255,255,255,0.4)"}>
               <path d="M3 13h8V3H3v10zm0 8h8v-6H3v6zm10 0h8V11h-8v10zm0-18v6h8V3h-8z"/>
             </svg>
@@ -1632,7 +1632,7 @@ async function handleCoupleSettlement(valor: number) {
           </button>
 
           {/* Modo Casal */}
-          <button onClick={()=>setTab("casal")} style={{display:"flex",flexDirection:"column" as const,alignItems:"center",gap:4,padding:"8px 20px",borderRadius:16,border:"none",background:tab==="casal"?`${T.accent}20`:"transparent",cursor:"pointer",transition:"all .2s",minWidth:70}}>
+          <button onClick={()=>setTab("casal")} style={{display:"flex",flexDirection:"column" as const,alignItems:"center",gap:4,padding:"8px 0",borderRadius:16,border:"none",background:tab==="casal"?`${T.accent}20`:"transparent",cursor:"pointer",transition:"all .2s",width:80}}>
             <svg width="22" height="22" viewBox="0 0 24 24" fill={tab==="casal"?T.accent:"rgba(255,255,255,0.4)"}>
               <path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z"/>
             </svg>
