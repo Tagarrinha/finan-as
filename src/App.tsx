@@ -1043,7 +1043,7 @@ async function handleCoupleSettlement(valor: number) {
               <div style={{flex:1,height:3,borderRadius:99,background:"rgba(255,255,255,0.07)",overflow:"hidden"}}>
                 <div style={{width:`${Math.min(100,savingsRate)}%`,height:"100%",background:`linear-gradient(90deg,${heroColor},${heroColor}88)`,borderRadius:99,transition:"width .6s ease"}}/>
               </div>
-              <span style={{fontSize:10,fontWeight:700,color:heroColor,whiteSpace:"nowrap" as const}}>{savingsRate}% poupado</span>
+              <span style={{fontSize:10,fontWeight:700,color:heroColor,whiteSpace:"nowrap" as const}}>{savingsRate}% disponível</span>
             </div>
           )}
         </div>
