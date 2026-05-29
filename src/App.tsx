@@ -978,7 +978,7 @@ async function handleCoupleSettlement(valor: number) {
   {/* ── HERO ── */}
   {(()=>{
     const savingsRate=totalInc>0?pct(balance,totalInc):0;
-    const heroColor=balance<0?T.negative:savingsRate>=20?T.positive:T.accent;
+    const heroColor=balance<0?T.negative:savingsRate>=10?T.positive:savingsRate>0?"#f59e0b":T.negative;
     const now=new Date();
     const prevMonth=now.getMonth()===0?11:now.getMonth()-1;
     const prevYear=now.getMonth()===0?now.getFullYear()-1:now.getFullYear();
