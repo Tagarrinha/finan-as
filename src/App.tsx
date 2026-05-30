@@ -213,7 +213,7 @@ function LeftNav({ isOpen, onClose, activeTab, onNavigate, accent, accentDark, o
           border-top: 1px solid rgba(255,255,255,0.06);
           margin-top: 4px;
         }
-        .lnav-nav { flex: 1; padding: 6px 10px; overflow-y: auto; display: flex; flex-direction: column; gap: 2px; min-height: 0; }
+        .lnav-nav { flex: 1; padding: 6px 10px; overflow-y: auto; display: flex; flex-direction: column; gap: 2px; min-height: 0; max-height: calc(100vh - 120px); -webkit-overflow-scrolling: touch; }
 
         .lnav-item {
           display: flex; align-items: center; gap: 11px;
