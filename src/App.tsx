@@ -164,6 +164,7 @@ function LeftNav({ isOpen, onClose, activeTab, onNavigate, accent, accentDark, o
           background: #0b0e18;
           border-right: 1px solid rgba(255,255,255,0.07);
           display: flex; flex-direction: column;
+          overflow: hidden;
           transform: translateX(-100%);
           transition: transform 0.28s cubic-bezier(0.4,0,0.2,1);
           will-change: transform;
