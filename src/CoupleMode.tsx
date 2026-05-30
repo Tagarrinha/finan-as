@@ -396,7 +396,7 @@ const jointBalance = totalContributions - totalSettledExpenses;
           </div>
         </div>
         {/* Status + stats */}
-        <div style={{flex:1,minWidth:0}}>
+        <div style={{flex:1,minWidth:0,alignSelf:"center"}}>
           <div style={{display:"flex",alignItems:"center",gap:5,marginBottom:3}}>
             <div style={{width:5,height:5,borderRadius:"50%",background:"#34d399",boxShadow:"0 0 5px #34d399",flexShrink:0}}/>
             <span style={{fontSize:10,color:subtext}}>modo casal ativo</span>
