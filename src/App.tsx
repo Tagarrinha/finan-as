@@ -213,7 +213,7 @@ function LeftNav({ isOpen, onClose, activeTab, onNavigate, accent, accentDark, o
           border-top: 1px solid rgba(255,255,255,0.06);
           margin-top: 4px;
         }
-        .lnav-nav { flex: 1; padding: 6px 10px; overflow-y: auto; display: flex; flex-direction: column; gap: 2px; min-height: 0; max-height: calc(100vh - 120px); -webkit-overflow-scrolling: touch; }
+        .lnav-nav { flex: 1; padding: 6px 10px 100px; overflow-y: auto; display: flex; flex-direction: column; gap: 2px; min-height: 0; -webkit-overflow-scrolling: touch; }
 
         .lnav-item {
           display: flex; align-items: center; gap: 11px;
@@ -257,10 +257,12 @@ function LeftNav({ isOpen, onClose, activeTab, onNavigate, accent, accentDark, o
 
         .lnav-footer {
           padding: 12px 18px;
+          padding-bottom: calc(12px + env(safe-area-inset-bottom, 0px));
           border-top: 1px solid rgba(255,255,255,0.05);
           font-family: 'Sora', sans-serif;
           font-size: 10px; color: rgba(255,255,255,0.18);
           text-align: center; letter-spacing: 0.02em;
+          flex-shrink: 0;
         }
 
         .lnav-hamburger {
