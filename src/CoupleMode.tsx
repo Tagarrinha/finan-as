@@ -385,68 +385,58 @@ const jointBalance = totalContributions - totalSettledExpenses;
   return(
     <div style={{fontFamily:"'Sora',sans-serif"}}>
       {/* Header compacto */}
-      <div style={{display:"flex",alignItems:"center",gap:8,padding:"8px 10px",background:`rgba(255,255,255,0.03)`,border:`1px solid rgba(255,255,255,0.07)`,borderRadius:14,marginBottom:12,position:"relative"}}>
-        {/* Avatares */}
-        <div style={{display:"flex",gap:4,flexShrink:0}}>
-          <div style={{width:26,height:26,borderRadius:"50%",background:`${MY_COLOR}30`,border:`1.5px solid ${MY_COLOR}`,display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0}}>
-            <span style={{fontSize:9,fontWeight:800,color:MY_COLOR}}>{userName.slice(0,2).toUpperCase()}</span>
-          </div>
-          <div style={{width:26,height:26,borderRadius:"50%",background:`${PARTNER_COLOR}30`,border:`1.5px solid ${PARTNER_COLOR}`,display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0}}>
-            <span style={{fontSize:9,fontWeight:800,color:PARTNER_COLOR}}>{partnerName.slice(0,2).toUpperCase()}</span>
-          </div>
-        </div>
-        {/* Status + stats */}
-        <div style={{flex:1,minWidth:0,alignSelf:"center"}}>
-          <div style={{display:"flex",alignItems:"center",gap:5,marginBottom:3}}>
-            <div style={{width:5,height:5,borderRadius:"50%",background:"#34d399",boxShadow:"0 0 5px #34d399",flexShrink:0}}/>
-            <span style={{fontSize:10,color:subtext}}>modo casal ativo</span>
-          </div>
-          <div style={{display:"flex",gap:12}}>
-            <div style={{display:"flex",alignItems:"center",gap:4}}>
-              <span style={{fontSize:9,color:subtext,textTransform:"uppercase" as const,letterSpacing:"0.06em"}}>Geridos</span>
-              <span style={{fontSize:12,fontWeight:800,color:"#f1f5f9"}}>{fmt(liquidadas.reduce((s,e)=>s+Number(e.valor),0))}</span>
+            <div style={{padding:"8px 10px",background:`rgba(255,255,255,0.03)`,border:`1px solid rgba(255,255,255,0.07)`,borderRadius:14,marginBottom:12}}>
+        <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",marginBottom:6}}>
+          {/* Linha 1: avatares + botões */}
+          <div style={{display:"flex",alignItems:"center",gap:6}}>
+            <div style={{width:26,height:26,borderRadius:"50%",background:`${MY_COLOR}30`,border:`1.5px solid ${MY_COLOR}`,display:"flex",alignItems:"center",justifyContent:"center"}}>
+              <span style={{fontSize:9,fontWeight:800,color:MY_COLOR}}>{userName.slice(0,2).toUpperCase()}</span>
             </div>
-            <div style={{display:"flex",alignItems:"center",gap:4}}>
-              <span style={{fontSize:9,color:subtext,textTransform:"uppercase" as const,letterSpacing:"0.06em"}}>Pendente</span>
-              <span style={{fontSize:12,fontWeight:800,color:porLiquidar.length>0?"#f59e0b":"#34d399"}}>{fmt(myDebt)}</span>
+            <div style={{width:26,height:26,borderRadius:"50%",background:`${PARTNER_COLOR}30`,border:`1.5px solid ${PARTNER_COLOR}`,display:"flex",alignItems:"center",justifyContent:"center"}}>
+              <span style={{fontSize:9,fontWeight:800,color:PARTNER_COLOR}}>{partnerName.slice(0,2).toUpperCase()}</span>
+            </div>
+            <div style={{display:"flex",alignItems:"center",gap:4,marginLeft:4}}>
+              <div style={{width:5,height:5,borderRadius:"50%",background:"#34d399",boxShadow:"0 0 5px #34d399"}}/>
+              <span style={{fontSize:10,color:subtext}}>modo casal ativo</span>
             </div>
           </div>
-        </div>
-        {/* Botões */}
-        <div style={{display:"flex",gap:6,flexShrink:0}}>
-          <button onClick={()=>setShowNotifications(v=>!v)} style={{width:30,height:30,borderRadius:8,background:"rgba(255,255,255,0.05)",border:"1px solid rgba(255,255,255,0.08)",display:"flex",alignItems:"center",justifyContent:"center",cursor:"pointer",fontSize:13,position:"relative"}}>
-            🔔
-            {notifications.length>0&&(
-              <span style={{position:"absolute",top:-3,right:-3,width:14,height:14,borderRadius:"50%",background:"#ef4444",color:"white",fontSize:8,fontWeight:800,display:"flex",alignItems:"center",justifyContent:"center"}}>
-                {notifications.length}
-              </span>
-            )}
-          </button>
-          {showNotifications&&(
-            <>
-              <div onClick={()=>setShowNotifications(false)} style={{position:"fixed",inset:0,zIndex:10}}/>
-              <div style={{position:"absolute",top:"calc(100% + 8px)",right:0,zIndex:20,background:"#0f1117",border:"1px solid rgba(255,255,255,0.1)",borderRadius:16,padding:"12px",minWidth:280,maxWidth:320,boxShadow:"0 8px 32px rgba(0,0,0,0.5)"}}>
-                <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:10}}>
-                  <div style={{fontSize:12,fontWeight:700,color:"#f1f5f9"}}>Notificações</div>
-                  {notifications.length>0&&(
-                    <button onClick={async()=>{await supabase.from("notifications").update({lida:true}).eq("user_id",userId);setNotifications([]);setShowNotifications(false);}} style={{fontSize:11,color:accent,background:"none",border:"none",cursor:"pointer",fontFamily:"'Sora',sans-serif",fontWeight:600}}>
-                      Marcar todas como lidas
-                    </button>
-                  )}
-                </div>
-                {notifications.length===0?(
-                  <div style={{textAlign:"center" as const,padding:"16px 0",color:subtext,fontSize:13}}>Sem notificações</div>
-                ):notifications.map(n=>(
-                  <div key={n.id} style={{padding:"10px 0",borderBottom:"1px solid rgba(255,255,255,0.06)"}}>
-                    <div style={{fontSize:13,color:"#e2e8f0",lineHeight:1.5}}>{n.mensagem}</div>
-                    <div style={{fontSize:10,color:subtext,marginTop:4}}>{new Date(n.created_at).toLocaleDateString("pt-PT",{day:"2-digit",month:"short",hour:"2-digit",minute:"2-digit"})}</div>
+          <div style={{display:"flex",gap:6,position:"relative"}}>
+            <button onClick={()=>setShowNotifications(v=>!v)} style={{width:28,height:28,borderRadius:8,background:"rgba(255,255,255,0.05)",border:"1px solid rgba(255,255,255,0.08)",display:"flex",alignItems:"center",justifyContent:"center",cursor:"pointer",fontSize:13,position:"relative"}}>
+              🔔
+              {notifications.length>0&&<span style={{position:"absolute",top:-3,right:-3,width:14,height:14,borderRadius:"50%",background:"#ef4444",color:"white",fontSize:8,fontWeight:800,display:"flex",alignItems:"center",justifyContent:"center"}}>{notifications.length}</span>}
+            </button>
+            {showNotifications&&(
+              <>
+                <div onClick={()=>setShowNotifications(false)} style={{position:"fixed",inset:0,zIndex:10}}/>
+                <div style={{position:"absolute",top:"calc(100% + 8px)",right:0,zIndex:20,background:"#0f1117",border:"1px solid rgba(255,255,255,0.1)",borderRadius:16,padding:"12px",minWidth:280,maxWidth:320,boxShadow:"0 8px 32px rgba(0,0,0,0.5)"}}>
+                  <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:10}}>
+                    <div style={{fontSize:12,fontWeight:700,color:"#f1f5f9"}}>Notificações</div>
+                    {notifications.length>0&&<button onClick={async()=>{await supabase.from("notifications").update({lida:true}).eq("user_id",userId);setNotifications([]);setShowNotifications(false);}} style={{fontSize:11,color:accent,background:"none",border:"none",cursor:"pointer",fontFamily:"'Sora',sans-serif",fontWeight:600}}>Marcar todas como lidas</button>}
                   </div>
-                ))}
-              </div>
-            </>
-          )}
-          <button onClick={dissolveCouple} style={{width:30,height:30,borderRadius:8,background:"rgba(239,68,68,0.06)",border:"1px solid rgba(239,68,68,0.12)",display:"flex",alignItems:"center",justifyContent:"center",color:"#f87171",fontSize:12,cursor:"pointer"}}>✕</button>
+                  {notifications.length===0?<div style={{textAlign:"center" as const,padding:"16px 0",color:subtext,fontSize:13}}>Sem notificações</div>:notifications.map(n=>(
+                    <div key={n.id} style={{padding:"10px 0",borderBottom:"1px solid rgba(255,255,255,0.06)"}}>
+                      <div style={{fontSize:13,color:"#e2e8f0",lineHeight:1.5}}>{n.mensagem}</div>
+                      <div style={{fontSize:10,color:subtext,marginTop:4}}>{new Date(n.created_at).toLocaleDateString("pt-PT",{day:"2-digit",month:"short",hour:"2-digit",minute:"2-digit"})}</div>
+                    </div>
+                  ))}
+                </div>
+              </>
+            )}
+            <button onClick={dissolveCouple} style={{width:28,height:28,borderRadius:8,background:"rgba(239,68,68,0.06)",border:"1px solid rgba(239,68,68,0.12)",display:"flex",alignItems:"center",justifyContent:"center",color:"#f87171",fontSize:12,cursor:"pointer"}}>✕</button>
+          </div>
         </div>
+        {/* Linha 2: stats */}
+        <div style={{display:"flex",gap:16}}>
+          <div style={{display:"flex",alignItems:"center",gap:4}}>
+            <span style={{fontSize:9,color:subtext,textTransform:"uppercase" as const,letterSpacing:"0.06em"}}>Geridos</span>
+            <span style={{fontSize:12,fontWeight:800,color:"#f1f5f9"}}>{fmt(liquidadas.reduce((s,e)=>s+Number(e.valor),0))}</span>
+          </div>
+          <div style={{display:"flex",alignItems:"center",gap:4}}>
+            <span style={{fontSize:9,color:subtext,textTransform:"uppercase" as const,letterSpacing:"0.06em"}}>Pendente</span>
+            <span style={{fontSize:12,fontWeight:800,color:porLiquidar.length>0?"#f59e0b":"#34d399"}}>{fmt(myDebt)}</span>
+          </div>
+        </div>
+
       </div>
       {/* Sync message */}
       {syncMsg&&(
