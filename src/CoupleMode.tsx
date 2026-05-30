@@ -959,7 +959,49 @@ const jointBalance = totalContributions - totalSettledExpenses;
       })}
     </div>
   )}
-</>}
+      </>}
+
+      {/* ── RECORRENTES ── */}
+      {tab==="recorrentes"&&couple&&(
+        <CoupleRecurring
+          coupleId={couple.id}
+          isUser1={isUser1}
+          userName={userName}
+          partnerName={partnerName}
+          expCats={expCats}
+          accent={accent}
+          accentDark={accentDark}
+          cardBg={cardBg}
+          cardBorder={cardBorder}
+          subtext={subtext}
+          negative={negative}
+          items={recurringItems}
+          setItems={setRecurringItems}
+          onApplyDue={async (r) => {
+            const total = Number(r.valor);
+            const s1 = r.split_user1 || total/2;
+            const s2 = r.split_user2 || total/2;
+            const {data, error} = await supabase.from("couple_expenses").insert({
+              couple_id: couple.id,
+              created_by: userId,
+              descricao: r.descricao,
+              valor: total,
+              cat: r.cat,
+              subcat: "",
+              tipo: r.tipo,
+              data: new Date().toISOString().slice(0,10),
+              split_user1: s1,
+              split_user2: s2,
+              pago_por: userId,
+              liquidado: r.liquidado_auto,
+            }).select().single();
+            if(!error && data) {
+              setExpenses(p => [data as CoupleExpense, ...p]);
+              if(r.liquidado_auto) await syncToPersonal(data as CoupleExpense);
+            }
+          }}
+        />
+      )}
     </div>
   );
 }
