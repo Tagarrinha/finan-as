@@ -413,7 +413,7 @@ const jointBalance = totalContributions - totalSettledExpenses;
           </div>
         </div>
         {/* Botões */}
-        <div style={{display:"flex",gap:6,flexShrink:0,position:"relative"}}>
+        <div style={{display:"flex",gap:6,flexShrink:0}}>
           <button onClick={()=>setShowNotifications(v=>!v)} style={{width:30,height:30,borderRadius:8,background:"rgba(255,255,255,0.05)",border:"1px solid rgba(255,255,255,0.08)",display:"flex",alignItems:"center",justifyContent:"center",cursor:"pointer",fontSize:13,position:"relative"}}>
             🔔
             {notifications.length>0&&(
