@@ -384,77 +384,68 @@ const jointBalance = totalContributions - totalSettledExpenses;
   // ── ACTIVE ──────────────────────────────────────────────────────────────────
   return(
     <div style={{fontFamily:"'Sora',sans-serif"}}>
-      {/* Header */}
-      <div style={{background:`linear-gradient(135deg,${MY_COLOR}22,${PARTNER_COLOR}15)`,border:`1px solid ${MY_COLOR}40`,borderRadius:18,padding:"12px 14px",marginBottom:12,position:"relative",overflow:"hidden"}}>
-        {/* Glow background */}
-        <div style={{position:"absolute",top:-40,left:-40,width:160,height:160,borderRadius:"50%",background:`radial-gradient(circle,${MY_COLOR}20 0%,transparent 70%)`,pointerEvents:"none"}}/>
-        <div style={{position:"absolute",top:-40,right:-40,width:160,height:160,borderRadius:"50%",background:`radial-gradient(circle,${PARTNER_COLOR}20 0%,transparent 70%)`,pointerEvents:"none"}}/>
-        {/* Linha superior: avatares + botões */}
-        <div style={{display:"flex",alignItems:"flex-start",justifyContent:"space-between",marginBottom:16,position:"relative"}}>
-          {/* Avatares com iniciais */}
-          <div style={{display:"flex"}}>
-            <div style={{width:36,height:36,borderRadius:"50%",background:`linear-gradient(135deg,${MY_COLOR}40,${MY_COLOR}20)`,border:`2px solid ${MY_COLOR}`,display:"flex",alignItems:"center",justifyContent:"center",zIndex:2,boxShadow:`0 0 10px ${MY_COLOR}30`}}>
-              <span style={{fontSize:13,fontWeight:800,color:MY_COLOR}}>{userName.slice(0,2).toUpperCase()}</span>
-            </div>
-            <div style={{width:36,height:36,borderRadius:"50%",background:`linear-gradient(135deg,${PARTNER_COLOR}40,${PARTNER_COLOR}20)`,border:`2px solid ${PARTNER_COLOR}`,display:"flex",alignItems:"center",justifyContent:"center",marginLeft:-10,zIndex:1,boxShadow:`0 0 10px ${PARTNER_COLOR}30`}}>
-              <span style={{fontSize:13,fontWeight:800,color:PARTNER_COLOR}}>{partnerName.slice(0,2).toUpperCase()}</span>
-            </div>
-            <div style={{width:18,height:18,borderRadius:"50%",background:"#0f1117",border:"1.5px solid rgba(255,255,255,0.15)",display:"flex",alignItems:"center",justifyContent:"center",fontSize:9,marginLeft:-7,zIndex:3,alignSelf:"flex-end",marginBottom:1}}>💑</div>
+      {/* Header compacto */}
+      <div style={{display:"flex",alignItems:"center",gap:10,padding:"10px 14px",background:`rgba(255,255,255,0.03)`,border:`1px solid rgba(255,255,255,0.07)`,borderRadius:14,marginBottom:12,position:"relative"}}>
+        {/* Avatares */}
+        <div style={{display:"flex",flexShrink:0}}>
+          <div style={{width:28,height:28,borderRadius:"50%",background:`${MY_COLOR}30`,border:`2px solid ${MY_COLOR}`,display:"flex",alignItems:"center",justifyContent:"center",zIndex:2}}>
+            <span style={{fontSize:10,fontWeight:800,color:MY_COLOR}}>{userName.slice(0,2).toUpperCase()}</span>
           </div>
-          {/* Botões */}
-          <div style={{display:"flex",gap:6,alignItems:"center"}}>
-            <div style={{position:"relative"}}>
-              <button onClick={()=>setShowNotifications(v=>!v)} style={{width:34,height:34,borderRadius:10,background:"rgba(255,255,255,0.06)",border:"1px solid rgba(255,255,255,0.1)",display:"flex",alignItems:"center",justifyContent:"center",cursor:"pointer",fontSize:15,position:"relative"}}>
-                🔔
-                {notifications.length>0&&(
-                  <span style={{position:"absolute",top:-4,right:-4,width:16,height:16,borderRadius:"50%",background:"#ef4444",color:"white",fontSize:9,fontWeight:800,display:"flex",alignItems:"center",justifyContent:"center"}}>
-                    {notifications.length}
-                  </span>
-                )}
-              </button>
-              {showNotifications&&(
-                <>
-                  <div onClick={()=>setShowNotifications(false)} style={{position:"fixed",inset:0,zIndex:10}}/>
-                  <div style={{position:"absolute",top:"calc(100% + 8px)",right:0,zIndex:20,background:"#0f1117",border:"1px solid rgba(255,255,255,0.1)",borderRadius:16,padding:"12px",minWidth:280,maxWidth:320,boxShadow:"0 8px 32px rgba(0,0,0,0.5)"}}>
-                    <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:10}}>
-                      <div style={{fontSize:12,fontWeight:700,color:"#f1f5f9"}}>Notificações</div>
-                      {notifications.length>0&&(
-                        <button onClick={async()=>{await supabase.from("notifications").update({lida:true}).eq("user_id",userId);setNotifications([]);setShowNotifications(false);}} style={{fontSize:11,color:accent,background:"none",border:"none",cursor:"pointer",fontFamily:"'Sora',sans-serif",fontWeight:600}}>
-                          Marcar todas como lidas
-                        </button>
-                      )}
-                    </div>
-                    {notifications.length===0?(
-                      <div style={{textAlign:"center" as const,padding:"16px 0",color:subtext,fontSize:13}}>Sem notificações</div>
-                    ):notifications.map(n=>(
-                      <div key={n.id} style={{padding:"10px 0",borderBottom:"1px solid rgba(255,255,255,0.06)"}}>
-                        <div style={{fontSize:13,color:"#e2e8f0",lineHeight:1.5}}>{n.mensagem}</div>
-                        <div style={{fontSize:10,color:subtext,marginTop:4}}>{new Date(n.created_at).toLocaleDateString("pt-PT",{day:"2-digit",month:"short",hour:"2-digit",minute:"2-digit"})}</div>
-                      </div>
-                    ))}
-                  </div>
-                </>
-              )}
-            </div>
-            <button onClick={dissolveCouple} style={{width:34,height:34,borderRadius:10,background:"rgba(239,68,68,0.08)",border:"1px solid rgba(239,68,68,0.15)",display:"flex",alignItems:"center",justifyContent:"center",color:"#f87171",fontSize:14,cursor:"pointer"}}>✕</button>
+          <div style={{width:28,height:28,borderRadius:"50%",background:`${PARTNER_COLOR}30`,border:`2px solid ${PARTNER_COLOR}`,display:"flex",alignItems:"center",justifyContent:"center",marginLeft:-8,zIndex:1}}>
+            <span style={{fontSize:10,fontWeight:800,color:PARTNER_COLOR}}>{partnerName.slice(0,2).toUpperCase()}</span>
           </div>
         </div>
-        {/* Status + stats inline */}
-        <div style={{position:"relative",paddingTop:10,borderTop:"1px solid rgba(255,255,255,0.08)",display:"flex",alignItems:"center",justifyContent:"space-between"}}>
-          <div style={{display:"flex",alignItems:"center",gap:5}}>
-            <div style={{width:5,height:5,borderRadius:"50%",background:"#34d399",boxShadow:"0 0 5px #34d399"}}/>
+        {/* Status + stats */}
+        <div style={{flex:1,minWidth:0}}>
+          <div style={{display:"flex",alignItems:"center",gap:5,marginBottom:3}}>
+            <div style={{width:5,height:5,borderRadius:"50%",background:"#34d399",boxShadow:"0 0 5px #34d399",flexShrink:0}}/>
             <span style={{fontSize:10,color:subtext}}>modo casal ativo</span>
           </div>
-          <div style={{display:"flex",gap:14}}>
-            <div style={{textAlign:"right" as const}}>
-              <div style={{fontSize:9,color:subtext,textTransform:"uppercase" as const,letterSpacing:"0.06em"}}>Geridos</div>
-              <div style={{fontSize:13,fontWeight:800,color:"#f1f5f9"}}>{fmt(liquidadas.reduce((s,e)=>s+Number(e.valor),0))}</div>
+          <div style={{display:"flex",gap:12}}>
+            <div style={{display:"flex",alignItems:"center",gap:4}}>
+              <span style={{fontSize:9,color:subtext,textTransform:"uppercase" as const,letterSpacing:"0.06em"}}>Geridos</span>
+              <span style={{fontSize:12,fontWeight:800,color:"#f1f5f9"}}>{fmt(liquidadas.reduce((s,e)=>s+Number(e.valor),0))}</span>
             </div>
-            <div style={{textAlign:"right" as const}}>
-              <div style={{fontSize:9,color:subtext,textTransform:"uppercase" as const,letterSpacing:"0.06em"}}>Pendente</div>
-              <div style={{fontSize:13,fontWeight:800,color:porLiquidar.length>0?"#f59e0b":"#34d399"}}>{fmt(myDebt)}</div>
+            <div style={{display:"flex",alignItems:"center",gap:4}}>
+              <span style={{fontSize:9,color:subtext,textTransform:"uppercase" as const,letterSpacing:"0.06em"}}>Pendente</span>
+              <span style={{fontSize:12,fontWeight:800,color:porLiquidar.length>0?"#f59e0b":"#34d399"}}>{fmt(myDebt)}</span>
             </div>
           </div>
+        </div>
+        {/* Botões */}
+        <div style={{display:"flex",gap:6,flexShrink:0,position:"relative"}}>
+          <button onClick={()=>setShowNotifications(v=>!v)} style={{width:30,height:30,borderRadius:8,background:"rgba(255,255,255,0.05)",border:"1px solid rgba(255,255,255,0.08)",display:"flex",alignItems:"center",justifyContent:"center",cursor:"pointer",fontSize:13,position:"relative"}}>
+            🔔
+            {notifications.length>0&&(
+              <span style={{position:"absolute",top:-3,right:-3,width:14,height:14,borderRadius:"50%",background:"#ef4444",color:"white",fontSize:8,fontWeight:800,display:"flex",alignItems:"center",justifyContent:"center"}}>
+                {notifications.length}
+              </span>
+            )}
+          </button>
+          {showNotifications&&(
+            <>
+              <div onClick={()=>setShowNotifications(false)} style={{position:"fixed",inset:0,zIndex:10}}/>
+              <div style={{position:"absolute",top:"calc(100% + 8px)",right:0,zIndex:20,background:"#0f1117",border:"1px solid rgba(255,255,255,0.1)",borderRadius:16,padding:"12px",minWidth:280,maxWidth:320,boxShadow:"0 8px 32px rgba(0,0,0,0.5)"}}>
+                <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:10}}>
+                  <div style={{fontSize:12,fontWeight:700,color:"#f1f5f9"}}>Notificações</div>
+                  {notifications.length>0&&(
+                    <button onClick={async()=>{await supabase.from("notifications").update({lida:true}).eq("user_id",userId);setNotifications([]);setShowNotifications(false);}} style={{fontSize:11,color:accent,background:"none",border:"none",cursor:"pointer",fontFamily:"'Sora',sans-serif",fontWeight:600}}>
+                      Marcar todas como lidas
+                    </button>
+                  )}
+                </div>
+                {notifications.length===0?(
+                  <div style={{textAlign:"center" as const,padding:"16px 0",color:subtext,fontSize:13}}>Sem notificações</div>
+                ):notifications.map(n=>(
+                  <div key={n.id} style={{padding:"10px 0",borderBottom:"1px solid rgba(255,255,255,0.06)"}}>
+                    <div style={{fontSize:13,color:"#e2e8f0",lineHeight:1.5}}>{n.mensagem}</div>
+                    <div style={{fontSize:10,color:subtext,marginTop:4}}>{new Date(n.created_at).toLocaleDateString("pt-PT",{day:"2-digit",month:"short",hour:"2-digit",minute:"2-digit"})}</div>
+                  </div>
+                ))}
+              </div>
+            </>
+          )}
+          <button onClick={dissolveCouple} style={{width:30,height:30,borderRadius:8,background:"rgba(239,68,68,0.06)",border:"1px solid rgba(239,68,68,0.12)",display:"flex",alignItems:"center",justifyContent:"center",color:"#f87171",fontSize:12,cursor:"pointer"}}>✕</button>
         </div>
       </div>
       {/* Sync message */}
