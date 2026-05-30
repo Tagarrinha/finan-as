@@ -385,14 +385,14 @@ const jointBalance = totalContributions - totalSettledExpenses;
   return(
     <div style={{fontFamily:"'Sora',sans-serif"}}>
       {/* Header compacto */}
-      <div style={{display:"flex",alignItems:"center",gap:10,padding:"10px 14px",background:`rgba(255,255,255,0.03)`,border:`1px solid rgba(255,255,255,0.07)`,borderRadius:14,marginBottom:12,position:"relative"}}>
+      <div style={{display:"flex",alignItems:"center",gap:8,padding:"8px 10px",background:`rgba(255,255,255,0.03)`,border:`1px solid rgba(255,255,255,0.07)`,borderRadius:14,marginBottom:12,position:"relative"}}>
         {/* Avatares */}
         <div style={{display:"flex",flexShrink:0}}>
-          <div style={{width:28,height:28,borderRadius:"50%",background:`${MY_COLOR}30`,border:`2px solid ${MY_COLOR}`,display:"flex",alignItems:"center",justifyContent:"center",zIndex:2}}>
-            <span style={{fontSize:10,fontWeight:800,color:MY_COLOR}}>{userName.slice(0,2).toUpperCase()}</span>
+          <div style={{width:32,height:32,borderRadius:"50%",background:`${MY_COLOR}30`,border:`2px solid ${MY_COLOR}`,display:"flex",alignItems:"center",justifyContent:"center",zIndex:2,flexShrink:0}}>
+            <span style={{fontSize:11,fontWeight:800,color:MY_COLOR}}>{userName.slice(0,2).toUpperCase()}</span>
           </div>
-          <div style={{width:28,height:28,borderRadius:"50%",background:`${PARTNER_COLOR}30`,border:`2px solid ${PARTNER_COLOR}`,display:"flex",alignItems:"center",justifyContent:"center",marginLeft:-8,zIndex:1}}>
-            <span style={{fontSize:10,fontWeight:800,color:PARTNER_COLOR}}>{partnerName.slice(0,2).toUpperCase()}</span>
+          <div style={{width:32,height:32,borderRadius:"50%",background:`${PARTNER_COLOR}30`,border:`2px solid ${PARTNER_COLOR}`,display:"flex",alignItems:"center",justifyContent:"center",marginLeft:-12,zIndex:1,flexShrink:0}}>
+            <span style={{fontSize:11,fontWeight:800,color:PARTNER_COLOR}}>{partnerName.slice(0,2).toUpperCase()}</span>
           </div>
         </div>
         {/* Status + stats */}
