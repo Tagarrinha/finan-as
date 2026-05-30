@@ -1016,8 +1016,13 @@ async function handleCoupleSettlement(valor: number) {
     const diff=prevBal!==0?Math.round(((balance-prevBal)/Math.abs(prevBal))*100):null;
     const overBudgetCount=(Object.entries(budgetTargets) as [TypeKey,number][]).filter(([type,target])=>(byType[type]||0)>totalInc*(target/100)&&totalInc>0).length;
     let msg="",emoji="";
+    const needOk=(byType["necessidade"]||0)<=totalInc*(budgetTargets["necessidade"]/100);
+    const desireOk=(byType["desejo"]||0)<=totalInc*(budgetTargets["desejo"]/100);
+    const investOver=(byType["investimento"]||0)>totalInc*(budgetTargets["investimento"]/100);
+    const investingWell=investOver&&needOk&&desireOk;
     if(totalInc===0){msg="Regista os teus rendimentos para começar";emoji="👋";}
     else if(balance<0){msg="Estás a gastar mais do que ganhas";emoji="⚠️";}
+    else if(investingWell){msg="Estás a investir acima do planeado — bom sinal!";emoji="🚀";}
     else if(savingsRate>=30){msg="Estás a poupar muito bem este mês";emoji="🚀";}
     else if(savingsRate>=15){msg="Boa gestão financeira este mês";emoji="💚";}
     else if(savingsRate>=5){msg="Podes melhorar a taxa de poupança";emoji="💡";}
