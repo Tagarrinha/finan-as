@@ -149,7 +149,7 @@ function LeftNav({ isOpen, onClose, activeTab, onNavigate, accent, accentDark, o
     <>
       <style>{`
         .lnav-backdrop {
-          position: fixed; inset: 0; z-index: 40;
+          position: fixed; inset: 0; z-index: 209;
           background: rgba(5,10,20,0.72);
           backdrop-filter: blur(3px);
           opacity: 0; pointer-events: none;
@@ -160,7 +160,7 @@ function LeftNav({ isOpen, onClose, activeTab, onNavigate, accent, accentDark, o
         .lnav-drawer {
           position: fixed; top: 0; left: 0; bottom: 0;
           width: 260px; max-width: 82vw;
-          z-index: 50;
+          z-index: 210;
           background: #0A0D14;
           border-right: 1px solid rgba(255,255,255,0.07);
           display: flex; flex-direction: column;
