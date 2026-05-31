@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Suporte — MyOwnFintrack</title>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { background: #0A0D14; color: #e2e8f0; font-family: 'Sora', sans-serif; min-height: 100vh; padding: 0 0 60px; }
+
+  .header {
+    background: linear-gradient(135deg, #0A0D14, #0F1420);
+    border-bottom: 1px solid rgba(255,255,255,0.08);
+    padding: 20px 24px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .header-logo {
+    width: 36px; height: 36px; border-radius: 10px;
+    background: linear-gradient(135deg, #5DA9FF, #8B6DFF);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 18px;
+  }
+  .header-title { font-size: 16px; font-weight: 800; color: #f1f5f9; }
+  .header-sub { font-size: 11px; color: #667085; margin-top: 1px; }
+  .header a { margin-left: auto; padding: 8px 16px; background: linear-gradient(135deg, #5DA9FF, #8B6DFF); border-radius: 8px; color: white; text-decoration: none; font-size: 13px; font-weight: 700; }
+
+  .hero {
+    text-align: center;
+    padding: 48px 24px 40px;
+  }
+  .hero h1 { font-size: 28px; font-weight: 800; color: #f1f5f9; letter-spacing: -0.5px; margin-bottom: 12px; }
+  .hero p { font-size: 15px; color: #667085; line-height: 1.6; margin-bottom: 28px; }
+  .hero-contact {
+    display: inline-flex; align-items: center; gap: 10px;
+    background: rgba(93,169,255,0.1); border: 1px solid rgba(93,169,255,0.3);
+    border-radius: 99px; padding: 12px 24px;
+    font-size: 14px; font-weight: 600; color: #5DA9FF;
+    text-decoration: none;
+  }
+
+  .container { max-width: 680px; margin: 0 auto; padding: 0 20px; }
+
+  .section-title {
+    font-size: 11px; font-weight: 700; color: #667085;
+    text-transform: uppercase; letter-spacing: 0.1em;
+    margin: 40px 0 16px;
+  }
+
+  .faq-item {
+    background: #151B2D;
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 14px;
+    margin-bottom: 10px;
+    overflow: hidden;
+  }
+  .faq-q {
+    width: 100%; text-align: left; background: none; border: none;
+    padding: 18px 20px; color: #f1f5f9; font-family: 'Sora', sans-serif;
+    font-size: 14px; font-weight: 600; cursor: pointer;
+    display: flex; justify-content: space-between; align-items: center;
+    gap: 12px;
+  }
+  .faq-q span { font-size: 18px; color: #5DA9FF; flex-shrink: 0; transition: transform 0.2s; }
+  .faq-q.open span { transform: rotate(45deg); }
+  .faq-a {
+    padding: 0 20px 18px;
+    font-size: 13px; color: #94a3b8; line-height: 1.7;
+    display: none;
+  }
+  .faq-a.open { display: block; }
+
+  .contact-box {
+    background: linear-gradient(135deg, rgba(93,169,255,0.08), rgba(139,109,255,0.06));
+    border: 1px solid rgba(93,169,255,0.2);
+    border-radius: 20px;
+    padding: 32px 24px;
+    text-align: center;
+    margin-top: 48px;
+  }
+  .contact-box h2 { font-size: 20px; font-weight: 800; color: #f1f5f9; margin-bottom: 10px; }
+  .contact-box p { font-size: 14px; color: #667085; margin-bottom: 24px; line-height: 1.6; }
+  .contact-box a {
+    display: inline-block;
+    padding: 14px 32px;
+    background: linear-gradient(135deg, #5DA9FF, #8B6DFF);
+    border-radius: 12px; color: white; text-decoration: none;
+    font-size: 15px; font-weight: 700;
+    box-shadow: 0 4px 20px rgba(93,169,255,0.3);
+  }
+
+  .footer {
+    text-align: center; margin-top: 48px;
+    font-size: 12px; color: rgba(255,255,255,0.15);
+  }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="header-logo">💰</div>
+  <div>
+    <div class="header-title">MyOwnFintrack</div>
+    <div class="header-sub">Centro de Suporte</div>
+  </div>
+  <a href="https://myownfintrack.app">Abrir app →</a>
+</div>
+
+<div class="hero">
+  <h1>Como podemos ajudar?</h1>
+  <p>Encontra respostas às perguntas mais frequentes<br>ou entra em contacto connosco directamente.</p>
+  <a href="mailto:myownfintrack@gmail.com" class="hero-contact">
+    ✉️ myownfintrack@gmail.com
+  </a>
+</div>
+
+<div class="container">
+
+  <div class="section-title">Conta & Acesso</div>
+
+  <div class="faq-item">
+    <button class="faq-q" onclick="toggle(this)">
+      Como crio uma conta?
+      <span>+</span>
+    </button>
+    <div class="faq-a">
+      Vai a <strong>myownfintrack.app</strong>, clica em "Criar conta" e preenche o teu nome, email e password. Recebes acesso imediato com 14 dias de trial Premium grátis.
+    </div>
+  </div>
+
+  <div class="faq-item">
+    <button class="faq-q" onclick="toggle(this)">
+      Esqueci-me da password. O que faço?
+      <span>+</span>
+    </button>
+    <div class="faq-a">
+      Na página de login, clica em "Esqueci a password" e introduz o teu email. Recebes um link para redefinir a password.
+    </div>
+  </div>
+
+  <div class="faq-item">
+    <button class="faq-q" onclick="toggle(this)">
+      Os meus dados estão seguros?
+      <span>+</span>
+    </button>
+    <div class="faq-a">
+      Sim. Os teus dados estão encriptados e armazenados em servidores seguros. Nunca partilhamos ou vendemos os teus dados a terceiros.
+    </div>
+  </div>
+
+  <div class="section-title">Planos & Pagamento</div>
+
+  <div class="faq-item">
+    <button class="faq-q" onclick="toggle(this)">
+      Quais são os planos disponíveis?
+      <span>+</span>
+    </button>
+    <div class="faq-a">
+      Temos 3 planos: <strong>Free</strong> (dashboard básico, 1 meta), <strong>Individual</strong> (despesas recorrentes, metas ilimitadas) e <strong>Premium</strong> (Modo Casal + exportação de dados). Todos os utilizadores novos têm 14 dias de Premium grátis.
+    </div>
+  </div>
+
+  <div class="faq-item">
+    <button class="faq-q" onclick="toggle(this)">
+      Como cancelo a subscrição?
+      <span>+</span>
+    </button>
+    <div class="faq-a">
+      Podes cancelar a qualquer momento nas Definições da app, em "Plano Premium". O acesso mantém-se até ao fim do período já pago.
+    </div>
+  </div>
+
+  <div class="section-title">Modo Casal</div>
+
+  <div class="faq-item">
+    <button class="faq-q" onclick="toggle(this)">
+      Como funciona o Modo Casal?
+      <span>+</span>
+    </button>
+    <div class="faq-a">
+      O Modo Casal permite gerir despesas partilhadas com o teu parceiro/a. Cada um usa a sua própria conta. Adicionam despesas conjuntas, dividem automaticamente (50/50 ou personalizado), e a app calcula quem deve quanto a quem.
+    </div>
+  </div>
+
+  <div class="faq-item">
+    <button class="faq-q" onclick="toggle(this)">
+      Como convido o meu parceiro/a?
+      <span>+</span>
+    </button>
+    <div class="faq-a">
+      Vai ao tab "Casal" na app e introduce o email com que o teu parceiro/a se registou. Ele/ela recebe o convite automaticamente quando abre o tab Casal na sua conta.
+    </div>
+  </div>
+
+  <div class="faq-item">
+    <button class="faq-q" onclick="toggle(this)">
+      O meu parceiro/a precisa de ter conta?
+      <span>+</span>
+    </button>
+    <div class="faq-a">
+      Sim, o teu parceiro/a precisa de criar uma conta gratuita no MyOwnFintrack. O plano Premium só precisa de estar activo numa das contas — o outro tem acesso ao Modo Casal automaticamente.
+    </div>
+  </div>
+
+  <div class="faq-item">
+    <button class="faq-q" onclick="toggle(this)">
+      O que são despesas liquidadas vs por liquidar?
+      <span>+</span>
+    </button>
+    <div class="faq-a">
+      <strong>Liquidadas</strong> são despesas já pagas e que aparecem nas contas pessoais de ambos. <strong>Por liquidar</strong> são despesas registadas mas que ainda não foram pagas — ficam no tab de acerto para acompanhamento.
+    </div>
+  </div>
+
+  <div class="section-title">Funcionalidades</div>
+
+  <div class="faq-item">
+    <button class="faq-q" onclick="toggle(this)">
+      O que são despesas recorrentes?
+      <span>+</span>
+    </button>
+    <div class="faq-a">
+      São despesas fixas como renda, ginásio ou seguros. Registas uma vez e a app avisa-te automaticamente quando é altura de as registar — sem teres de repetir todos os meses.
+    </div>
+  </div>
+
+  <div class="faq-item">
+    <button class="faq-q" onclick="toggle(this)">
+      Como instalo a app no telemóvel?
+      <span>+</span>
+    </button>
+    <div class="faq-a">
+      <strong>iPhone (Safari):</strong> Abre myownfintrack.app no Safari → toca no ícone de partilha → "Adicionar ao ecrã de início".<br><br>
+      <strong>Android (Chrome):</strong> Abre o site → toca nos 3 pontos → "Adicionar ao ecrã principal".
+    </div>
+  </div>
+
+  <div class="faq-item">
+    <button class="faq-q" onclick="toggle(this)">
+      Os dados sincronizam entre dispositivos?
+      <span>+</span>
+    </button>
+    <div class="faq-a">
+      Sim. Os teus dados estão na cloud e sincronizam automaticamente entre todos os dispositivos onde faças login com a mesma conta.
+    </div>
+  </div>
+
+  <div class="contact-box">
+    <h2>Não encontraste o que precisavas?</h2>
+    <p>Envia-nos um email e respondemos o mais rapidamente possível.<br>Normalmente respondemos em menos de 24 horas.</p>
+    <a href="mailto:myownfintrack@gmail.com">✉️ Enviar email</a>
+  </div>
+
+  <div class="footer">
+    © 2026 MyOwnFintrack · myownfintrack.app
+  </div>
+
+</div>
+
+<script>
+  function toggle(btn) {
+    const answer = btn.nextElementSibling;
+    const isOpen = answer.classList.contains('open');
+    document.querySelectorAll('.faq-a.open').forEach(a => a.classList.remove('open'));
+    document.querySelectorAll('.faq-q.open').forEach(b => b.classList.remove('open'));
+    if (!isOpen) {
+      answer.classList.add('open');
+      btn.classList.add('open');
+    }
+  }
+</script>
+
+</body>
+</html>
