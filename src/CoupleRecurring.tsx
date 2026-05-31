@@ -227,29 +227,24 @@ const payload = { descricao:form.descricao.trim(), valor:total, cat:form.cat, ti
         const isDue=r.proxima_data<=today&&r.ativa;
         const myShare=isUser1?Number(r.split_user1||r.valor/2):Number(r.split_user2||r.valor/2);
         return(
-          <div key={r.id} style={{background:cardBg,border:`1px solid ${isDue?"rgba(245,158,11,0.4)":r.ativa?cardBorder:"rgba(255,255,255,0.04)"}`,borderRadius:14,padding:"14px 16px",marginBottom:10,opacity:r.ativa?1:0.5}}>
-            <div style={{display:"flex",alignItems:"center",gap:10,marginBottom:10}}>
-              <div style={{width:38,height:38,borderRadius:10,background:`${accent}18`,display:"flex",alignItems:"center",justifyContent:"center",fontSize:20,flexShrink:0}}>{cat?.icon||"📦"}</div>
-              <div style={{flex:1,minWidth:0}}>
-                <div style={{fontSize:14,fontWeight:700,color:"#e2e8f0"}}>{r.descricao}</div>
-                <div style={{display:"flex",gap:6,marginTop:3,flexWrap:"wrap" as const}}>
-                  <span style={{fontSize:10,background:`${freq.color}20`,color:freq.color,padding:"2px 7px",borderRadius:99,fontWeight:700}}>{freq.icon} {freq.label}</span>
-                  <span style={{fontSize:10,background:TYPE_META[r.tipo].bg,color:TYPE_META[r.tipo].color,padding:"2px 7px",borderRadius:99,fontWeight:700}}>{TYPE_META[r.tipo].label}</span>
-                  <span style={{fontSize:10,background:r.liquidado_auto?"rgba(52,211,153,0.15)":"rgba(245,158,11,0.15)",color:r.liquidado_auto?"#34d399":"#f59e0b",padding:"2px 7px",borderRadius:99,fontWeight:700}}>{r.liquidado_auto?"✅ Auto":"⏳ Manual"}</span>
-                  {isDue&&<span style={{fontSize:10,background:"rgba(245,158,11,0.2)",color:"#f59e0b",padding:"2px 7px",borderRadius:99,fontWeight:700}}>🔔 A vencer</span>}
-                </div>
-              </div>
-              <div style={{textAlign:"right" as const}}>
-                <div style={{fontSize:15,fontWeight:800,color:negative}}>{fmt(Number(r.valor))}</div>
-                <div style={{fontSize:10,color:subtext}}>cada: {fmt(myShare)}</div>
-                <div style={{fontSize:10,color:subtext}}>{new Date(r.proxima_data+"T12:00:00").toLocaleDateString("pt-PT")}</div>
+          <div key={r.id} style={{display:"flex",alignItems:"center",gap:10,padding:"10px 0",borderBottom:`1px solid ${cardBorder}`,opacity:r.ativa?1:0.5}}>
+            <span style={{fontSize:17,minWidth:28,textAlign:"center" as const}}>{cat?.icon||"📦"}</span>
+            <div style={{flex:1,minWidth:0}}>
+              <div style={{fontSize:13,fontWeight:600,color:"#e2e8f0",whiteSpace:"nowrap" as const,overflow:"hidden",textOverflow:"ellipsis"}}>{r.descricao}</div>
+              <div style={{display:"flex",alignItems:"center",gap:6,marginTop:2,flexWrap:"wrap" as const}}>
+                <span style={{fontSize:10,color:subtext}}>{new Date(r.proxima_data+"T12:00:00").toLocaleDateString("pt-PT")}</span>
+                <span style={{fontSize:10,color:freq.color,fontWeight:600}}>{freq.icon} {freq.label}</span>
+                <span style={{fontSize:10,color:"#f97316",fontWeight:600}}>{fmt(myShare)}</span>
+                {r.liquidado_auto&&<span style={{fontSize:10,color:"#34d399",fontWeight:600}}>✅ Auto</span>}
+                {isDue&&<span style={{fontSize:10,color:"#f59e0b",fontWeight:700}}>🔔 Vence</span>}
               </div>
             </div>
-            <div style={{display:"flex",gap:6}}>
-              {isDue&&<button onClick={()=>applyAndAdvance(r)} style={{flex:2,padding:"7px 0",background:`${accent}22`,border:`1px solid ${accent}40`,borderRadius:8,color:accent,fontSize:12,fontWeight:700,cursor:"pointer",fontFamily:"'Sora',sans-serif"}}>✓ Registar agora</button>}
-              <button onClick={()=>openEdit(r)} style={{flex:1,padding:"7px 0",background:"rgba(245,158,11,0.08)",border:"1px solid rgba(245,158,11,0.2)",borderRadius:8,color:"#f59e0b",fontSize:11,fontWeight:600,cursor:"pointer",fontFamily:"'Sora',sans-serif"}}>✏️</button>
-              <button onClick={()=>toggleActive(r)} style={{flex:1,padding:"7px 0",background:"rgba(255,255,255,0.05)",border:"1px solid rgba(255,255,255,0.09)",borderRadius:8,color:r.ativa?"#f59e0b":"#94a3b8",fontSize:11,fontWeight:600,cursor:"pointer",fontFamily:"'Sora',sans-serif"}}>{r.ativa?"⏸":"▶"}</button>
-              <button onClick={()=>deleteItem(r.id)} style={{padding:"7px 10px",background:"rgba(239,68,68,0.08)",border:"1px solid rgba(239,68,68,0.2)",borderRadius:8,color:"#f87171",fontSize:11,cursor:"pointer"}}>🗑️</button>
+            <div style={{display:"flex",alignItems:"center",gap:5,flexShrink:0}}>
+              <span style={{fontSize:13,fontWeight:700,color:negative}}>{fmt(Number(r.valor))}</span>
+              {isDue&&<button onClick={()=>applyAndAdvance(r)} style={{width:26,height:26,background:`${accent}22`,border:`1px solid ${accent}40`,borderRadius:7,color:accent,fontSize:12,cursor:"pointer",display:"flex",alignItems:"center",justifyContent:"center"}}>✓</button>}
+              <button onClick={()=>openEdit(r)} style={{width:26,height:26,background:"rgba(255,255,255,0.05)",border:"1px solid rgba(255,255,255,0.08)",borderRadius:7,color:subtext,fontSize:12,cursor:"pointer",display:"flex",alignItems:"center",justifyContent:"center"}}>✏️</button>
+              <button onClick={()=>toggleActive(r)} style={{width:26,height:26,background:"rgba(255,255,255,0.05)",border:"1px solid rgba(255,255,255,0.08)",borderRadius:7,color:r.ativa?"#f59e0b":"#94a3b8",fontSize:11,cursor:"pointer",display:"flex",alignItems:"center",justifyContent:"center"}}>{r.ativa?"⏸":"▶"}</button>
+              <button onClick={()=>deleteItem(r.id)} style={{width:26,height:26,background:"rgba(239,68,68,0.06)",border:"1px solid rgba(239,68,68,0.15)",borderRadius:7,color:"#f87171",fontSize:12,cursor:"pointer",display:"flex",alignItems:"center",justifyContent:"center"}}>✕</button>
             </div>
           </div>
         );
