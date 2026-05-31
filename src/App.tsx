@@ -652,6 +652,7 @@ const [searchInc, setSearchInc] = useState("");
 const [successMsg, setSuccessMsg] = useState("");
   const [chartView, setChartView] = useState<"networth"|"fluxo">("fluxo");
   const [nwSnapshots, setNwSnapshots] = useState<{mes:number;ano:number;valor:number}[]>([]);
+  const [showOnboarding, setShowOnboarding] = useState(false);
 
 
   useEffect(()=>{loadAll();},[user.id]);
@@ -687,6 +688,7 @@ const [successMsg, setSuccessMsg] = useState("");
     if(goalsR.data)setGoals(goalsR.data as SavingsGoal[]);
     if(mrR.data){const rev:Record<string,Record<string,number[]>>={};(mrR.data as any[]).forEach(r=>{if(!rev[r.world])rev[r.world]={};if(!rev[r.world][r.year])rev[r.world][r.year]=new Array(12).fill(0);rev[r.world][r.year][r.month]=Number(r.valor);});setMonthlyRev(rev);}
     if(setR.data){const s=setR.data as any;setBudgetTargets({necessidade:s.budget_necessidade,desejo:s.budget_desejo,investimento:s.budget_investimento});if(s.enabled_p_exp)setEnabledPExp(s.enabled_p_exp);if(s.enabled_p_inc)setEnabledPInc(s.enabled_p_inc);if(s.enabled_c_exp)setEnabledCExp(s.enabled_c_exp);if(s.enabled_c_inc)setEnabledCInc(s.enabled_c_inc);if(s.custom_exp_cats)setCustomExpCats(s.custom_exp_cats);if(s.custom_inc_cats)setCustomIncCats(s.custom_inc_cats);if(s.theme)setThemeKey(s.theme as ThemeKey);if(s.world1_name)setWorld1Name(s.world1_name);if(s.world1_icon)setWorld1Icon(s.world1_icon);if(s.world2_name)setWorld2Name(s.world2_name);if(s.world2_icon)setWorld2Icon(s.world2_icon);if(!s.tour_done)setShowTour(true);}
+    if(s.tour_done && !s.onboarding_done) setShowOnboarding(true);
     if(snapR.data)setNwSnapshots(snapR.data as {mes:number;ano:number;valor:number}[]);
     setDataLoading(false);
   }
@@ -694,7 +696,7 @@ const [successMsg, setSuccessMsg] = useState("");
   async function saveSettings(patch:Record<string,any>){await supabase.from("user_settings").upsert({user_id:user.id,theme:"premium",...patch});}
   async function changeTheme(k:ThemeKey){setThemeKey(k);await saveSettings({theme:k});}
   async function saveWorlds(){await saveSettings({world1_name:world1Name,world1_icon:world1Icon,world2_name:world2Name,world2_icon:world2Icon});setEditingWorlds(false);}
-  async function finishTour(){setShowTour(false);await saveSettings({tour_done:true,theme:"premium"});}
+  async function finishTour(){setShowTour(false);setShowOnboarding(true);await saveSettings({tour_done:true,theme:"premium"});}
 
   const enabledExpCats=world==="pessoal"?enabledPExp:enabledCExp;
   const enabledIncCats=world==="pessoal"?enabledPInc:enabledCInc;
@@ -807,9 +809,30 @@ async function handleCoupleSettlement(valor: number) {
       <link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700;800&display=swap" rel="stylesheet"/>
       <div style={{position:"fixed",top:-80,right:-80,width:300,height:300,borderRadius:"50%",background:`radial-gradient(circle,${T.glow1} 0%,transparent 70%)`,pointerEvents:"none",zIndex:0}}/>
       <div style={{position:"fixed",bottom:-60,left:-60,width:250,height:250,borderRadius:"50%",background:`radial-gradient(circle,${T.glow2} 0%,transparent 70%)`,pointerEvents:"none",zIndex:0}}/>
-
       {showTour&&<Tour userName={userName} accent={T.accent} onFinish={finishTour}/>}
-
+      {showOnboarding&&(
+        <OnboardingFlow
+          accent={T.accent}
+          accentDark={T.accentDark}
+          cardBg={T.cardBg}
+          cardBorder={T.cardBorder}
+          subtext={T.subtext}
+          positive={T.positive}
+          accounts={accounts}
+          incCats={incCats}
+          userId={user.id}
+          onAddAccount={addAccount}
+          onFinish={async()=>{
+            setShowOnboarding(false);
+            await saveSettings({onboarding_done:true});
+          }}
+          onSkip={async()=>{
+            setShowOnboarding(false);
+            await saveSettings({onboarding_done:true});
+          }}
+          onNavigateToCouple={()=>{setTab("casal");setShowOnboarding(false);}}
+        />
+      )}
       {/* ── LEFT NAV DRAWER (NEW) ── */}
       <LeftNav
         isOpen={leftNavOpen}
