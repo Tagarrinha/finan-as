@@ -235,7 +235,8 @@ const payload = { descricao:form.descricao.trim(), valor:total, cat:form.cat, ti
                 <span style={{fontSize:10,color:subtext}}>{new Date(r.proxima_data+"T12:00:00").toLocaleDateString("pt-PT")}</span>
                 <span style={{fontSize:10,color:freq.color,fontWeight:600}}>{freq.label}</span>
                 <span style={{fontSize:10,color:"#f97316",fontWeight:700}}>{fmt(myShare)}</span>
-                {r.liquidado_auto&&<span style={{fontSize:10,color:"#34d399"}}>✅</span>}
+                {r.liquidado_auto&&<span style={{fontSize:10,color:"#34d399",fontWeight:600}}>Auto ✅</span>}
+
               </div>
             </div>
             <div style={{display:"flex",flexDirection:"column" as const,alignItems:"flex-end",gap:6,flexShrink:0}}>
