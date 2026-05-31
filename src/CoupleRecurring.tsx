@@ -231,12 +231,12 @@ const payload = { descricao:form.descricao.trim(), valor:total, cat:form.cat, ti
             <span style={{fontSize:17,minWidth:28,textAlign:"center" as const}}>{cat?.icon||"📦"}</span>
             <div style={{flex:1,minWidth:0}}>
               <div style={{fontSize:13,fontWeight:600,color:"#e2e8f0",whiteSpace:"nowrap" as const,overflow:"hidden",textOverflow:"ellipsis"}}>{r.descricao}</div>
-              <div style={{display:"flex",alignItems:"center",gap:6,marginTop:2,flexWrap:"wrap" as const}}>
-                <span style={{fontSize:10,color:subtext}}>{new Date(r.proxima_data+"T12:00:00").toLocaleDateString("pt-PT")}</span>
-                <span style={{fontSize:10,color:freq.color,fontWeight:600}}>{freq.icon} {freq.label}</span>
-                <span style={{fontSize:10,color:"#f97316",fontWeight:600}}>{fmt(myShare)}</span>
-                {r.liquidado_auto&&<span style={{fontSize:10,color:"#34d399",fontWeight:600}}>✅ Auto</span>}
-                {isDue&&<span style={{fontSize:10,color:"#f59e0b",fontWeight:700}}>🔔 Vence</span>}
+              <div style={{display:"flex",alignItems:"center",gap:6,marginTop:2,flexWrap:"nowrap" as const,overflow:"hidden"}}>
+                <span style={{fontSize:10,color:subtext,flexShrink:0}}>{new Date(r.proxima_data+"T12:00:00").toLocaleDateString("pt-PT")}</span>
+                <span style={{fontSize:10,color:freq.color,fontWeight:600,flexShrink:0}}>{freq.icon} {freq.label}</span>
+                <span style={{fontSize:10,color:"#f97316",fontWeight:600,flexShrink:0}}>{fmt(myShare)}</span>
+                {r.liquidado_auto&&<span style={{fontSize:10,color:"#34d399",fontWeight:600,flexShrink:0}}>✅</span>}
+                {isDue&&<span style={{fontSize:10,color:"#f59e0b",fontWeight:700,flexShrink:0}}>🔔</span>}
               </div>
             </div>
             <div style={{display:"flex",alignItems:"center",gap:5,flexShrink:0}}>
