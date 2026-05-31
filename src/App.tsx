@@ -977,8 +977,8 @@ async function handleCoupleSettlement(valor: number) {
     </button>
     {showFilterMenu&&(
       <>
-        <div onClick={()=>setShowFilterMenu(false)} style={{position:"fixed",inset:0,zIndex:9}}/>
-        <div style={{position:"absolute",top:"calc(100% + 8px)",right:0,zIndex:20,background:"#0f1117",border:`1px solid ${T.cardBorder}`,borderRadius:16,padding:"16px",minWidth:240,boxShadow:"0 8px 32px rgba(0,0,0,0.8)",backdropFilter:"none"}}>
+        <div onClick={()=>setShowFilterMenu(false)} style={{position:"fixed",inset:0,zIndex:199}}/>
+        <div style={{position:"absolute",top:"calc(100% + 8px)",right:0,zIndex:200,background:"#0f1117",border:`1px solid ${T.cardBorder}`,borderRadius:16,padding:"16px",minWidth:240,boxShadow:"0 8px 32px rgba(0,0,0,0.8)",backdropFilter:"none"}}>
           <div style={{fontSize:10,fontWeight:700,color:T.subtext,textTransform:"uppercase" as const,letterSpacing:"0.1em",marginBottom:10}}>Ano</div>
           <div style={{display:"flex",gap:6,flexWrap:"wrap" as const,marginBottom:14}}>
             {["todos","2024","2025","2026"].map(y=>(
