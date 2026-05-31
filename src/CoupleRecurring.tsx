@@ -241,10 +241,10 @@ const payload = { descricao:form.descricao.trim(), valor:total, cat:form.cat, ti
             </div>
             <div style={{display:"flex",alignItems:"center",gap:5,flexShrink:0}}>
               <span style={{fontSize:13,fontWeight:700,color:negative}}>{fmt(Number(r.valor))}</span>
-              {isDue&&<button onClick={()=>applyAndAdvance(r)} style={{width:26,height:26,background:`${accent}22`,border:`1px solid ${accent}40`,borderRadius:7,color:accent,fontSize:12,cursor:"pointer",display:"flex",alignItems:"center",justifyContent:"center"}}>✓</button>}
-              <button onClick={()=>openEdit(r)} style={{width:26,height:26,background:"rgba(255,255,255,0.05)",border:"1px solid rgba(255,255,255,0.08)",borderRadius:7,color:subtext,fontSize:12,cursor:"pointer",display:"flex",alignItems:"center",justifyContent:"center"}}>✏️</button>
-              <button onClick={()=>toggleActive(r)} style={{width:26,height:26,background:"rgba(255,255,255,0.05)",border:"1px solid rgba(255,255,255,0.08)",borderRadius:7,color:r.ativa?"#f59e0b":"#94a3b8",fontSize:11,cursor:"pointer",display:"flex",alignItems:"center",justifyContent:"center"}}>{r.ativa?"⏸":"▶"}</button>
-              <button onClick={()=>deleteItem(r.id)} style={{width:26,height:26,background:"rgba(239,68,68,0.06)",border:"1px solid rgba(239,68,68,0.15)",borderRadius:7,color:"#f87171",fontSize:12,cursor:"pointer",display:"flex",alignItems:"center",justifyContent:"center"}}>✕</button>
+              {isDue&&<button onClick={()=>applyAndAdvance(r)} style={{width:30,height:30,background:`${accent}22`,border:`1px solid ${accent}40`,borderRadius:7,color:accent,fontSize:12,cursor:"pointer",display:"flex",alignItems:"center",justifyContent:"center"}}>✓</button>}
+              <button onClick={()=>openEdit(r)} style={{width:30,height:30,background:"rgba(255,255,255,0.05)",border:"1px solid rgba(255,255,255,0.08)",borderRadius:7,color:subtext,fontSize:12,cursor:"pointer",display:"flex",alignItems:"center",justifyContent:"center"}}>✏️</button>
+              <button onClick={()=>toggleActive(r)} style={{width:30,height:30,background:"rgba(255,255,255,0.05)",border:"1px solid rgba(255,255,255,0.08)",borderRadius:7,color:r.ativa?"#f59e0b":"#94a3b8",fontSize:11,cursor:"pointer",display:"flex",alignItems:"center",justifyContent:"center"}}>{r.ativa?"⏸":"▶"}</button>
+              <button onClick={()=>deleteItem(r.id)} style={{width:30,height:30,background:"rgba(239,68,68,0.06)",border:"1px solid rgba(239,68,68,0.15)",borderRadius:7,color:"#f87171",fontSize:12,cursor:"pointer",display:"flex",alignItems:"center",justifyContent:"center"}}>✕</button>
             </div>
           </div>
         );
