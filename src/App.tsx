@@ -161,7 +161,7 @@ function LeftNav({ isOpen, onClose, activeTab, onNavigate, accent, accentDark, o
           position: fixed; top: 0; left: 0; bottom: 0;
           width: 260px; max-width: 82vw;
           z-index: 50;
-          background: #0b0e18;
+          background: #1a1f2e;
           border-right: 1px solid rgba(255,255,255,0.07);
           display: flex; flex-direction: column;
           overflow: hidden;
