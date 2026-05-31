@@ -227,24 +227,24 @@ const payload = { descricao:form.descricao.trim(), valor:total, cat:form.cat, ti
         const isDue=r.proxima_data<=today&&r.ativa;
         const myShare=isUser1?Number(r.split_user1||r.valor/2):Number(r.split_user2||r.valor/2);
         return(
-          <div key={r.id} style={{display:"flex",alignItems:"center",gap:10,padding:"10px 0",borderBottom:`1px solid ${cardBorder}`,opacity:r.ativa?1:0.5}}>
+          <div key={r.id} style={{display:"flex",alignItems:"center",gap:10,padding:"12px 0",borderBottom:`1px solid ${cardBorder}`,opacity:r.ativa?1:0.5}}>
             <span style={{fontSize:17,minWidth:28,textAlign:"center" as const}}>{cat?.icon||"📦"}</span>
             <div style={{flex:1,minWidth:0}}>
-              <div style={{fontSize:13,fontWeight:600,color:"#e2e8f0",whiteSpace:"nowrap" as const,overflow:"hidden",textOverflow:"ellipsis"}}>{r.descricao}</div>
-              <div style={{display:"flex",alignItems:"center",gap:6,marginTop:2,flexWrap:"nowrap" as const,overflow:"hidden"}}>
-                <span style={{fontSize:10,color:subtext,flexShrink:0}}>{new Date(r.proxima_data+"T12:00:00").toLocaleDateString("pt-PT")}</span>
-                <span style={{fontSize:10,color:freq.color,fontWeight:600,flexShrink:0}}>{freq.icon} {freq.label}</span>
-                <span style={{fontSize:10,color:"#f97316",fontWeight:600,flexShrink:0}}>{fmt(myShare)}</span>
-                {r.liquidado_auto&&<span style={{fontSize:10,color:"#34d399",fontWeight:600,flexShrink:0}}>✅</span>}
-                {isDue&&<span style={{fontSize:10,color:"#f59e0b",fontWeight:700,flexShrink:0}}>🔔</span>}
+              <div style={{fontSize:13,fontWeight:600,color:"#e2e8f0",whiteSpace:"nowrap" as const,overflow:"hidden",textOverflow:"ellipsis",marginBottom:3}}>{r.descricao}</div>
+              <div style={{display:"flex",alignItems:"center",gap:8}}>
+                <span style={{fontSize:10,color:subtext}}>{new Date(r.proxima_data+"T12:00:00").toLocaleDateString("pt-PT")}</span>
+                <span style={{fontSize:10,color:freq.color,fontWeight:600}}>{freq.label}</span>
+                <span style={{fontSize:10,color:"#f97316",fontWeight:700}}>{fmt(myShare)}</span>
+                {r.liquidado_auto&&<span style={{fontSize:10,color:"#34d399"}}>✅</span>}
               </div>
             </div>
-            <div style={{display:"flex",alignItems:"center",gap:5,flexShrink:0}}>
+            <div style={{display:"flex",flexDirection:"column" as const,alignItems:"flex-end",gap:6,flexShrink:0}}>
               <span style={{fontSize:13,fontWeight:700,color:negative}}>{fmt(Number(r.valor))}</span>
-              {isDue&&<button onClick={()=>applyAndAdvance(r)} style={{width:30,height:30,background:`${accent}22`,border:`1px solid ${accent}40`,borderRadius:7,color:accent,fontSize:12,cursor:"pointer",display:"flex",alignItems:"center",justifyContent:"center"}}>✓</button>}
-              <button onClick={()=>openEdit(r)} style={{width:30,height:30,background:"rgba(255,255,255,0.05)",border:"1px solid rgba(255,255,255,0.08)",borderRadius:7,color:subtext,fontSize:12,cursor:"pointer",display:"flex",alignItems:"center",justifyContent:"center"}}>✏️</button>
-              <button onClick={()=>toggleActive(r)} style={{width:30,height:30,background:"rgba(255,255,255,0.05)",border:"1px solid rgba(255,255,255,0.08)",borderRadius:7,color:r.ativa?"#f59e0b":"#94a3b8",fontSize:11,cursor:"pointer",display:"flex",alignItems:"center",justifyContent:"center"}}>{r.ativa?"⏸":"▶"}</button>
-              <button onClick={()=>deleteItem(r.id)} style={{width:30,height:30,background:"rgba(239,68,68,0.06)",border:"1px solid rgba(239,68,68,0.15)",borderRadius:7,color:"#f87171",fontSize:12,cursor:"pointer",display:"flex",alignItems:"center",justifyContent:"center"}}>✕</button>
+              <div style={{display:"flex",gap:4}}>
+                <button onClick={()=>openEdit(r)} style={{width:28,height:28,background:"rgba(255,255,255,0.05)",border:"1px solid rgba(255,255,255,0.08)",borderRadius:7,color:subtext,fontSize:12,cursor:"pointer",display:"flex",alignItems:"center",justifyContent:"center"}}>✏️</button>
+                <button onClick={()=>toggleActive(r)} style={{width:28,height:28,background:"rgba(255,255,255,0.05)",border:"1px solid rgba(255,255,255,0.08)",borderRadius:7,color:r.ativa?"#f59e0b":"#94a3b8",fontSize:11,cursor:"pointer",display:"flex",alignItems:"center",justifyContent:"center"}}>{r.ativa?"⏸":"▶"}</button>
+                <button onClick={()=>deleteItem(r.id)} style={{width:28,height:28,background:"rgba(239,68,68,0.06)",border:"1px solid rgba(239,68,68,0.15)",borderRadius:7,color:"#f87171",fontSize:12,cursor:"pointer",display:"flex",alignItems:"center",justifyContent:"center"}}>✕</button>
+              </div>
             </div>
           </div>
         );
