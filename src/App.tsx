@@ -9,6 +9,7 @@ import { supabase } from "./supabase";
 import ExportData from "./ExportData";
 import SubscriptionModal from "./SubscriptionModal";
 import { usePlan } from "./usePlan";
+import OnboardingFlow from "./OnboardingFlow";
 
 type TypeKey = "necessidade"|"desejo"|"investimento";
 type ThemeKey = "original"|"aurora"|"ocean"|"nebula"|"verde"|"premium";
@@ -688,8 +689,7 @@ const [successMsg, setSuccessMsg] = useState("");
     if(recR.data)setRecurring(recR.data as RecurringExpense[]);
     if(goalsR.data)setGoals(goalsR.data as SavingsGoal[]);
     if(mrR.data){const rev:Record<string,Record<string,number[]>>={};(mrR.data as any[]).forEach(r=>{if(!rev[r.world])rev[r.world]={};if(!rev[r.world][r.year])rev[r.world][r.year]=new Array(12).fill(0);rev[r.world][r.year][r.month]=Number(r.valor);});setMonthlyRev(rev);}
-    if(setR.data){const s=setR.data as any;setBudgetTargets({necessidade:s.budget_necessidade,desejo:s.budget_desejo,investimento:s.budget_investimento});if(s.enabled_p_exp)setEnabledPExp(s.enabled_p_exp);if(s.enabled_p_inc)setEnabledPInc(s.enabled_p_inc);if(s.enabled_c_exp)setEnabledCExp(s.enabled_c_exp);if(s.enabled_c_inc)setEnabledCInc(s.enabled_c_inc);if(s.custom_exp_cats)setCustomExpCats(s.custom_exp_cats);if(s.custom_inc_cats)setCustomIncCats(s.custom_inc_cats);if(s.theme)setThemeKey(s.theme as ThemeKey);if(s.world1_name)setWorld1Name(s.world1_name);if(s.world1_icon)setWorld1Icon(s.world1_icon);if(s.world2_name)setWorld2Name(s.world2_name);if(s.world2_icon)setWorld2Icon(s.world2_icon);if(!s.tour_done)setShowTour(true);}
-    if(s.tour_done && !s.onboarding_done) setShowOnboarding(true);
+    if(setR.data){const s=setR.data as any;setBudgetTargets({necessidade:s.budget_necessidade,desejo:s.budget_desejo,investimento:s.budget_investimento});if(s.enabled_p_exp)setEnabledPExp(s.enabled_p_exp);if(s.enabled_p_inc)setEnabledPInc(s.enabled_p_inc);if(s.enabled_c_exp)setEnabledCExp(s.enabled_c_exp);if(s.enabled_c_inc)setEnabledCInc(s.enabled_c_inc);if(s.custom_exp_cats)setCustomExpCats(s.custom_exp_cats);if(s.custom_inc_cats)setCustomIncCats(s.custom_inc_cats);if(s.theme)setThemeKey(s.theme as ThemeKey);if(s.world1_name)setWorld1Name(s.world1_name);if(s.world1_icon)setWorld1Icon(s.world1_icon);if(s.world2_name)setWorld2Name(s.world2_name);if(s.world2_icon)setWorld2Icon(s.world2_icon);if(!s.tour_done)setShowTour(true);if(s.tour_done&&!s.onboarding_done)setShowOnboarding(true);}
     if(snapR.data)setNwSnapshots(snapR.data as {mes:number;ano:number;valor:number}[]);
     setDataLoading(false);
   }
