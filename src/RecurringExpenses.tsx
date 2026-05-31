@@ -223,6 +223,7 @@ export default function RecurringExpenses({ userId, world, expCats, accent, acce
             </div>
           </div>
         );
+      })}
 
       {/* Summary */}
       {myRecurring.filter(r=>r.ativa).length>0&&(
