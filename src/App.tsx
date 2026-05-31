@@ -936,7 +936,7 @@ async function handleCoupleSettlement(valor: number) {
       </div>
 
 {/* HEADER */}
-<div style={{padding:"12px 16px 0",position:"relative",zIndex:1,display:"flex",alignItems:"center",justifyContent:"space-between"}}>
+<div style={{padding:"12px 16px 0",position:"relative",zIndex:200,display:"flex",alignItems:"center",justifyContent:"space-between"}}>
   <button
     className="lnav-hamburger"
     onClick={() => setLeftNavOpen(true)}
