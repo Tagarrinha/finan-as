@@ -338,6 +338,13 @@ function LeftNav({ isOpen, onClose, activeTab, onNavigate, accent, accentDark, o
             <span className="lnav-item-icon">⚙️</span>
             <span className="lnav-item-label">Definições</span>
           </button>
+          <button
+            className="lnav-item"
+            onClick={() => { window.open("/support.html", "_blank"); onClose(); }}
+          >
+            <span className="lnav-item-icon">❓</span>
+            <span className="lnav-item-label">Suporte</span>
+          </button>
         </nav>
 
         {/* Footer */}
