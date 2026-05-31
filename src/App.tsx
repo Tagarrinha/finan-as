@@ -295,8 +295,8 @@ function LeftNav({ isOpen, onClose, activeTab, onNavigate, accent, accentDark, o
           <div className="lnav-logo">
             <div className="lnav-logo-icon"><img src="/favicon.svg" width="18" height="18" style={{borderRadius:4}}/></div>
             <div className="lnav-logo-text">
-              FinTrack
-              <span className="lnav-logo-sub">myownfintrack</span>
+              MyOwnFintrack
+              <span className="lnav-logo-sub">myownfintrack.app</span>
             </div>
           </div>
           <button className="lnav-close" onClick={onClose} aria-label="Fechar menu">✕</button>
@@ -339,7 +339,7 @@ function LeftNav({ isOpen, onClose, activeTab, onNavigate, accent, accentDark, o
         </nav>
 
         {/* Footer */}
-        <div className="lnav-footer">myownfintrack.netlify.app</div>
+        <div className="lnav-footer">myownfintrack.app</div>
       </div>
     </>
   );
