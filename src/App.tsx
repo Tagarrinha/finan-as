@@ -87,7 +87,8 @@ const TIPO_ACC: Record<BankAccount["tipo"],{label:string;icon:string;cor:string}
 const TOUR_STEPS = [
   { title:"Olá! 👋",                    desc:"Bem-vindo ao MyOwnFintrack! Faz este tour rápido para perceberes como tudo funciona.", anchor:"middle", pwa:false },
   { title:"Dashboard 📊",               desc:"Vês o teu balanço em tempo real — receitas, despesas, resultado do mês e evolução do Net Worth.", anchor:"middle", pwa:false },
-  { title:"Modo Casal 💑",              desc:"O teu diferenciador. Gere despesas partilhadas, acertos automáticos e metas conjuntas com o teu parceiro/a. Disponível no plano Premium.", anchor:"middle", pwa:false },
+  { title:"Modo Casal 💑",              desc:"O único diferenciador no mercado português. Adiciona despesas conjuntas, divide automaticamente entre os dois, e sabe sempre quem deve quanto a quem — sem discussões no fim do mês.", anchor:"middle", pwa:false },
+  { title:"Como funciona o Modo Casal 👫", desc:"1️⃣ Convidas o teu parceiro/a pelo email. 2️⃣ Adicionam despesas conjuntas com split automático 50/50 ou personalizado. 3️⃣ O acerto calcula automaticamente quem paga a quem. As despesas liquidadas aparecem nas contas pessoais de ambos.", anchor:"middle", pwa:false },
   { title:"Metas de poupança 🎯",        desc:"Cria objetivos pessoais ou partilhados — férias, casa, carro. Acompanha o progresso de ambos em tempo real.", anchor:"middle", pwa:false },
   { title:"Despesas recorrentes 🔄",     desc:"Regista renda, ginásio ou subscrições uma vez — a app avisa quando é altura de as registar.", anchor:"middle", pwa:false },
   { title:"Menu lateral ☰",             desc:"Acede a todas as secções pelo menu no canto superior esquerdo — despesas, rendimentos, comparação mensal e exportação.", anchor:"top", pwa:false },
