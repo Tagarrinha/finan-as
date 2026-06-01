@@ -27,7 +27,7 @@ const TYPE_META: Record<TypeKey,{label:string;color:string;bg:string}> = {
 const MY_COLOR      = "#f97316";
 const PARTNER_COLOR = "#ec4899";
 
-export default function CoupleMode({ userId, userEmail, userName, expCats, accent, accentDark, cardBg, cardBorder, subtext, positive, negative, onSettlement }: Props) {
+export default function CoupleMode({ userId, userEmail, userName, expCats, accent, accentDark, cardBg, cardBorder, subtext, positive, negative, onSettlement, fMonth, fYear }: Props) {
   const [couple,      setCouple]      = useState<Couple|null>(null);
   const [account,     setAccount]     = useState<CoupleAccount|null>(null);
   const [expenses,    setExpenses]    = useState<CoupleExpense[]>([]);
