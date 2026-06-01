@@ -1292,8 +1292,10 @@ async function handleCoupleSettlement(valor: number) {
             const hasSnaps=nwSnapshots.length>0;
             if(!hasSnaps) return <div style={{height:H,display:"flex",alignItems:"center",justifyContent:"center",color:T.subtext,fontSize:12}}>Sem dados ainda</div>;
             const maxVal=Math.max(...nwSnapshots.map(s=>s.valor),1);
-            const minVal=Math.min(...nwSnapshots.map(s=>s.valor),0);
-            const range=maxVal-minVal||1;
+            const rawMin=Math.min(...nwSnapshots.map(s=>s.valor));
+            const padding=(maxVal-rawMin)*0.3||maxVal*0.05;
+            const minVal=Math.max(0,rawMin-padding);
+            const range=maxVal-minVal||1;   
             const currentMonth=new Date().getMonth();
             const points=MONTHS.map((_,i)=>{
               const snap=nwSnapshots.find(s=>s.mes===i);
