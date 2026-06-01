@@ -309,14 +309,19 @@ async function saveOrcamento() {
   const partnerEmail=couple?(isUser1?couple.user2_email:couple.user1_email):null;
   const partnerName=partnerEmail?partnerEmail.split("@")[0]:"Parceiro/a";
 
-  const liquidadas=expenses.filter(e=>e.liquidado);
-  const porLiquidar=expenses.filter(e=>!e.liquidado);
+  const now2 = new Date();
+const thisM = now2.getMonth();
+const thisY = now2.getFullYear();
+const liquidadas=expenses.filter(e=>e.liquidado&&new Date(e.data+"T12:00:00").getMonth()===thisM&&new Date(e.data+"T12:00:00").getFullYear()===thisY);
+const liquidadasAll=expenses.filter(e=>e.liquidado);
+const porLiquidar=expenses.filter(e=>!e.liquidado);
 
   // Quanto cada um deve no total das por liquidar
   const myDebt=porLiquidar.reduce((s,e)=>s+(isUser1?e.split_user1:e.split_user2),0);
   const partnerDebt=porLiquidar.reduce((s,e)=>s+(isUser1?e.split_user2:e.split_user1),0);
   const totalContributions = (account?.contribuicao_user1||0) + (account?.contribuicao_user2||0);
 const totalSettledExpenses = liquidadas.reduce((s,e) => s + Number(e.valor), 0);
+const totalSettledAll = liquidadasAll.reduce((s,e) => s + Number(e.valor), 0);
 const jointBalance = totalContributions - totalSettledExpenses;
   
 
@@ -626,13 +631,13 @@ const jointBalance = totalContributions - totalSettledExpenses;
           const thisMonth = now.getMonth();
           const MONTHS_PT = ["Jan","Fev","Mar","Abr","Mai","Jun","Jul","Ago","Set","Out","Nov","Dez"];
           const monthlyData = MONTHS_PT.map((_,i)=>({
-            mes: i,
-            label: MONTHS_PT[i],
-            total: expenses.filter(e=>{
-              const d = new Date(e.data);
-              return e.liquidado && d.getMonth()===i && d.getFullYear()===thisYear;
-            }).reduce((s,e)=>s+Number(e.valor),0)
-          }));
+  mes: i,
+  label: MONTHS_PT[i],
+  total: liquidadasAll.filter(e=>{
+    const d = new Date(e.data);
+    return d.getMonth()===i && d.getFullYear()===thisYear;
+  }).reduce((s,e)=>s+Number(e.valor),0)
+}));
           const maxVal = Math.max(...monthlyData.map(m=>m.total),1);
           const hasData = monthlyData.some(m=>m.total>0);
           return(
@@ -920,7 +925,7 @@ const jointBalance = totalContributions - totalSettledExpenses;
   )}
 
   {/* ── Liquidadas ── */}
-  {liquidadas.filter(e=>{
+  {liquidadasAll.filter(e=>{
     if(searchCouple&&!e.descricao.toLowerCase().includes(searchCouple.toLowerCase())) return false;
     if(dateFrom&&e.data<dateFrom) return false;
     if(dateTo&&e.data>dateTo) return false;
@@ -928,7 +933,7 @@ const jointBalance = totalContributions - totalSettledExpenses;
   }).length>0&&(
     <div>
       <div style={{fontSize:10,fontWeight:700,color:"#34d399",textTransform:"uppercase" as const,letterSpacing:"0.08em",marginBottom:8}}>✅ Liquidadas</div>
-      {liquidadas.filter(e=>{
+      {liquidadasAll.filter(e=>{
         if(searchCouple&&!e.descricao.toLowerCase().includes(searchCouple.toLowerCase())) return false;
         if(dateFrom&&e.data<dateFrom) return false;
         if(dateTo&&e.data>dateTo) return false;
