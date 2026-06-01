@@ -89,11 +89,14 @@ function CatEvolution({ months, expCats, cardBorder, cardBg, accent, subtext, ne
           );
         })}
       </svg>
-      <div style={{display:"flex",justifyContent:"space-between",marginBottom:8}}>
-        {months.map((m,i)=>(
-          <span key={i} style={{fontSize:8,color:i===5?accent:subtext,flex:1,textAlign:"center" as const}}>{m.label}</span>
-        ))}
-      </div>
+      <svg viewBox={`0 0 ${W} 16`} style={{width:"100%",height:16,marginBottom:8,overflow:"visible"}}>
+        {months.map((m,i)=>{
+          const x = Math.round((i/(months.length-1))*W);
+          return(
+            <text key={i} x={x} y={12} textAnchor="middle" fontSize="8" fontFamily="Sora,sans-serif" fill={i===5?accent:subtext} fontWeight={i===5?700:400}>{m.label}</text>
+          );
+        })}
+      </svg>
       {/* Legenda — todas */}
       {selected==="todas"&&(
         <div style={{display:"flex",gap:10,flexWrap:"wrap" as const,paddingTop:8,borderTop:`1px solid ${cardBorder}`}}>
@@ -246,11 +249,14 @@ export default function MonthComparison({ expenses, incomes, expCats, world, acc
                   );
                 })}
               </svg>
-              <div style={{display:"flex",justifyContent:"space-between"}}>
-                {months.map((m,i)=>(
-                  <span key={i} style={{fontSize:9,color:i===5?accent:subtext,fontWeight:i===5?700:400,flex:1,textAlign:"center" as const}}>{m.label}</span>
-                ))}
-              </div>
+              <svg viewBox={`0 0 ${W} 16`} style={{width:"100%",height:16,overflow:"visible"}}>
+                {months.map((m,i)=>{
+                  const x = Math.round((i/(months.length-1))*W);
+                  return(
+                    <text key={i} x={x} y={12} textAnchor="middle" fontSize="9" fontFamily="Sora,sans-serif" fill={i===5?accent:subtext} fontWeight={i===5?700:400}>{m.label}</text>
+                  );
+                })}
+              </svg>
               <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginTop:10,paddingTop:8,borderTop:`1px solid ${cardBorder}`}}>
                 <div style={{display:"flex",alignItems:"center",gap:5,fontSize:11,color:"#94a3b8"}}><div style={{width:10,height:10,borderRadius:2,background:positive}}/>Positivo</div>
                 <div style={{display:"flex",alignItems:"center",gap:5,fontSize:11,color:"#94a3b8"}}><div style={{width:10,height:10,borderRadius:2,background:negative}}/>Negativo</div>
