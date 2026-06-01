@@ -136,29 +136,68 @@ export default function MonthComparison({ expenses, incomes, expCats, world, acc
         </div>
       </div>
 
-      {/* Bar chart — 6 months */}
+      {/* Linha poupança 6 meses */}
       <div style={{ ...S.card }}>
-        <span style={S.secTitle}>Evolução 6 meses</span>
-        <div style={{ display:"flex", alignItems:"flex-end", gap:4, height:80, marginBottom:10 }}>
-          {months.map((m,i)=>{
-            const rH = Math.round((m.totalInc/maxBar)*72)||2;
-            const dH = Math.round((m.totalExp/maxBar)*72)||2;
-            const isLast = i===5;
-            return(
-              <div key={i} style={{ flex:1, display:"flex", flexDirection:"column", alignItems:"center", gap:2 }}>
-                <div style={{ display:"flex", alignItems:"flex-end", gap:1, height:72 }}>
-                  <div style={{ width:"45%", height:rH, background:isLast?positive:`${positive}55`, borderRadius:"3px 3px 0 0", transition:"height .4s" }}/>
-                  <div style={{ width:"45%", height:dH, background:isLast?negative:`${negative}55`, borderRadius:"3px 3px 0 0", transition:"height .4s" }}/>
-                </div>
-                <span style={{ fontSize:9, color:isLast?accent:subtext, fontWeight:isLast?700:400 }}>{m.label}</span>
+        <span style={S.secTitle}>Resultado líquido — 6 meses</span>
+        {(()=>{
+          const H=80, W=300;
+          const vals = months.map(m=>m.poupanca);
+          const maxV = Math.max(...vals.map(Math.abs), 1);
+          const mid = H/2;
+          const points = months.map((m,i)=>({
+            x: Math.round((i/(months.length-1))*W),
+            y: Math.round(mid - (m.poupanca/maxV)*(mid-8)),
+            m
+          }));
+          const pathD = points.map((p,i)=>`${i===0?"M":"L"}${p.x},${p.y}`).join(" ");
+          const areaPos = `M${points[0].x},${mid} ${points.map(p=>`L${p.x},${Math.min(p.y,mid)}`).join(" ")} L${points[points.length-1].x},${mid} Z`;
+          const areaNeg = `M${points[0].x},${mid} ${points.map(p=>`L${p.x},${Math.max(p.y,mid)}`).join(" ")} L${points[points.length-1].x},${mid} Z`;
+          return(
+            <div>
+              <svg viewBox={`0 0 ${W} ${H}`} style={{width:"100%",height:H,overflow:"visible",marginBottom:8}}>
+                <defs>
+                  <linearGradient id="posGrad" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="0%" stopColor={positive} stopOpacity="0.3"/>
+                    <stop offset="100%" stopColor={positive} stopOpacity="0"/>
+                  </linearGradient>
+                  <linearGradient id="negGrad" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="0%" stopColor={negative} stopOpacity="0"/>
+                    <stop offset="100%" stopColor={negative} stopOpacity="0.3"/>
+                  </linearGradient>
+                </defs>
+                {/* Linha zero */}
+                <line x1={0} y1={mid} x2={W} y2={mid} stroke="rgba(255,255,255,0.08)" strokeWidth="1" strokeDasharray="4,4"/>
+                {/* Área positiva */}
+                <path d={areaPos} fill="url(#posGrad)"/>
+                {/* Área negativa */}
+                <path d={areaNeg} fill="url(#negGrad)"/>
+                {/* Linha */}
+                <path d={pathD} fill="none" stroke={accent} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                {/* Pontos */}
+                {points.map((p,i)=>{
+                  const isLast=i===5;
+                  const color=p.m.poupanca>=0?positive:negative;
+                  return(
+                    <g key={i}>
+                      {isLast&&<circle cx={p.x} cy={p.y} r={8} fill={color} fillOpacity="0.15"/>}
+                      <circle cx={p.x} cy={p.y} r={isLast?4:2.5} fill={isLast?color:cardBg} stroke={color} strokeWidth="1.5"/>
+                    </g>
+                  );
+                })}
+              </svg>
+              <div style={{display:"flex",justifyContent:"space-between"}}>
+                {months.map((m,i)=>(
+                  <span key={i} style={{fontSize:9,color:i===5?accent:subtext,fontWeight:i===5?700:400,flex:1,textAlign:"center" as const}}>{m.label}</span>
+                ))}
               </div>
-            );
-          })}
-        </div>
-        <div style={{ display:"flex", gap:14 }}>
-          <div style={{ display:"flex", alignItems:"center", gap:5, fontSize:11, color:"#94a3b8" }}><div style={{ width:10,height:10,borderRadius:2,background:positive }}/>Rendimento</div>
-          <div style={{ display:"flex", alignItems:"center", gap:5, fontSize:11, color:"#94a3b8" }}><div style={{ width:10,height:10,borderRadius:2,background:negative }}/>Despesas</div>
-        </div>
+              <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginTop:10,paddingTop:8,borderTop:`1px solid ${cardBorder}`}}>
+                <div style={{display:"flex",alignItems:"center",gap:5,fontSize:11,color:"#94a3b8"}}><div style={{width:10,height:10,borderRadius:2,background:positive}}/>Positivo</div>
+                <div style={{display:"flex",alignItems:"center",gap:5,fontSize:11,color:"#94a3b8"}}><div style={{width:10,height:10,borderRadius:2,background:negative}}/>Negativo</div>
+                <span style={{fontSize:11,color:subtext}}>mês actual destacado</span>
+              </div>
+            </div>
+          );
+        })()}
       </div>
 
       {/* Category comparison */}
