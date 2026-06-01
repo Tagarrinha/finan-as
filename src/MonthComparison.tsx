@@ -282,7 +282,7 @@ export default function MonthComparison({ expenses, incomes, expCats, world, acc
                 <div style={{ display:"flex", alignItems:"center", gap:8 }}>
                   {pVal>0&&<span style={{ fontSize:11, color:subtext }}>ant: {fmt(pVal)}</span>}
                   <span style={{ fontSize:13, fontWeight:700, color:cVal>0?negative:subtext }}>{fmt(cVal)}</span>
-                  {pVal>0&&<TrendBadge curr={cVal} prev={pVal} inverse/>}
+                  {pVal>0&&<TrendBadge curr={cVal} prev={pVal} inverse={c.type!=="investimento"}/>}
                 </div>
               </div>
               <div style={{ display:"flex", flexDirection:"column", gap:3 }}>
@@ -293,7 +293,7 @@ export default function MonthComparison({ expenses, incomes, expCats, world, acc
                   <div style={{ width:`${(pVal/maxVal)*100}%`, height:"100%", background:`${negative}55`, borderRadius:99, transition:"width .5s" }}/>
                 </div>
               </div>
-              {diff!==0&&<div style={{ fontSize:10, color:diff>0?"#fb7185":"#34d399", marginTop:3, fontWeight:600 }}>{diff>0?"↑":"↓"} {fmt(Math.abs(diff))} vs mês anterior</div>}
+              {diff!==0&&<div style={{ fontSize:10, color:c.type==="investimento"?(diff>0?"#34d399":"#fb7185"):(diff>0?"#fb7185":"#34d399"), marginTop:3, fontWeight:600 }}>{diff>0?"↑":"↓"} {fmt(Math.abs(diff))} vs mês anterior</div>}
             </div>
           );
         })}
