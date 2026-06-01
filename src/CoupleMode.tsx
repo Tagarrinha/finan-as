@@ -929,6 +929,11 @@ const jointBalance = totalContributions - totalSettledExpenses;
     if(searchCouple&&!e.descricao.toLowerCase().includes(searchCouple.toLowerCase())) return false;
     if(dateFrom&&e.data<dateFrom) return false;
     if(dateTo&&e.data>dateTo) return false;
+    // Filtro mês actual por defeito (se não há filtro de datas manual)
+    if(!dateFrom&&!dateTo){
+      const d=new Date(e.data+"T12:00:00");
+      if(d.getMonth()!==thisM||d.getFullYear()!==thisY) return false;
+    }
     return true;
   }).length>0&&(
     <div>
