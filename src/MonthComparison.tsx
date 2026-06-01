@@ -254,6 +254,52 @@ export default function MonthComparison({ expenses, incomes, expCats, world, acc
         })}
       </div>
 
+    {/* Evolução por categoria */}
+      <div style={{ ...S.card }}>
+        <span style={S.secTitle}>Evolução por categoria</span>
+        {expCats.filter(c=>months.some(m=>m.byCat[c.id]>0)).map(c=>{
+          const vals = months.map(m=>m.byCat[c.id]||0);
+          const maxV = Math.max(...vals,1);
+          const H=48,W=300;
+          const points = vals.map((v,i)=>({
+            x:Math.round((i/(vals.length-1))*W),
+            y:Math.round(H-8-(v/maxV)*(H-16))
+          }));
+          const pathD = points.map((p,i)=>`${i===0?"M":"L"}${p.x},${p.y}`).join(" ");
+          const hasActivity = vals.some(v=>v>0);
+          if(!hasActivity) return null;
+          const trend = vals[5]-vals[4];
+          return(
+            <div key={c.id} style={{marginBottom:16,paddingBottom:16,borderBottom:`1px solid ${cardBorder}`}}>
+              <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:8}}>
+                <span style={{fontSize:13,fontWeight:600,color:"#e2e8f0"}}>{c.icon} {c.label}</span>
+                <div style={{display:"flex",alignItems:"center",gap:8}}>
+                  <span style={{fontSize:12,fontWeight:700,color:negative}}>{fmt(vals[5])}</span>
+                  {vals[4]>0&&<span style={{fontSize:10,fontWeight:700,color:trend>0?"#fb7185":"#34d399",background:trend>0?"rgba(251,113,133,0.1)":"rgba(52,211,153,0.1)",padding:"2px 7px",borderRadius:99}}>{trend>0?"↑":"↓"} {fmt(Math.abs(trend))}</span>}
+                </div>
+              </div>
+              <svg viewBox={`0 0 ${W} ${H}`} style={{width:"100%",height:H,overflow:"visible"}}>
+                <defs>
+                  <linearGradient id={`catGrad${c.id}`} x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="0%" stopColor={negative} stopOpacity="0.2"/>
+                    <stop offset="100%" stopColor={negative} stopOpacity="0"/>
+                  </linearGradient>
+                </defs>
+                <path d={`${pathD} L${points[points.length-1].x},${H} L${points[0].x},${H} Z`} fill={`url(#catGrad${c.id})`}/>
+                <path d={pathD} fill="none" stroke={negative} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" opacity="0.7"/>
+                {points.map((p,i)=>(
+                  <circle key={i} cx={p.x} cy={p.y} r={i===5?3.5:2} fill={i===5?negative:cardBg} stroke={negative} strokeWidth="1.2" opacity={i===5?1:0.6}/>
+                ))}
+              </svg>
+              <div style={{display:"flex",justifyContent:"space-between",marginTop:4}}>
+                {months.map((m,i)=>(
+                  <span key={i} style={{fontSize:8,color:i===5?accent:subtext,flex:1,textAlign:"center" as const}}>{m.label}</span>
+                ))}
+              </div>
+            </div>
+          );
+        })}
+      </div>
     </div>
   );
 }
