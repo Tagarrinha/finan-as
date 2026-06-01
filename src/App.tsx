@@ -1490,6 +1490,8 @@ async function handleCoupleSettlement(valor: number) {
               cardBg={T.cardBg} cardBorder={T.cardBorder} subtext={T.subtext}
               positive={T.positive} negative={T.negative}
               onSettlement={handleCoupleSettlement}
+              fMonth={fMonth}
+              fYear={fYear}
             />
           ) : (
             <div style={{textAlign:"center",padding:"60px 24px",fontFamily:"'Sora',sans-serif"}}>

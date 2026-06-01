@@ -14,6 +14,8 @@ interface Props {
   expCats:ExpCat[]; accent:string; accentDark:string;
   cardBg:string; cardBorder:string; subtext:string; positive:string; negative:string;
   onSettlement: (valor: number) => void;
+  fMonth: string;
+  fYear: string;
 }
 
 const fmt = (n:number) => new Intl.NumberFormat("pt-PT",{style:"currency",currency:"EUR"}).format(n||0);
@@ -312,7 +314,9 @@ async function saveOrcamento() {
   const now2 = new Date();
 const thisM = now2.getMonth();
 const thisY = now2.getFullYear();
-const liquidadas=expenses.filter(e=>e.liquidado&&new Date(e.data+"T12:00:00").getMonth()===thisM&&new Date(e.data+"T12:00:00").getFullYear()===thisY);
+const filterM = fMonth!=="todos" ? Number(fMonth) : thisM;
+const filterY = fYear!=="todos" ? Number(fYear) : thisY;
+const liquidadas=expenses.filter(e=>e.liquidado&&new Date(e.data+"T12:00:00").getMonth()===filterM&&new Date(e.data+"T12:00:00").getFullYear()===filterY);
 const liquidadasAll=expenses.filter(e=>e.liquidado);
 const porLiquidar=expenses.filter(e=>!e.liquidado);
 
@@ -932,7 +936,7 @@ const jointBalance = totalContributions - totalSettledExpenses;
     // Filtro mês actual por defeito (se não há filtro de datas manual)
     if(!dateFrom&&!dateTo){
       const d=new Date(e.data+"T12:00:00");
-      if(d.getMonth()!==thisM||d.getFullYear()!==thisY) return false;
+      if(d.getMonth()!==filterM||d.getFullYear()!==filterY) return false;
     }
     return true;
   }).length>0&&(
