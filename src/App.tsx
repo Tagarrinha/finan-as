@@ -1453,14 +1453,6 @@ async function handleCoupleSettlement(valor: number) {
 
         {/* RECORRENTES */}
         {tab==="recorrentes"&&(
-          plan==="free" ? (
-            <div style={{textAlign:"center",padding:"60px 24px",fontFamily:"'Sora',sans-serif"}}>
-              <div style={{fontSize:48,marginBottom:16}}>🔄</div>
-              <div style={{fontSize:20,fontWeight:800,color:"#f1f5f9",marginBottom:8}}>Despesas recorrentes</div>
-              <div style={{fontSize:14,color:"#667085",marginBottom:28,lineHeight:1.7}}>Regista despesas fixas uma vez e a app avisa quando vencer.<br/>Disponível no plano Individual.</div>
-              <button onClick={()=>setShowPricing(true)} style={{padding:"14px 32px",background:"linear-gradient(135deg,#5DA9FF,#8B6DFF)",border:"none",borderRadius:12,color:"white",fontWeight:700,fontSize:15,cursor:"pointer",fontFamily:"'Sora',sans-serif",boxShadow:"0 4px 20px rgba(93,169,255,0.3)"}}>Ver planos →</button>
-            </div>
-          ) : (
           <RecurringExpenses
             userId={user.id} world={world} expCats={expCats}
             accent={T.accent} accentDark={T.accentDark} cardBg={T.cardBg}
@@ -1478,33 +1470,24 @@ async function handleCoupleSettlement(valor: number) {
             positive={T.positive} negative={T.negative}
             goals={goals} setGoals={setGoals}
             monthlyIncome={totalInc}
-            maxGoals={plan==="free"?1:undefined}
+            maxGoals={undefined}
             onUpgrade={()=>setShowPricing(true)}
           />
         )}
 
         {/* MODO CASAL */}
         {tab==="casal"&&(
-          hasFullAccess ? (
-            <CoupleMode
-              userId={user.id} userEmail={user.email||""} userName={userName}
-              expCats={expCats} accent={T.accent} accentDark={T.accentDark}
-              cardBg={T.cardBg} cardBorder={T.cardBorder} subtext={T.subtext}
-              positive={T.positive} negative={T.negative}
-              onSettlement={handleCoupleSettlement}
-              fMonth={fMonth}
-              fYear={fYear}
-            />
-          ) : (
-            <div style={{textAlign:"center",padding:"60px 24px",fontFamily:"'Sora',sans-serif"}}>
-              <div style={{fontSize:48,marginBottom:16}}>💑</div>
-              <div style={{fontSize:20,fontWeight:800,color:"#f1f5f9",marginBottom:8,letterSpacing:"-0.5px"}}>Modo casal</div>
-              <div style={{fontSize:14,color:"#667085",marginBottom:28,lineHeight:1.7}}>Gere despesas partilhadas com o teu parceiro/a.<br/>Disponível no plano Premium.</div>
-              <button onClick={()=>setShowPricing(true)} style={{padding:"14px 32px",background:"linear-gradient(135deg,#5DA9FF,#8B6DFF)",border:"none",borderRadius:12,color:"white",fontWeight:700,fontSize:15,cursor:"pointer",fontFamily:"'Sora',sans-serif",boxShadow:"0 4px 20px rgba(93,169,255,0.3)"}}>
-                Ver planos →
-              </button>
-            </div>
-          )
+          <CoupleMode
+            userId={user.id} userEmail={user.email||""} userName={userName}
+            expCats={expCats} accent={T.accent} accentDark={T.accentDark}
+            cardBg={T.cardBg} cardBorder={T.cardBorder} subtext={T.subtext}
+            positive={T.positive} negative={T.negative}
+            onSettlement={handleCoupleSettlement}
+            fMonth={fMonth}
+            fYear={fYear}
+            isPremium={isPremium}
+            onUpgrade={()=>setShowPricing(true)}
+          />
         )}
         {/* EXPORTAR */}
         {tab==="exportar"&&(
