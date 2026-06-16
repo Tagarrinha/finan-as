@@ -272,6 +272,7 @@ async function saveOrcamento() {
     tipo: form.tipo, data: form.data,
     split_user1: s1, split_user2: s2,
     liquidado: form.liquidado,
+    pago_por: form.pagoPor === "me" ? userId : (isUser1local ? couple!.user2_id : couple!.user1_id),
   }).eq("id", editingExpenseId);
   // Edge Function trata do delete + re-insert com service role
   if(form.liquidado) {
@@ -285,7 +286,7 @@ async function saveOrcamento() {
     });
   }
   setExpenses(p => p.map(x => x.id === editingExpenseId
-    ? {...x, descricao:form.descricao.trim(), valor:total, cat:form.cat, subcat:form.subcat, tipo:form.tipo, data:form.data, split_user1:s1, split_user2:s2, liquidado:form.liquidado}
+    ? {...x, descricao:form.descricao.trim(), valor:total, cat:form.cat, subcat:form.subcat, tipo:form.tipo, data:form.data, split_user1:s1, split_user2:s2, liquidado:form.liquidado, pago_por: form.pagoPor === "me" ? userId : (isUser1local ? couple!.user2_id : couple!.user1_id)}
     : x
   ));
   setEditingExpenseId(null);

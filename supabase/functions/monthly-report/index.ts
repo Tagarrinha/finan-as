@@ -90,7 +90,16 @@ serve(async (req) => {
         const totalExp = (expenses || []).reduce((s, e) => s + Number(e.valor), 0);
         const totalInc = (incomes || []).reduce((s, i) => s + Number(i.valor), 0);
         const balance = totalInc - totalExp;
-        const totalSaldo = (accounts || []).reduce((s, a) => s + Number(a.saldo), 0);
+        // Busca snapshot do net worth do mês anterior
+const { data: nwSnap } = await supabase
+  .from("net_worth_snapshots")
+  .select("valor")
+  .eq("user_id", userId)
+  .eq("mes", prevMonth)
+  .eq("ano", prevYear)
+  .maybeSingle();
+
+const totalSaldo = nwSnap?.valor ?? (accounts || []).reduce((s, a) => s + Number(a.saldo), 0);
 
         // Se não tem dados no mês, skip
         if (totalExp === 0 && totalInc === 0) continue;

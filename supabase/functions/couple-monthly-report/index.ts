@@ -96,10 +96,11 @@ serve(async (req) => {
         const monthDiff = totalThisMonth - totalPrevMonth;
 
         // Contribuições
-        const contrib1 = Number(account?.contribuicao_user1) || 0;
-        const contrib2 = Number(account?.contribuicao_user2) || 0;
+        const contrib1 = (thisMonthExp || []).reduce((s: number, e: any) => s + Number(e.split_user1), 0);
+        const contrib2 = (thisMonthExp || []).reduce((s: number, e: any) => s + Number(e.split_user2), 0);
         const totalContrib = contrib1 + contrib2;
         const saldoConjunto = totalContrib - totalThisMonth;
+
 
         // Top categorias este mês
         const catMap: Record<string, number> = {};
