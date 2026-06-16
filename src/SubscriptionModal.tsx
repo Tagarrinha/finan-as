@@ -1,11 +1,8 @@
 // ============================================================
 // SubscriptionModal.tsx
-// Coloca em src/SubscriptionModal.tsx
 // ============================================================
-
-
 interface Plan {
-  id: "free" | "individual" | "premium";
+  id: "free" | "premium";
   name: string;
   price: string;
   period: string;
@@ -14,7 +11,6 @@ interface Plan {
   link?: string;
   featured?: boolean;
 }
-
 const PLANS: Plan[] = [
   {
     id: "free",
@@ -23,25 +19,12 @@ const PLANS: Plan[] = [
     period: "para sempre",
     cta: "Plano atual",
     features: [
-      "Registo manual de despesas",
-      "Dashboard básico",
-      "1 meta financeira",
-    ],
-  },
-  {
-    id: "individual",
-    name: "Individual",
-    price: "4,99€",
-    period: "por mês",
-    cta: "Subscrever Individual",
-    link: "https://buy.stripe.com/bJe14nbSabh0cCW2vd2cg00",
-    features: [
-      "Tudo do plano Grátis",
-      "Metas ilimitadas",
-      "Insights inteligentes",
+      "Despesas e rendimentos ilimitados",
+      "Dashboard completo",
+      "Metas financeiras ilimitadas",
       "Despesas recorrentes",
-      "Histórico completo",
-      "Estatísticas avançadas",
+      "Estatísticas e comparação mensal",
+      "Modo casal — até 3 despesas/mês",
     ],
   },
   {
@@ -53,17 +36,16 @@ const PLANS: Plan[] = [
     link: "https://buy.stripe.com/3cI7sL9K2acW6eyc5N2cg01",
     featured: true,
     features: [
-      "Tudo do Individual",
-      "Modo casal completo",
+      "Tudo do plano Grátis",
+      "Modo casal ilimitado",
       "Acertos automáticos",
-      "Conta conjunta",
-      "Sincronização a dois",
+      "Conta e metas conjuntas",
+      "Relatório mensal de casal",
       "Export PDF + Excel",
       "Suporte prioritário",
     ],
   },
 ];
-
 interface SubscriptionModalProps {
   userId: string;
   userEmail: string;
@@ -79,7 +61,6 @@ interface SubscriptionModalProps {
   onClose: () => void;
   onPlanUpdate: (plan: string) => void;
 }
-
 export default function SubscriptionModal({
   userId,
   userEmail,
@@ -95,16 +76,11 @@ export default function SubscriptionModal({
   onClose,
   onPlanUpdate,
 }: SubscriptionModalProps) {
-
-
-  function openStripe(link: string, plan: "individual" | "premium") {
-    // Adiciona email e client_reference_id ao link para identificar o utilizador
+  function openStripe(link: string) {
     const url = `${link}?prefilled_email=${encodeURIComponent(userEmail)}&client_reference_id=${userId}`;
     window.open(url, "_blank");
   }
-
   const worldBtn = `linear-gradient(135deg,${accent},${accent2})`;
-
   return (
     <>
       {/* Backdrop */}
@@ -115,7 +91,6 @@ export default function SubscriptionModal({
           zIndex: 200, backdropFilter: "blur(6px)",
         }}
       />
-
       {/* Modal */}
       <div style={{
         position: "fixed", inset: 0, zIndex: 201,
@@ -140,45 +115,44 @@ export default function SubscriptionModal({
           >✕</button>
 
           {/* Header */}
-<div style={{ textAlign: "center", marginBottom: 28 }}>
-  {isBeta && (
-    <div style={{
-      display: "inline-flex", alignItems: "center", gap: 6,
-      background: "rgba(87,227,160,0.12)", border: "1px solid rgba(87,227,160,0.3)",
-      borderRadius: 99, padding: "4px 14px", marginBottom: 14,
-      fontSize: 12, fontWeight: 700, color: "#57E3A0",
-    }}>
-      ⭐ Conta Beta — Acesso Premium gratuito
-    </div>
-  )}
-  {!isBeta && isTrial && (
-    <div style={{
-      display: "inline-flex", alignItems: "center", gap: 6,
-      background: "rgba(93,169,255,0.12)", border: "1px solid rgba(93,169,255,0.3)",
-      borderRadius: 99, padding: "4px 14px", marginBottom: 14,
-      fontSize: 12, fontWeight: 700, color: "#5DA9FF",
-    }}>
-      ⏳ Trial Premium — {trialDaysLeft} dia{trialDaysLeft !== 1 ? "s" : ""} restante{trialDaysLeft !== 1 ? "s" : ""}
-    </div>
-  )}
-  <div style={{ fontSize: 22, fontWeight: 800, color: "#f1f5f9", letterSpacing: "-0.5px" }}>
-    {isBeta ? "O teu plano especial" : isTrial ? "O teu trial Premium" : "Escolhe o teu plano"}
-  </div>
-  <div style={{ fontSize: 13, color: subtext, marginTop: 6 }}>
-    {isBeta
-      ? "Tens acesso Premium como utilizador beta. Obrigado por testares!"
-      : isTrial
-      ? `Tens acesso completo durante o trial. Subscreve para não perderes o acesso.`
-      : "Cancela quando quiseres. Sem compromissos."}
-  </div>
-</div>
+          <div style={{ textAlign: "center", marginBottom: 28 }}>
+            {isBeta && (
+              <div style={{
+                display: "inline-flex", alignItems: "center", gap: 6,
+                background: "rgba(87,227,160,0.12)", border: "1px solid rgba(87,227,160,0.3)",
+                borderRadius: 99, padding: "4px 14px", marginBottom: 14,
+                fontSize: 12, fontWeight: 700, color: "#57E3A0",
+              }}>
+                ⭐ Conta Beta — Acesso Premium gratuito
+              </div>
+            )}
+            {!isBeta && isTrial && (
+              <div style={{
+                display: "inline-flex", alignItems: "center", gap: 6,
+                background: "rgba(93,169,255,0.12)", border: "1px solid rgba(93,169,255,0.3)",
+                borderRadius: 99, padding: "4px 14px", marginBottom: 14,
+                fontSize: 12, fontWeight: 700, color: "#5DA9FF",
+              }}>
+                ⏳ Trial Premium — {trialDaysLeft} dia{trialDaysLeft !== 1 ? "s" : ""} restante{trialDaysLeft !== 1 ? "s" : ""}
+              </div>
+            )}
+            <div style={{ fontSize: 22, fontWeight: 800, color: "#f1f5f9", letterSpacing: "-0.5px" }}>
+              {isBeta ? "O teu plano especial" : isTrial ? "O teu trial Premium" : "Escolhe o teu plano"}
+            </div>
+            <div style={{ fontSize: 13, color: subtext, marginTop: 6 }}>
+              {isBeta
+                ? "Tens acesso Premium como utilizador beta. Obrigado por testares!"
+                : isTrial
+                ? `Tens acesso completo durante ${trialDaysLeft} dias. Subscreve para não perderes o acesso.`
+                : "2 meses grátis para novos utilizadores. Cancela quando quiseres."}
+            </div>
+          </div>
 
           {/* Plans */}
           <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
             {PLANS.map((plan) => {
               const isCurrentPlan = currentPlan === plan.id || (isBeta && plan.id === "premium");
               const isFeatured = plan.featured;
-
               return (
                 <div
                   key={plan.id}
@@ -196,21 +170,17 @@ export default function SubscriptionModal({
                     <div style={{
                       position: "absolute", top: -12, left: "50%", transform: "translateX(-50%)",
                       background: worldBtn, color: "white", fontSize: 11, fontWeight: 700,
-                      padding: "3px 16px", borderRadius: 99, whiteSpace: "nowrap",
+                      padding: "3px 16px", borderRadius: 99, whiteSpace: "nowrap" as const,
                       boxShadow: "0 4px 12px rgba(93,169,255,0.3)",
                     }}>⭐ Mais popular</div>
                   )}
-
                   <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 12 }}>
                     <div>
                       <div style={{ fontSize: 15, fontWeight: 800, color: "#f1f5f9" }}>{plan.name}</div>
                       <div style={{ fontSize: 11, color: subtext, marginTop: 2 }}>{plan.period}</div>
                     </div>
-                    <div style={{
-                      fontSize: 22, fontWeight: 800, color: "#f1f5f9", letterSpacing: "-1px",
-                    }}>{plan.price}</div>
+                    <div style={{ fontSize: 22, fontWeight: 800, color: "#f1f5f9", letterSpacing: "-1px" }}>{plan.price}</div>
                   </div>
-
                   <div style={{ display: "flex", flexDirection: "column", gap: 6, marginBottom: 14 }}>
                     {plan.features.map((f, i) => (
                       <div key={i} style={{ display: "flex", alignItems: "center", gap: 8, fontSize: 12, color: "#94a3b8" }}>
@@ -224,39 +194,33 @@ export default function SubscriptionModal({
                       </div>
                     ))}
                   </div>
-
-                  {/* CTA */}
                   {isCurrentPlan ? (
                     <div style={{
                       width: "100%", padding: "11px 0", borderRadius: 10,
                       background: "rgba(87,227,160,0.1)", border: "1px solid rgba(87,227,160,0.3)",
-                      color: "#57E3A0", fontSize: 13, fontWeight: 700, textAlign: "center",
+                      color: "#57E3A0", fontSize: 13, fontWeight: 700, textAlign: "center" as const,
                     }}>
                       ✓ Plano atual
                     </div>
                   ) : plan.id === "free" ? null : (
-                    <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
-                      {/* Botão principal — abre Stripe */}
-                      <button
-                        onClick={() => openStripe(plan.link!, plan.id as "individual" | "premium")}
-                        style={{
-                          width: "100%", padding: "12px 0", borderRadius: 10,
-                          background: isFeatured ? worldBtn : "rgba(93,169,255,0.15)",
-                          border: isFeatured ? "none" : `1px solid ${accent}`,
-                          color: "white", fontSize: 13, fontWeight: 700, cursor: "pointer",
-                          fontFamily: "'Sora',sans-serif",
-                          boxShadow: isFeatured ? "0 4px 16px rgba(93,169,255,0.3)" : "none",
-                        }}
-                      >
-                        {plan.cta} →
-                      </button>
-                    </div>
+                    <button
+                      onClick={() => openStripe(plan.link!)}
+                      style={{
+                        width: "100%", padding: "12px 0", borderRadius: 10,
+                        background: isFeatured ? worldBtn : "rgba(93,169,255,0.15)",
+                        border: isFeatured ? "none" : `1px solid ${accent}`,
+                        color: "white", fontSize: 13, fontWeight: 700, cursor: "pointer",
+                        fontFamily: "'Sora',sans-serif",
+                        boxShadow: isFeatured ? "0 4px 16px rgba(93,169,255,0.3)" : "none",
+                      }}
+                    >
+                      {plan.cta} →
+                    </button>
                   )}
                 </div>
               );
             })}
           </div>
-
           <div style={{ textAlign: "center", marginTop: 16, fontSize: 11, color: "#334155" }}>
             🔒 Pagamento seguro via Stripe · Cancela quando quiseres
           </div>
