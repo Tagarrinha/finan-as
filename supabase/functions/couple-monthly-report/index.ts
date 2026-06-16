@@ -95,9 +95,16 @@ serve(async (req) => {
         const totalPrevMonth = (prevMonthExp || []).reduce((s: number, e: any) => s + Number(e.valor), 0);
         const monthDiff = totalThisMonth - totalPrevMonth;
 
-        // Contribuições
-        const contrib1 = (thisMonthExp || []).reduce((s: number, e: any) => s + Number(e.split_user1), 0);
-        const contrib2 = (thisMonthExp || []).reduce((s: number, e: any) => s + Number(e.split_user2), 0);
+        // Contribuições — busca da tabela por mês
+        const { data: contributions } = await supabase
+          .from("couple_contributions")
+          .select("*")
+          .eq("couple_id", couple.id)
+          .eq("mes", prevMonth)
+          .eq("ano", prevYear);
+
+        const contrib1 = Number(contributions?.find((c: any) => c.user_id === couple.user1_id)?.valor) || 0;
+        const contrib2 = Number(contributions?.find((c: any) => c.user_id === couple.user2_id)?.valor) || 0;
         const totalContrib = contrib1 + contrib2;
         const saldoConjunto = totalContrib - totalThisMonth;
 

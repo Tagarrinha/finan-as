@@ -234,7 +234,13 @@ async function saveOrcamento() {
     const isUser1=couple.user1_id===userId;
     const u1=isUser1?Number(myContrib):Number(partnerContrib);
     const u2=isUser1?Number(partnerContrib):Number(myContrib);
+    const now=new Date();
     await supabase.from("couple_account").update({contribuicao_user1:u1,contribuicao_user2:u2}).eq("id",account.id);
+    // Guarda contribuição do mês actual por utilizador
+    await supabase.from("couple_contributions").upsert([
+      {couple_id:couple.id,user_id:couple.user1_id,valor:u1,mes:now.getMonth(),ano:now.getFullYear()},
+      {couple_id:couple.id,user_id:couple.user2_id,valor:u2,mes:now.getMonth(),ano:now.getFullYear()},
+    ],{onConflict:"couple_id,user_id,mes,ano"});
     setAccount(a=>a?{...a,contribuicao_user1:u1,contribuicao_user2:u2}:a);
     setEditContrib(false);
   }
