@@ -16,7 +16,6 @@ const supabase = createClient(
 );
 
 const PRICE_TO_PLAN: Record<string, string> = {
-  "price_1TYVKGDTJaEAWlCFCVPIU7a0": "individual",
   "price_1TYVLwDTJaEAWlCFMU8ZNasn": "premium",
 };
 
