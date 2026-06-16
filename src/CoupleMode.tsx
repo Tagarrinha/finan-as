@@ -16,6 +16,8 @@ interface Props {
   onSettlement: (valor: number) => void;
   fMonth: string;
   fYear: string;
+  isPremium: boolean;
+  onUpgrade: () => void;
 }
 
 const fmt = (n:number) => new Intl.NumberFormat("pt-PT",{style:"currency",currency:"EUR"}).format(n||0);
@@ -27,7 +29,7 @@ const TYPE_META: Record<TypeKey,{label:string;color:string;bg:string}> = {
 const MY_COLOR      = "#f97316";
 const PARTNER_COLOR = "#ec4899";
 
-export default function CoupleMode({ userId, userEmail, userName, expCats, accent, accentDark, cardBg, cardBorder, subtext, positive, negative, onSettlement, fMonth, fYear }: Props) {
+export default function CoupleMode({ userId, userEmail, userName, expCats, accent, accentDark, cardBg, cardBorder, subtext, positive, negative, onSettlement, fMonth, fYear, isPremium, onUpgrade }: Props) {
   const [couple,      setCouple]      = useState<Couple|null>(null);
   const [account,     setAccount]     = useState<CoupleAccount|null>(null);
   const [expenses,    setExpenses]    = useState<CoupleExpense[]>([]);
@@ -323,6 +325,13 @@ const thisM = now2.getMonth();
 const thisY = now2.getFullYear();
 const filterM = fMonth!=="todos" ? Number(fMonth) : thisM;
 const filterY = fYear!=="todos" ? Number(fYear) : thisY;
+// Limite de 5 despesas no mês actual para free
+const expensesThisMonth = expenses.filter(e=>{
+  const d = new Date(e.data+"T12:00:00");
+  return d.getMonth()===thisM && d.getFullYear()===thisY;
+});
+const FREE_LIMIT = 5;
+const reachedLimit = !isPremium && expensesThisMonth.length >= FREE_LIMIT;
 const liquidadas=expenses.filter(e=>e.liquidado&&new Date(e.data+"T12:00:00").getMonth()===filterM&&new Date(e.data+"T12:00:00").getFullYear()===filterY);
 const liquidadasAll=expenses.filter(e=>e.liquidado);
 const porLiquidar=expenses.filter(e=>!e.liquidado);
@@ -751,12 +760,20 @@ const jointBalance = totalContributions - totalSettledExpenses;
   })()}
 
   {/* ── Botão adicionar ── */}
-  <button onClick={()=>{
-    if(showForm){setShowForm(false);setEditingExpenseId(null);setForm(f=>({...f,descricao:"",valor:"",subcat:""}));}
-    else setShowForm(true);
-  }} style={{width:"100%",marginBottom:12,padding:"11px 0",background:showForm?`${accent}18`:`linear-gradient(135deg,${accent},${accentDark})`,border:showForm?`1px solid ${accent}40`:"none",borderRadius:10,color:showForm?accent:"#fff",fontWeight:700,fontSize:13,cursor:"pointer",fontFamily:"'Sora',sans-serif"}}>
-    {showForm?(editingExpenseId?"✕ Cancelar edição":"✕ Cancelar"):"+ Adicionar despesa conjunta"}
-  </button>
+  {reachedLimit && !showForm ? (
+    <div style={{background:"rgba(139,109,255,0.08)",border:"1px solid rgba(139,109,255,0.25)",borderRadius:10,padding:"12px 16px",marginBottom:12,textAlign:"center" as const}}>
+      <div style={{fontSize:13,fontWeight:700,color:"#a78bfa",marginBottom:4}}>💎 Limite do plano gratuito</div>
+      <div style={{fontSize:12,color:subtext,marginBottom:10}}>Atingiste o limite de {FREE_LIMIT} despesas conjuntas por mês. Faz upgrade para adicionar mais.</div>
+      <button onClick={onUpgrade} style={{padding:"9px 20px",background:"linear-gradient(135deg,#5DA9FF,#8B6DFF)",border:"none",borderRadius:9,color:"#fff",fontSize:12,fontWeight:700,cursor:"pointer",fontFamily:"'Sora',sans-serif"}}>Ver planos →</button>
+    </div>
+  ) : (
+    <button onClick={()=>{
+      if(showForm){setShowForm(false);setEditingExpenseId(null);setForm(f=>({...f,descricao:"",valor:"",subcat:""}));}
+      else setShowForm(true);
+    }} style={{width:"100%",marginBottom:12,padding:"11px 0",background:showForm?`${accent}18`:`linear-gradient(135deg,${accent},${accentDark})`,border:showForm?`1px solid ${accent}40`:"none",borderRadius:10,color:showForm?accent:"#fff",fontWeight:700,fontSize:13,cursor:"pointer",fontFamily:"'Sora',sans-serif"}}>
+      {showForm?(editingExpenseId?"✕ Cancelar edição":"✕ Cancelar"):"+ Adicionar despesa conjunta"}
+    </button>
+  )}
 
   {/* ── Formulário ── */}
   {showForm&&(

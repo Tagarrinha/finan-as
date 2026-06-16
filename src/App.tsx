@@ -1459,7 +1459,6 @@ async function handleCoupleSettlement(valor: number) {
             cardBorder={T.cardBorder} subtext={T.subtext} positive={T.positive} negative={T.negative}
             recurring={recurring} setRecurring={setRecurring} onApplyDue={applyRecurring}
           />
-          )
         )}
 
         {/* OBJETIVOS */}
